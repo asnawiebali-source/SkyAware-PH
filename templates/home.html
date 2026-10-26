@@ -1,0 +1,90 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="hero text-center mb-5">
+    <h1 class="display-4 fw-bold">
+        Stay Informed. Stay Prepared.
+    </h1>
+
+    <p class="lead mt-3">
+        Your trusted platform for weather forecasts,
+        earthquake information, and disaster preparedness.
+    </p>
+
+    <a href="#features" class="btn btn-light btn-lg mt-3">
+        Explore Features
+    </a>
+</section>
+
+<section id="features">
+    <h2 class="fw-bold text-center mb-4">
+        Explore SkyAware PH
+    </h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <h1>☀️</h1>
+                    <h4>Weather Forecast</h4>
+                    <p class="text-muted">
+                        Check weather conditions and forecasts
+                        for Philippine cities.
+                    </p>
+                    <span class="badge bg-secondary">
+                        Coming Soon
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <h1>🌍</h1>
+                    <h4>Earthquake Updates</h4>
+                    <p class="text-muted">
+                        View recent earthquake information
+                        from external monitoring sources.
+                    </p>
+                    <span class="badge bg-secondary">
+                        Coming Soon
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <h1>🛡️</h1>
+                    <h4>Disaster Preparedness</h4>
+                    <p class="text-muted">
+                        Learn practical safety tips and
+                        emergency preparedness information.
+                    </p>
+                    <span class="badge bg-secondary">
+                        Coming Soon
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section id="about" class="text-center mt-5 py-5">
+    <h2 class="fw-bold">About SkyAware PH</h2>
+
+    <p class="text-muted mx-auto" style="max-width:700px;">
+        SkyAware PH is a web-based weather and disaster
+        information portal designed to help Philippine
+        residents access weather forecasts, earthquake
+        information, and preparedness resources in one place.
+    </p>
+</section>
+
+{% endblock %}

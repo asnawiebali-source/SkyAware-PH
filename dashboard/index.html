@@ -1,0 +1,45 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold">
+        Welcome, {{ request.user.username }}!
+    </h2>
+    <p class="text-muted">
+        SkyAware PH Dashboard
+    </p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>☀ Weather Forecast</h5>
+                <p>Check weather conditions.</p>
+                <span class="badge bg-secondary">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>🌍 Earthquake Updates</h5>
+                <p>View recent earthquake information.</p>
+                <span class="badge bg-secondary">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5>📍 Saved Locations</h5>
+                <p>Manage your preferred cities.</p>
+                <span class="badge bg-secondary">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Database
+db.sqlite3
+
+# Uploaded files
+media/
+
+# Generated static files
+staticfiles/
+
+# VS Code
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
