@@ -1,0 +1,360 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Earthquake Updates | SkyAware PH
+{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="mb-4">
+
+    <h2 class="fw-bold text-primary">
+        🌍 Earthquake Updates
+    </h2>
+
+    <p class="text-muted">
+        Recent earthquake activity in and around
+        the Philippines using USGS earthquake data.
+    </p>
+
+</div>
+
+
+<!-- SAFETY NOTICE -->
+<div class="alert alert-info mb-4">
+
+    <strong>Important Notice:</strong>
+
+    Earthquake information is provided by the
+    United States Geological Survey (USGS).
+
+    This page displays reported earthquake records,
+    not predictions or emergency alerts.
+
+    For official Philippine earthquake bulletins,
+    visit
+
+    <a href="https://www.phivolcs.dost.gov.ph/"
+       target="_blank"
+       rel="noopener noreferrer">
+        PHIVOLCS
+    </a>.
+
+</div>
+
+
+<!-- ERROR MESSAGE -->
+{% if error %}
+
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+{% if earthquake_data %}
+
+<!-- SUMMARY CARDS -->
+<div class="row g-4 mb-4">
+
+    <!-- TOTAL EARTHQUAKES -->
+    <div class="col-md-4">
+
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <p class="text-muted mb-2">
+                    Earthquakes Displayed
+                </p>
+
+                <h2 class="fw-bold text-primary">
+                    {{ earthquake_data.count }}
+                </h2>
+
+                <small class="text-muted">
+                    Up to 50 recent matching events
+                </small>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- MINIMUM MAGNITUDE -->
+    <div class="col-md-4">
+
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <p class="text-muted mb-2">
+                    Minimum Magnitude
+                </p>
+
+                <h2 class="fw-bold">
+                    {{ earthquake_data.min_magnitude }}
+                </h2>
+
+                <small class="text-muted">
+                    Search filter
+                </small>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH PERIOD -->
+    <div class="col-md-4">
+
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <p class="text-muted mb-2">
+                    Search Period
+                </p>
+
+                <h2 class="fw-bold">
+                    {{ earthquake_data.days }} Days
+                </h2>
+
+                <small class="text-muted">
+                    Most recent reporting period
+                </small>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- LAST UPDATED -->
+<div class="mb-4">
+
+    <p class="text-muted">
+
+        <strong>Last Retrieved:</strong>
+
+        {{ earthquake_data.updated_at }}
+
+        (Philippine Time)
+
+    </p>
+
+</div>
+
+
+<!-- EARTHQUAKE LIST HEADER -->
+<h4 class="fw-bold mb-4">
+    Recent Earthquake Reports
+</h4>
+
+
+{% if earthquake_data.earthquakes %}
+
+<div class="row g-4">
+
+    {% for quake in earthquake_data.earthquakes %}
+
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card feature-card shadow-sm h-100">
+
+            <div class="card-body p-4">
+
+                <!-- MAGNITUDE -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <h3 class="fw-bold mb-0">
+
+                        M {{ quake.magnitude|floatformat:1 }}
+
+                    </h3>
+
+
+                    {% if quake.magnitude >= 6 %}
+
+                    <span class="badge bg-danger">
+                        M 6.0+
+                    </span>
+
+                    {% elif quake.magnitude >= 4 %}
+
+                    <span class="badge bg-warning text-dark">
+                        M 4.0–5.9
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge bg-secondary">
+                        Below M 4.0
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <h5 class="fw-bold">
+
+                    📍 {{ quake.place }}
+
+                </h5>
+
+                <hr>
+
+
+                <!-- DATE -->
+                <p>
+
+                    <strong>📅 Date:</strong>
+
+                    {{ quake.date }}
+
+                </p>
+
+
+                <!-- TIME -->
+                <p>
+
+                    <strong>🕒 Time:</strong>
+
+                    {{ quake.time }} PHT
+
+                </p>
+
+
+                <!-- DEPTH -->
+                <p>
+
+                    <strong>📏 Depth:</strong>
+
+                    {% if quake.depth != None %}
+
+                        {{ quake.depth|floatformat:1 }} km
+
+                    {% else %}
+
+                        Not Available
+
+                    {% endif %}
+
+                </p>
+
+
+                <!-- LATITUDE -->
+                <p>
+
+                    <strong>🌐 Latitude:</strong>
+
+                    {% if quake.latitude != None %}
+
+                        {{ quake.latitude|floatformat:4 }}
+
+                    {% else %}
+
+                        N/A
+
+                    {% endif %}
+
+                </p>
+
+
+                <!-- LONGITUDE -->
+                <p>
+
+                    <strong>🌐 Longitude:</strong>
+
+                    {% if quake.longitude != None %}
+
+                        {{ quake.longitude|floatformat:4 }}
+
+                    {% else %}
+
+                        N/A
+
+                    {% endif %}
+
+                </p>
+
+
+                <!-- RECORD STATUS -->
+                <p>
+
+                    <strong>Record Status:</strong>
+
+                    {{ quake.status|title }}
+
+                </p>
+
+
+                <!-- USGS LINK -->
+                {% if quake.url %}
+
+                <a href="{{ quake.url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-outline-primary w-100">
+
+                    View USGS Details
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="alert alert-secondary">
+
+    No matching earthquakes were reported
+    within the selected region and search period.
+
+</div>
+
+{% endif %}
+
+
+<!-- DATA SOURCE -->
+<div class="alert alert-light border mt-4">
+
+    <strong>Data Source:</strong>
+
+    <a href="https://earthquake.usgs.gov/"
+       target="_blank"
+       rel="noopener noreferrer">
+
+        USGS Earthquake Hazards Program
+
+    </a>
+
+    <p class="mt-2 mb-0">
+
+        Earthquake reports may be updated or revised.
+        This page displays up to 50 recent matching
+        earthquakes in the selected Philippine region
+        and nearby waters.
+
+    </p>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

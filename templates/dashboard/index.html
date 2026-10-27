@@ -1,0 +1,177 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | SkyAware PH{% endblock %}
+
+{% block content %}
+
+<!-- DASHBOARD HEADER -->
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">
+        Welcome, {{ user.username }}!
+    </h2>
+
+    <p class="text-muted">
+        Stay informed and prepared with SkyAware PH.
+    </p>
+</div>
+
+<!-- FEATURE CARDS -->
+<div class="row g-4">
+
+    <!-- WEATHER FORECAST -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>☀️</h3>
+
+                <h5 class="fw-bold">
+                    Weather Forecast
+                </h5>
+
+                <p class="text-muted">
+                    Check current weather conditions
+                    and 7-day forecasts in Philippine cities.
+                </p>
+
+                <a href="{% url 'weather_forecast' %}"
+                   class="btn btn-primary">
+                    View Weather
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- EARTHQUAKE UPDATES -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>🌍</h3>
+
+                <h5 class="fw-bold">
+                    Earthquake Updates
+                </h5>
+
+                <p class="text-muted">
+                    View recent reported earthquakes
+                    near the Philippines, including
+                    magnitudes, locations, and depths.
+                </p>
+
+                <a href="{% url 'earthquake_updates' %}"
+                   class="btn btn-primary">
+                    View Earthquakes
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVED LOCATIONS -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>📍</h3>
+
+                <h5 class="fw-bold">
+                    Saved Locations
+                </h5>
+
+                <p class="text-muted">
+                    Add, view, edit, and delete
+                    your favorite Philippine cities.
+                </p>
+
+                <a href="{% url 'saved_locations' %}"
+                   class="btn btn-primary">
+                    Manage Locations
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- AIR QUALITY -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>🌫️</h3>
+
+                <h5 class="fw-bold">
+                    Air Quality
+                </h5>
+
+                <p class="text-muted">
+                    Check air quality information
+                    for your selected location.
+                </p>
+
+                <span class="badge bg-secondary">
+                    Coming Soon
+                </span>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- AI SAFETY ASSISTANT -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>🤖</h3>
+
+                <h5 class="fw-bold">
+                    AI Safety Assistant
+                </h5>
+
+                <p class="text-muted">
+                    Ask AI questions about disaster
+                    preparedness and general safety.
+                </p>
+
+                <span class="badge bg-secondary">
+                    Coming Soon
+                </span>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    {% if user.is_staff %}
+
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h3>⚙️</h3>
+
+                <h5 class="fw-bold">
+                    Administration
+                </h5>
+
+                <p class="text-muted">
+                    Manage users, saved locations,
+                    and system information.
+                </p>
+
+                <a href="{% url 'admin:index' %}"
+                   class="btn btn-primary">
+                    Open Admin Panel
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

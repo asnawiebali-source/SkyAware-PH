@@ -1,0 +1,223 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Weather Forecast | SkyAware PH{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">
+        ☀️ Weather Forecast
+    </h2>
+    <p class="text-muted">
+        Search for current weather conditions and
+        a 7-day forecast in Philippine cities.
+    </p>
+</div>
+
+<!-- CITY SEARCH -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <form method="GET" action="{% url 'weather_forecast' %}">
+            <label class="form-label fw-bold">
+                Search Philippine City
+            </label>
+
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="city"
+                    class="form-control"
+                    placeholder="Example: Iligan City"
+                    value="{{ city_name }}"
+                    maxlength="100"
+                    required
+                >
+
+                <button class="btn btn-primary" type="submit">
+                    Search Weather
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ERROR MESSAGE -->
+{% if error %}
+<div class="alert alert-warning">
+    {{ error }}
+</div>
+{% endif %}
+
+{% if weather_data and city %}
+
+<!-- LOCATION HEADING -->
+<div class="mb-4">
+    <h4 class="fw-bold mb-1">
+        📍 {{ city.name }}
+    </h4>
+
+    <p class="text-muted mb-0">
+        {{ city.admin1|default:"Philippines" }},
+        {{ city.country }}
+    </p>
+</div>
+
+<!-- CURRENT WEATHER -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+
+        <h5 class="fw-bold mb-4">
+            Current Weather
+        </h5>
+
+        <div class="row align-items-center">
+
+            <div class="col-md-6 text-center mb-4 mb-md-0">
+                <div style="font-size: 65px;">
+                    {{ weather_data.icon }}
+                </div>
+
+                <h1 class="display-3 fw-bold text-primary">
+                    {{ weather_data.current.temperature_2m|floatformat:1 }}°C
+                </h1>
+
+                <h4>
+                    {{ weather_data.description }}
+                </h4>
+
+                <p class="text-muted">
+                    Feels like
+                    {{ weather_data.current.apparent_temperature|floatformat:1 }}°C
+                </p>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row g-3">
+
+                    <div class="col-6">
+                        <div class="bg-light rounded p-3">
+                            <small class="text-muted">
+                                💧 Humidity
+                            </small>
+                            <h4 class="fw-bold mt-2">
+                                {{ weather_data.current.relative_humidity_2m }}%
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="bg-light rounded p-3">
+                            <small class="text-muted">
+                                💨 Wind Speed
+                            </small>
+                            <h4 class="fw-bold mt-2">
+                                {{ weather_data.current.wind_speed_10m }}
+                                <small>km/h</small>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="bg-light rounded p-3">
+                            <small class="text-muted">
+                                🌧️ Precipitation
+                            </small>
+                            <h4 class="fw-bold mt-2">
+                                {{ weather_data.current.precipitation }}
+                                <small>mm</small>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="bg-light rounded p-3">
+                            <small class="text-muted">
+                                🕒 Observation Time
+                            </small>
+                            <div class="fw-bold mt-2">
+                                {{ weather_data.current.time }}
+                            </div>
+                            <small class="text-muted">
+                                Asia/Manila
+                            </small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- SEVEN DAY FORECAST -->
+<div class="mb-4">
+    <h4 class="fw-bold">
+        📅 7-Day Weather Forecast
+    </h4>
+</div>
+
+<div class="row g-3">
+    {% for day in weather_data.forecast %}
+    <div class="col-md-4 col-lg-3">
+
+        <div class="card feature-card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+
+                <h6 class="fw-bold">
+                    {{ day.date }}
+                </h6>
+
+                <div class="my-3" style="font-size: 42px;">
+                    {{ day.icon }}
+                </div>
+
+                <p class="fw-semibold">
+                    {{ day.description }}
+                </p>
+
+                <h5 class="text-primary fw-bold">
+                    {{ day.max_temp|floatformat:1 }}°C
+                </h5>
+
+                <p class="text-muted mb-2">
+                    Low:
+                    {{ day.min_temp|floatformat:1 }}°C
+                </p>
+
+                <small class="text-muted">
+                    🌧️ Rain chance:
+                    {% if day.rain_probability != None %}
+                        {{ day.rain_probability }}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </small>
+
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<div class="alert alert-info mt-4">
+    <strong>Weather Data Source:</strong>
+    <a href="https://open-meteo.com/"
+       target="_blank"
+       rel="noopener noreferrer">
+        Open-Meteo
+    </a>
+
+    <p class="mb-0 mt-2">
+        Weather information is based on forecast models
+        and may change. This portal does not issue
+        official weather warnings. For official Philippine
+        weather advisories, consult PAGASA.
+    </p>
+</div>
+
+{% endif %}
+
+{% endblock %}

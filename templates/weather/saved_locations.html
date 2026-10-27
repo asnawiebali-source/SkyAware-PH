@@ -1,0 +1,62 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Saved Locations | SkyAware PH{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">📍 Saved Locations</h2>
+
+    <a href="{% url 'add_location' %}" class="btn btn-primary">
+        + Add Location
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        {% if locations %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>City</th>
+                            <th>Province</th>
+                            <th>Country</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for location in locations %}
+                        <tr>
+                            <td>{{ location.city }}</td>
+                            <td>{{ location.province|default:"—" }}</td>
+                            <td>{{ location.country }}</td>
+                            <td>
+                                <a href="{% url 'edit_location' location.pk %}"
+                                   class="btn btn-sm btn-warning">
+                                    Edit
+                                </a>
+
+                                <a href="{% url 'delete_location' location.pk %}"
+                                   class="btn btn-sm btn-danger">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted text-center my-4">
+                No saved locations yet. Add your first city!
+            </p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
