@@ -22,6 +22,10 @@ from integrations.usgs_earthquake import (
     get_recent_earthquakes
 )
 
+from integrations.air_quality import (
+    get_air_quality
+)
+
 
 # ==========================================
 # HOMEPAGE
@@ -124,6 +128,68 @@ def earthquake_updates(request):
         'weather/earthquakes.html',
         {
             'earthquake_data': earthquake_data,
+            'error': error,
+        }
+    )
+
+
+# ==========================================
+# AIR QUALITY - OPEN-METEO API
+# ==========================================
+
+@login_required
+def air_quality_view(request):
+
+    city_name = request.GET.get(
+        'city', 'Iligan City'
+    ).strip()
+
+    city = None
+    air_quality_data = None
+    error = None
+
+    if not city_name:
+        error = "Please enter a city name."
+
+    elif len(city_name) > 100:
+        error = "City name is too long."
+
+    else:
+        try:
+            # Reuse the existing city geocoding API
+            city = search_city(city_name)
+
+            if city:
+                air_quality_data = get_air_quality(
+                    city['latitude'],
+                    city['longitude']
+                )
+            else:
+                error = (
+                    "City not found in the Philippines. "
+                    "Please try another city."
+                )
+
+        except requests.RequestException:
+            error = (
+                "Unable to connect to the Air Quality API. "
+                "Please check your internet connection "
+                "and try again."
+            )
+
+        except (ValueError, KeyError, IndexError, TypeError):
+            error = (
+                "Air quality information is temporarily "
+                "unavailable. Please try again later."
+            )
+
+    return render(
+        request,
+        'weather/air_quality.html',
+        {
+            'city_name': city_name,
+            'city': city,
+            'air_quality_data': air_quality_data,
             'error': error,
         }
     )

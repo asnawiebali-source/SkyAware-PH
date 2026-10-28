@@ -5,7 +5,6 @@
 
 {% block content %}
 
-<!-- DASHBOARD HEADER -->
 <div class="mb-4">
     <h2 class="fw-bold text-primary">
         Welcome, {{ user.username }}!
@@ -16,7 +15,6 @@
     </p>
 </div>
 
-<!-- FEATURE CARDS -->
 <div class="row g-4">
 
     <!-- WEATHER FORECAST -->
@@ -25,10 +23,7 @@
             <div class="card-body p-4">
 
                 <h3>☀️</h3>
-
-                <h5 class="fw-bold">
-                    Weather Forecast
-                </h5>
+                <h5 class="fw-bold">Weather Forecast</h5>
 
                 <p class="text-muted">
                     Check current weather conditions
@@ -50,10 +45,7 @@
             <div class="card-body p-4">
 
                 <h3>🌍</h3>
-
-                <h5 class="fw-bold">
-                    Earthquake Updates
-                </h5>
+                <h5 class="fw-bold">Earthquake Updates</h5>
 
                 <p class="text-muted">
                     View recent reported earthquakes
@@ -76,10 +68,7 @@
             <div class="card-body p-4">
 
                 <h3>📍</h3>
-
-                <h5 class="fw-bold">
-                    Saved Locations
-                </h5>
+                <h5 class="fw-bold">Saved Locations</h5>
 
                 <p class="text-muted">
                     Add, view, edit, and delete
@@ -101,19 +90,18 @@
             <div class="card-body p-4">
 
                 <h3>🌫️</h3>
-
-                <h5 class="fw-bold">
-                    Air Quality
-                </h5>
+                <h5 class="fw-bold">Air Quality</h5>
 
                 <p class="text-muted">
-                    Check air quality information
-                    for your selected location.
+                    Check European AQI, PM2.5,
+                    PM10, and air pollution levels
+                    for Philippine cities.
                 </p>
 
-                <span class="badge bg-secondary">
-                    Coming Soon
-                </span>
+                <a href="{% url 'air_quality' %}"
+                   class="btn btn-primary">
+                    View Air Quality
+                </a>
 
             </div>
         </div>
@@ -125,10 +113,7 @@
             <div class="card-body p-4">
 
                 <h3>🤖</h3>
-
-                <h5 class="fw-bold">
-                    AI Safety Assistant
-                </h5>
+                <h5 class="fw-bold">AI Safety Assistant</h5>
 
                 <p class="text-muted">
                     Ask AI questions about disaster
@@ -143,7 +128,7 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL -->
+    <!-- ADMINISTRATION -->
     {% if user.is_staff %}
 
     <div class="col-md-4">
@@ -151,10 +136,7 @@
             <div class="card-body p-4">
 
                 <h3>⚙️</h3>
-
-                <h5 class="fw-bold">
-                    Administration
-                </h5>
+                <h5 class="fw-bold">Administration</h5>
 
                 <p class="text-muted">
                     Manage users, saved locations,

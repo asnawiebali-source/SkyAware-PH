@@ -19,6 +19,13 @@ urlpatterns = [
         name='earthquake_updates'
     ),
 
+    # Air Quality
+    path(
+        'air-quality/',
+        views.air_quality_view,
+        name='air_quality'
+    ),
+
     # Saved Locations - Read
     path(
         'locations/',

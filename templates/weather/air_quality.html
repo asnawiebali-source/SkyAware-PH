@@ -1,0 +1,395 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Air Quality | SkyAware PH{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">
+        🌫️ Air Quality Monitoring
+    </h2>
+
+    <p class="text-muted">
+        Check current air quality and pollution
+        measurements in Philippine cities.
+    </p>
+</div>
+
+<!-- CITY SEARCH -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+
+        <form method="GET" action="{% url 'air_quality' %}">
+
+            <label class="form-label fw-bold">
+                Search Philippine City
+            </label>
+
+            <div class="input-group">
+                <input
+                    type="text"
+                    name="city"
+                    class="form-control"
+                    placeholder="Example: Iligan City"
+                    value="{{ city_name }}"
+                    maxlength="100"
+                    required
+                >
+
+                <button type="submit" class="btn btn-primary">
+                    Check Air Quality
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- ERROR MESSAGE -->
+{% if error %}
+<div class="alert alert-warning">
+    {{ error }}
+</div>
+{% endif %}
+
+{% if air_quality_data and city %}
+
+<!-- LOCATION INFORMATION -->
+<div class="mb-4">
+
+    <h4 class="fw-bold">
+        📍 {{ city.name }}
+    </h4>
+
+    <p class="text-muted">
+        {{ city.admin1|default:"Philippines" }},
+        {{ city.country }}
+    </p>
+
+</div>
+
+<!-- MAIN AQI CARD -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+
+        <h5 class="fw-bold mb-4">
+            Current European Air Quality Index
+        </h5>
+
+        <div class="row align-items-center">
+
+            <div class="col-md-5 text-center mb-4 mb-md-0">
+
+                <div style="font-size: 55px;">
+                    🌍
+                </div>
+
+                <h1 class="display-2 fw-bold text-primary">
+                    {% if air_quality_data.aqi != None %}
+                        {{ air_quality_data.aqi }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h1>
+
+                <span class="badge bg-{{ air_quality_data.category.color }} fs-6 px-4 py-2">
+                    {{ air_quality_data.category.label }}
+                </span>
+
+                <p class="text-muted mt-3 mb-0">
+                    European AQI
+                </p>
+
+            </div>
+
+            <div class="col-md-7">
+
+                <h5 class="fw-bold">
+                    Air Quality Guidance
+                </h5>
+
+                <p>
+                    {{ air_quality_data.category.advice }}
+                </p>
+
+                <hr>
+
+                <p class="mb-2">
+                    <strong>Measurement Time:</strong>
+                    {{ air_quality_data.current.time|default:"Unavailable" }}
+                </p>
+
+                <p class="text-muted mb-0">
+                    Timezone: Asia/Manila
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- POLLUTANT MEASUREMENTS -->
+<h4 class="fw-bold mb-4">
+    Air Pollution Measurements
+</h4>
+
+<div class="row g-4">
+
+    <!-- PM2.5 -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">PM2.5</h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.pm2_5 != None %}
+                        {{ air_quality_data.current.pm2_5|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    Fine particles that can enter
+                    deep into the lungs.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PM10 -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">PM10</h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.pm10 != None %}
+                        {{ air_quality_data.current.pm10|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    Inhalable particles including
+                    dust and other airborne matter.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CARBON MONOXIDE -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">
+                    Carbon Monoxide (CO)
+                </h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.carbon_monoxide != None %}
+                        {{ air_quality_data.current.carbon_monoxide|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    A gas associated with
+                    incomplete combustion.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NITROGEN DIOXIDE -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">
+                    Nitrogen Dioxide (NO₂)
+                </h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.nitrogen_dioxide != None %}
+                        {{ air_quality_data.current.nitrogen_dioxide|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    A pollutant commonly associated
+                    with vehicles and fuel combustion.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- OZONE -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">
+                    Ozone (O₃)
+                </h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.ozone != None %}
+                        {{ air_quality_data.current.ozone|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    Ground-level ozone can
+                    irritate the respiratory system.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SULPHUR DIOXIDE -->
+    <div class="col-md-4">
+        <div class="card feature-card shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">
+                    Sulphur Dioxide (SO₂)
+                </h5>
+
+                <h3 class="text-primary fw-bold">
+                    {% if air_quality_data.current.sulphur_dioxide != None %}
+                        {{ air_quality_data.current.sulphur_dioxide|floatformat:1 }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </h3>
+
+                <p class="text-muted">
+                    µg/m³
+                </p>
+
+                <small>
+                    A gas associated with
+                    fuel combustion and some
+                    industrial processes.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- AQI REFERENCE TABLE -->
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-body p-4">
+
+        <h5 class="fw-bold mb-3">
+            European AQI Reference
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>European AQI</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>0–20</td>
+                        <td>Good</td>
+                    </tr>
+                    <tr>
+                        <td>21–40</td>
+                        <td>Fair</td>
+                    </tr>
+                    <tr>
+                        <td>41–60</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>61–80</td>
+                        <td>Poor</td>
+                    </tr>
+                    <tr>
+                        <td>81–100</td>
+                        <td>Very Poor</td>
+                    </tr>
+                    <tr>
+                        <td>Above 100</td>
+                        <td>Extremely Poor</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- DATA SOURCE NOTICE -->
+<div class="alert alert-info mt-4">
+
+    <strong>Data Source:</strong>
+
+    <a href="https://open-meteo.com/en/docs/air-quality-api"
+       target="_blank"
+       rel="noopener noreferrer">
+        Open-Meteo Air Quality API
+    </a>
+
+    <p class="mb-0 mt-2">
+        Air quality values are model-based estimates
+        and may differ from measurements at local
+        monitoring stations. This information is for
+        general awareness and is not an official
+        health advisory.
+    </p>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
