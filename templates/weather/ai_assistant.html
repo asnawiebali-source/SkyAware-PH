@@ -1,0 +1,387 @@
+
+{% extends 'base.html' %}
+
+{% block title %}AI Safety Assistant | SkyAware PH{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">
+        🤖 AI Safety Assistant
+    </h2>
+
+    <p class="text-muted">
+        Ask questions about disaster preparedness,
+        emergency safety, and risk awareness.
+    </p>
+</div>
+
+<div class="row g-4">
+
+    <!-- MAIN CONTENT -->
+    <div class="col-lg-8">
+
+        <!-- QUESTION FORM -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    Ask SkyAware AI
+                </h5>
+
+                <form method="POST"
+                      action="{% url 'ai_assistant' %}"
+                      id="aiQuestionForm">
+
+                    {% csrf_token %}
+
+                    <label for="question"
+                           class="form-label">
+                        Your Question
+                    </label>
+
+                    <textarea
+                        id="question"
+                        name="question"
+                        class="form-control"
+                        rows="5"
+                        maxlength="1000"
+                        placeholder="Example: What should I do during an earthquake?"
+                        required>{{ question }}</textarea>
+
+                    <div class="form-text">
+                        Maximum 1000 characters.
+                        Do not enter sensitive personal information.
+                    </div>
+
+                    <button type="submit"
+                            id="askButton"
+                            class="btn btn-primary mt-3">
+                        Ask AI Assistant
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        {% if error %}
+        <div class="alert alert-warning">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- AI RESPONSE -->
+        {% if answer %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold text-primary mb-3">
+                    🤖 SkyAware AI Response
+                </h5>
+
+                <div class="alert alert-light border">
+                    <strong>Your question:</strong>
+                    <p class="mb-0 mt-2">
+                        {{ question }}
+                    </p>
+                </div>
+
+                <!-- Raw answer is escaped by Django -->
+                <div id="rawAiAnswer"
+                     class="d-none">{{ answer }}</div>
+
+                <!-- Safely formatted response -->
+                <div id="formattedAiAnswer"
+                     class="ai-answer"
+                     aria-live="polite"></div>
+
+                <hr>
+
+                <p class="text-muted small mb-0">
+                    AI-generated guidance may contain errors.
+                    Always follow official emergency instructions
+                    from local authorities, PAGASA, PHIVOLCS,
+                    and your local DRRMO.
+                </p>
+
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4">
+
+        <!-- EXAMPLE QUESTIONS -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">
+                    💡 Example Questions
+                </h5>
+
+                <div class="d-grid gap-2">
+
+                    <button type="button"
+                            class="btn btn-outline-primary text-start example-question"
+                            data-question="What should I do during an earthquake?">
+                        What should I do during an earthquake?
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-primary text-start example-question"
+                            data-question="How can I prepare for a typhoon in the Philippines?">
+                        How can I prepare for a typhoon?
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-primary text-start example-question"
+                            data-question="What should I put in an emergency kit?">
+                        What should I put in an emergency kit?
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-primary text-start example-question"
+                            data-question="What should I do if floodwater enters my home?">
+                        What should I do during flooding?
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EMERGENCY REMINDER -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold">
+                    🚨 Emergency Reminder
+                </h5>
+
+                <p class="text-muted">
+                    This assistant provides general
+                    preparedness information only.
+                    It does not monitor live emergencies
+                    or issue official disaster warnings.
+                </p>
+
+                <p class="mb-2">
+                    <strong>Philippines Emergency Hotline:</strong>
+                    911
+                </p>
+
+                <a href="https://www.pagasa.dost.gov.ph/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="d-block mb-2">
+                    PAGASA
+                </a>
+
+                <a href="https://www.phivolcs.dost.gov.ph/"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    PHIVOLCS
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+<style>
+    .ai-answer {
+        line-height: 1.8;
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .ai-answer h1,
+    .ai-answer h2,
+    .ai-answer h3,
+    .ai-answer h4 {
+        font-weight: 700;
+        color: #0d6efd;
+        margin-top: 1.3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .ai-answer h1 {
+        font-size: 1.5rem;
+    }
+
+    .ai-answer h2 {
+        font-size: 1.3rem;
+    }
+
+    .ai-answer h3,
+    .ai-answer h4 {
+        font-size: 1.1rem;
+    }
+
+    .ai-answer p {
+        margin-bottom: 1rem;
+    }
+
+    .ai-answer ul,
+    .ai-answer ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .ai-answer li {
+        margin-bottom: 0.4rem;
+    }
+
+    .ai-answer table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 14px;
+    }
+
+    .ai-answer th,
+    .ai-answer td {
+        border: 1px solid #dee2e6;
+        padding: 0.7rem;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .ai-answer th {
+        background-color: #f1f5f9;
+        font-weight: 700;
+    }
+
+    .ai-answer blockquote {
+        border-left: 4px solid #0d6efd;
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;
+    }
+
+    .ai-answer pre {
+        background-color: #f1f5f9;
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+    }
+
+    .ai-answer code {
+        overflow-wrap: anywhere;
+    }
+
+    .example-question {
+        white-space: normal;
+    }
+</style>
+{% endblock %}
+
+
+{% block extra_js %}
+
+<!-- Markdown parser -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- HTML sanitizer -->
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // ==================================
+        // EXAMPLE QUESTIONS
+        // ==================================
+
+        document.querySelectorAll(
+            ".example-question"
+        ).forEach(function(button) {
+
+            button.addEventListener("click", function() {
+
+                const questionInput =
+                    document.getElementById("question");
+
+                questionInput.value =
+                    button.dataset.question;
+
+                questionInput.focus();
+            });
+        });
+
+
+        // ==================================
+        // FORM SUBMISSION
+        // ==================================
+
+        const questionForm =
+            document.getElementById("aiQuestionForm");
+
+        if (questionForm) {
+
+            questionForm.addEventListener(
+                "submit",
+                function() {
+
+                    const button =
+                        document.getElementById("askButton");
+
+                    if (questionForm.checkValidity()) {
+                        button.disabled = true;
+                        button.textContent =
+                            "Generating response...";
+                    }
+                }
+            );
+        }
+
+
+        // ==================================
+        // FORMAT AI RESPONSE
+        // ==================================
+
+        const rawAnswer =
+            document.getElementById("rawAiAnswer");
+
+        const formattedAnswer =
+            document.getElementById("formattedAiAnswer");
+
+        if (rawAnswer && formattedAnswer) {
+
+            const text = rawAnswer.textContent;
+
+            if (
+                typeof marked !== "undefined" &&
+                typeof DOMPurify !== "undefined"
+            ) {
+
+                // Convert Markdown into HTML
+                const markdownHtml = marked.parse(text);
+
+                // Remove unsafe HTML
+                const safeHtml = DOMPurify.sanitize(
+                    markdownHtml
+                );
+
+                // Display formatted response
+                formattedAnswer.innerHTML = safeHtml;
+
+            } else {
+
+                // Safe fallback if libraries fail to load
+                formattedAnswer.textContent = text;
+                formattedAnswer.style.whiteSpace =
+                    "pre-wrap";
+            }
+        }
+
+    });
+</script>
+{% endblock %}

@@ -3,39 +3,47 @@ from django.contrib import admin
 from django.urls import path, include
 
 from weather.views import home
+from dashboard.views import admin_dashboard_view
 
 
 urlpatterns = [
 
     # Django Admin Panel
     path(
-        'admin/',
+        "admin/",
         admin.site.urls
+    ),
+
+    # Custom SkyAware PH Admin Dashboard
+    path(
+        "admin-dashboard/",
+        admin_dashboard_view,
+        name="admin_dashboard"
     ),
 
     # Authentication: Register, Login, Logout
     path(
-        'accounts/',
-        include('accounts.urls')
+        "accounts/",
+        include("accounts.urls")
     ),
 
     # User Dashboard
     path(
-        'dashboard/',
-        include('dashboard.urls')
+        "dashboard/",
+        include("dashboard.urls")
     ),
 
     # Homepage
     path(
-        '',
+        "",
         home,
-        name='home'
+        name="home"
     ),
 
-    # Weather API and Saved Locations CRUD
+    # Weather APIs and Saved Locations CRUD
     path(
-        '',
-        include('weather.urls')
+        "",
+        include("weather.urls")
     ),
 
 ]

@@ -9,6 +9,7 @@ from django.shortcuts import (
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 
 from .models import SavedLocation
 from .forms import SavedLocationForm
@@ -26,24 +27,30 @@ from integrations.air_quality import (
     get_air_quality
 )
 
+from integrations.groq_ai import (
+    ask_groq,
+    GroqConfigurationError,
+    GroqServiceError
+)
+
 
 # ==========================================
 # HOMEPAGE
 # ==========================================
 
 def home(request):
-    return render(request, 'home.html')
+    return render(request, "home.html")
 
 
 # ==========================================
-# WEATHER FORECAST - OPEN-METEO API
+# WEATHER FORECAST
 # ==========================================
 
 @login_required
 def weather_forecast(request):
 
     city_name = request.GET.get(
-        'city', 'Iligan City'
+        "city", "Iligan City"
     ).strip()
 
     city = None
@@ -62,8 +69,8 @@ def weather_forecast(request):
 
             if city:
                 weather_data = get_weather(
-                    city['latitude'],
-                    city['longitude']
+                    city["latitude"],
+                    city["longitude"]
                 )
             else:
                 error = (
@@ -73,8 +80,8 @@ def weather_forecast(request):
 
         except requests.RequestException:
             error = (
-                "Unable to connect to the weather service. "
-                "Please try again."
+                "Unable to connect to the weather "
+                "service. Please try again."
             )
 
         except (ValueError, KeyError, IndexError):
@@ -85,18 +92,18 @@ def weather_forecast(request):
 
     return render(
         request,
-        'weather/forecast.html',
+        "weather/forecast.html",
         {
-            'city_name': city_name,
-            'city': city,
-            'weather_data': weather_data,
-            'error': error,
+            "city_name": city_name,
+            "city": city,
+            "weather_data": weather_data,
+            "error": error,
         }
     )
 
 
 # ==========================================
-# EARTHQUAKE UPDATES - USGS API
+# EARTHQUAKE UPDATES
 # ==========================================
 
 @login_required
@@ -113,35 +120,35 @@ def earthquake_updates(request):
 
     except requests.RequestException:
         error = (
-            "Unable to connect to the USGS earthquake "
-            "service. Please try again later."
+            "Unable to connect to the USGS "
+            "earthquake service. Please try later."
         )
 
     except (ValueError, KeyError, TypeError, OverflowError):
         error = (
-            "Earthquake data is temporarily unavailable. "
-            "Please try again later."
+            "Earthquake data is temporarily "
+            "unavailable. Please try again later."
         )
 
     return render(
         request,
-        'weather/earthquakes.html',
+        "weather/earthquakes.html",
         {
-            'earthquake_data': earthquake_data,
-            'error': error,
+            "earthquake_data": earthquake_data,
+            "error": error,
         }
     )
 
 
 # ==========================================
-# AIR QUALITY - OPEN-METEO API
+# AIR QUALITY
 # ==========================================
 
 @login_required
 def air_quality_view(request):
 
     city_name = request.GET.get(
-        'city', 'Iligan City'
+        "city", "Iligan City"
     ).strip()
 
     city = None
@@ -156,13 +163,12 @@ def air_quality_view(request):
 
     else:
         try:
-            # Reuse the existing city geocoding API
             city = search_city(city_name)
 
             if city:
                 air_quality_data = get_air_quality(
-                    city['latitude'],
-                    city['longitude']
+                    city["latitude"],
+                    city["longitude"]
                 )
             else:
                 error = (
@@ -173,8 +179,7 @@ def air_quality_view(request):
         except requests.RequestException:
             error = (
                 "Unable to connect to the Air Quality API. "
-                "Please check your internet connection "
-                "and try again."
+                "Please try again."
             )
 
         except (ValueError, KeyError, IndexError, TypeError):
@@ -185,12 +190,63 @@ def air_quality_view(request):
 
     return render(
         request,
-        'weather/air_quality.html',
+        "weather/air_quality.html",
         {
-            'city_name': city_name,
-            'city': city,
-            'air_quality_data': air_quality_data,
-            'error': error,
+            "city_name": city_name,
+            "city": city,
+            "air_quality_data": air_quality_data,
+            "error": error,
+        }
+    )
+
+
+# ==========================================
+# GROQ AI SAFETY ASSISTANT
+# ==========================================
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def ai_assistant(request):
+
+    question = ""
+    answer = None
+    error = None
+
+    if request.method == "POST":
+
+        question = request.POST.get(
+            "question", ""
+        ).strip()
+
+        if not question:
+            error = "Please enter your question."
+
+        elif len(question) > 1000:
+            error = (
+                "Your question is too long. "
+                "Please use 1000 characters or fewer."
+            )
+
+        else:
+            try:
+                answer = ask_groq(question)
+
+            except GroqConfigurationError:
+                error = (
+                    "Groq API is not configured. "
+                    "Please contact the administrator."
+                )
+
+            except GroqServiceError as exc:
+                error = str(exc)
+
+    return render(
+        request,
+        "weather/ai_assistant.html",
+        {
+            "question": question,
+            "answer": answer,
+            "error": error,
         }
     )
 
@@ -208,9 +264,9 @@ def saved_locations(request):
 
     return render(
         request,
-        'weather/saved_locations.html',
+        "weather/saved_locations.html",
         {
-            'locations': locations
+            "locations": locations
         }
     )
 
@@ -222,30 +278,32 @@ def saved_locations(request):
 @login_required
 def add_location(request):
 
-    if request.method == 'POST':
+    if request.method == "POST":
+
         form = SavedLocationForm(request.POST)
 
         if form.is_valid():
+
             location = form.save(commit=False)
             location.user = request.user
             location.save()
 
             messages.success(
                 request,
-                'Location added successfully!'
+                "Location added successfully!"
             )
 
-            return redirect('saved_locations')
+            return redirect("saved_locations")
 
     else:
         form = SavedLocationForm()
 
     return render(
         request,
-        'weather/location_form.html',
+        "weather/location_form.html",
         {
-            'form': form,
-            'title': 'Add Location'
+            "form": form,
+            "title": "Add Location",
         }
     )
 
@@ -263,21 +321,23 @@ def edit_location(request, pk):
         user=request.user
     )
 
-    if request.method == 'POST':
+    if request.method == "POST":
+
         form = SavedLocationForm(
             request.POST,
             instance=location
         )
 
         if form.is_valid():
+
             form.save()
 
             messages.success(
                 request,
-                'Location updated successfully!'
+                "Location updated successfully!"
             )
 
-            return redirect('saved_locations')
+            return redirect("saved_locations")
 
     else:
         form = SavedLocationForm(
@@ -286,10 +346,10 @@ def edit_location(request, pk):
 
     return render(
         request,
-        'weather/location_form.html',
+        "weather/location_form.html",
         {
-            'form': form,
-            'title': 'Edit Location'
+            "form": form,
+            "title": "Edit Location",
         }
     )
 
@@ -307,20 +367,21 @@ def delete_location(request, pk):
         user=request.user
     )
 
-    if request.method == 'POST':
+    if request.method == "POST":
+
         location.delete()
 
         messages.success(
             request,
-            'Location deleted successfully!'
+            "Location deleted successfully!"
         )
 
-        return redirect('saved_locations')
+        return redirect("saved_locations")
 
     return render(
         request,
-        'weather/delete_location.html',
+        "weather/delete_location.html",
         {
-            'location': location
+            "location": location
         }
     )

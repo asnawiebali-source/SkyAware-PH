@@ -7,50 +7,57 @@ urlpatterns = [
 
     # Weather Forecast
     path(
-        'forecast/',
+        "forecast/",
         views.weather_forecast,
-        name='weather_forecast'
+        name="weather_forecast"
     ),
 
     # Earthquake Updates
     path(
-        'earthquakes/',
+        "earthquakes/",
         views.earthquake_updates,
-        name='earthquake_updates'
+        name="earthquake_updates"
     ),
 
     # Air Quality
     path(
-        'air-quality/',
+        "air-quality/",
         views.air_quality_view,
-        name='air_quality'
+        name="air_quality"
+    ),
+
+    # Gemini AI Safety Assistant
+    path(
+        "ai-assistant/",
+        views.ai_assistant,
+        name="ai_assistant"
     ),
 
     # Saved Locations - Read
     path(
-        'locations/',
+        "locations/",
         views.saved_locations,
-        name='saved_locations'
+        name="saved_locations"
     ),
 
     # Saved Locations - Create
     path(
-        'locations/add/',
+        "locations/add/",
         views.add_location,
-        name='add_location'
+        name="add_location"
     ),
 
     # Saved Locations - Update
     path(
-        'locations/<int:pk>/edit/',
+        "locations/<int:pk>/edit/",
         views.edit_location,
-        name='edit_location'
+        name="edit_location"
     ),
 
     # Saved Locations - Delete
     path(
-        'locations/<int:pk>/delete/',
+        "locations/<int:pk>/delete/",
         views.delete_location,
-        name='delete_location'
+        name="delete_location"
     ),
 ]
