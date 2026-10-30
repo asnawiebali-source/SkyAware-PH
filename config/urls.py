@@ -7,43 +7,47 @@ from dashboard.views import admin_dashboard_view
 
 
 urlpatterns = [
-
     # Django Admin Panel
     path(
         "admin/",
-        admin.site.urls
+        admin.site.urls,
     ),
 
     # Custom SkyAware PH Admin Dashboard
     path(
         "admin-dashboard/",
         admin_dashboard_view,
-        name="admin_dashboard"
+        name="admin_dashboard",
     ),
 
-    # Authentication: Register, Login, Logout
+    # Authentication
     path(
         "accounts/",
-        include("accounts.urls")
+        include("accounts.urls"),
     ),
 
     # User Dashboard
     path(
         "dashboard/",
-        include("dashboard.urls")
+        include("dashboard.urls"),
+    ),
+
+    # PayMongo Test Donations
+    path(
+        "",
+        include("donations.urls"),
     ),
 
     # Homepage
     path(
         "",
         home,
-        name="home"
+        name="home",
     ),
 
     # Weather APIs and Saved Locations CRUD
     path(
         "",
-        include("weather.urls")
+        include("weather.urls"),
     ),
-
 ]

@@ -4,28 +4,17 @@ import os
 
 from dotenv import load_dotenv
 
-
-# ==========================================
-# BASE DIRECTORY AND ENVIRONMENT VARIABLES
-# ==========================================
-
+# BASE DIRECTORY AND ENVIRONMENT
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 load_dotenv(BASE_DIR / ".env")
 
-
-# ==========================================
 # SECURITY SETTINGS
-# ==========================================
-
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
     "django-insecure-local-development-only-change-me"
 )
 
-DEBUG = os.getenv(
-    "DJANGO_DEBUG", "True"
-).lower() == "true"
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -36,21 +25,15 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# GROQ AI CONFIGURATION
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
-# ==========================================
-# AI API CONFIGURATION
-# ==========================================
+# PAYMONGO TEST MODE CONFIGURATION
+PAYMONGO_SECRET_KEY = os.getenv("PAYMONGO_SECRET_KEY", "")
+PAYMONGO_API_URL = "https://api.paymongo.com/v1"
+PAYMONGO_TEST_MODE = True
 
-# Groq AI - SkyAware PH AI Safety Assistant
-GROQ_API_KEY = os.getenv(
-    "GROQ_API_KEY", ""
-)
-
-
-# ==========================================
 # INSTALLED APPLICATIONS
-# ==========================================
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -58,18 +41,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # SkyAware PH applications
     "accounts",
     "dashboard",
     "weather",
+    "donations",
 ]
 
-
-# ==========================================
 # MIDDLEWARE
-# ==========================================
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -80,24 +58,13 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
-# ==========================================
-# URL CONFIGURATION
-# ==========================================
-
 ROOT_URLCONF = "config.urls"
 
-
-# ==========================================
 # TEMPLATES
-# ==========================================
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / "templates",
-        ],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,18 +77,9 @@ TEMPLATES = [
     },
 ]
 
-
-# ==========================================
-# WSGI
-# ==========================================
-
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# ==========================================
 # DATABASE
-# ==========================================
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -129,11 +87,7 @@ DATABASES = {
     }
 }
 
-
-# ==========================================
 # PASSWORD VALIDATION
-# ==========================================
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
@@ -161,55 +115,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# ==========================================
 # LANGUAGE AND TIMEZONE
-# ==========================================
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "Asia/Manila"
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# ==========================================
 # STATIC FILES
-# ==========================================
-
 STATIC_URL = "static/"
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = (
+    [BASE_DIR / "static"]
+    if (BASE_DIR / "static").exists()
+    else []
+)
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-] if (BASE_DIR / "static").exists() else []
-
-
-# ==========================================
 # AUTHENTICATION
-# ==========================================
-
 LOGIN_URL = "login"
-
 LOGIN_REDIRECT_URL = "dashboard"
-
 LOGOUT_REDIRECT_URL = "home"
-
-
-# ==========================================
-# DEFAULT PRIMARY KEY
-# ==========================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-# ==========================================
 # CACHE
-# ==========================================
-
 CACHES = {
     "default": {
         "BACKEND": (
