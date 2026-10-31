@@ -1,325 +1,372 @@
 
 {% extends 'base.html' %}
 
-{% block title %}
-Admin Dashboard | SkyAware PH
-{% endblock %}
+{% block title %}Admin Dashboard | SkyAware PH{% endblock %}
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold text-primary">
-            SkyAware PH Admin Dashboard
-        </h2>
-        <p class="text-muted mb-0">
-            System overview and administration
-        </p>
-    </div>
-    <span class="badge bg-primary">
-        Administrator
-    </span>
-</div>
+<div class="admin-layout">
 
-<!-- USER STATISTICS -->
-<h5 class="fw-bold mb-3">System Statistics</h5>
-
-<div class="row g-4 mb-5">
-
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Total Users</p>
-                <h2 class="fw-bold text-primary">
-                    {{ total_users }}
-                </h2>
-            </div>
+    <!-- ADMIN SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="px-3 mb-4">
+            <h5 class="fw-bold mb-1">
+                <i class="bi bi-shield-check me-2"></i>
+                Admin Panel
+            </h5>
+            <small style="color:#adc5df;">
+                SkyAware PH Management
+            </small>
         </div>
-    </div>
 
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Active Users</p>
-                <h2 class="fw-bold text-success">
-                    {{ active_users }}
+        <nav>
+            <a href="{% url 'admin_dashboard' %}" class="active">
+                <i class="bi bi-grid-1x2"></i>
+                Overview
+            </a>
+
+            <a href="#users-section">
+                <i class="bi bi-people"></i>
+                Users
+            </a>
+
+            <a href="#donations-section">
+                <i class="bi bi-heart"></i>
+                Donations
+            </a>
+
+            <a href="{% url 'saved_locations' %}">
+                <i class="bi bi-geo-alt"></i>
+                Saved Locations
+            </a>
+
+            <a href="#integrations-section">
+                <i class="bi bi-plug"></i>
+                API Integrations
+            </a>
+
+            <div class="sidebar-heading">Administration</div>
+
+            <a href="{% url 'admin:index' %}">
+                <i class="bi bi-gear"></i>
+                Django Admin
+            </a>
+
+            <a href="{% url 'dashboard' %}">
+                <i class="bi bi-arrow-left-circle"></i>
+                User Dashboard
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ADMIN CONTENT -->
+    <div class="admin-content">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h2 class="page-title mb-1">
+                    Admin Overview
                 </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Saved Locations</p>
-                <h2 class="fw-bold text-info">
-                    {{ total_saved_locations }}
-                </h2>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Admin Accounts</p>
-                <h2 class="fw-bold text-warning">
-                    {{ admin_users }}
-                </h2>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- DONATION STATISTICS -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0">
-        Disaster Relief Donation Statistics
-    </h5>
-    <span class="badge bg-warning text-dark">
-        Test Mode Only
-    </span>
-</div>
-
-<div class="row g-4 mb-4">
-
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Total Donations</p>
-                <h2 class="fw-bold text-primary">
-                    {{ total_donations }}
-                </h2>
-                <small class="text-muted">
-                    All test transactions
-                </small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">
-                    Confirmed Test Donations
+                <p class="text-muted mb-0">
+                    Monitor your users, donations, and system integrations.
                 </p>
-                <h2 class="fw-bold text-success">
-                    ₱{{ total_donation_amount|floatformat:2 }}
-                </h2>
-                <small class="text-muted">
-                    {{ successful_donations }} confirmed payments
-                </small>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">
-                    Pending Donations
-                </p>
-                <h2 class="fw-bold text-warning">
-                    {{ pending_donations }}
-                </h2>
-                <small class="text-muted">
-                    Awaiting confirmation
-                </small>
+            <span class="badge bg-primary px-3 py-2">
+                <i class="bi bi-shield-check me-1"></i>
+                Administrator
+            </span>
+        </div>
+
+        <!-- SYSTEM STATISTICS -->
+        <h5 class="fw-bold mb-3">System Statistics</h5>
+
+        <div class="row g-3 mb-5">
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card p-4 h-100">
+                    <div class="stat-icon mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <p class="text-muted mb-1">Total Users</p>
+                    <div class="stat-number">
+                        {{ total_users|default:0 }}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">
-                    Failed Donations
-                </p>
-                <h2 class="fw-bold text-danger">
-                    {{ failed_donations }}
-                </h2>
-                <small class="text-muted">
-                    Failed checkout attempts
-                </small>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card p-4 h-100">
+                    <div class="stat-icon mb-3 text-success bg-success-subtle">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <p class="text-muted mb-1">Active Users</p>
+                    <div class="stat-number">
+                        {{ active_users|default:0 }}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-</div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card p-4 h-100">
+                    <div class="stat-icon mb-3 text-info bg-info-subtle">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <p class="text-muted mb-1">Saved Locations</p>
+                    <div class="stat-number">
+                        {{ total_saved_locations|default:0 }}
+                    </div>
+                </div>
+            </div>
 
-<!-- RECENT DONATIONS -->
-<div class="card border-0 shadow-sm mb-5">
-    <div class="card-body p-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card p-4 h-100">
+                    <div class="stat-icon mb-3 text-warning bg-warning-subtle">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <p class="text-muted mb-1">Admin Accounts</p>
+                    <div class="stat-number">
+                        {{ admin_users|default:0 }}
+                    </div>
+                </div>
+            </div>
 
-        <h5 class="fw-bold mb-3">
-            Recent Donation Transactions
-        </h5>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>User</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for donation in recent_donations %}
-                    <tr>
-                        <td>#{{ donation.id }}</td>
-                        <td>{{ donation.user.username }}</td>
-                        <td>
-                            ₱{{ donation.amount|floatformat:2 }}
-                        </td>
-                        <td>
-                            {% if donation.status == "paid" %}
-                            <span class="badge bg-success">
-                                Paid (Test)
-                            </span>
-                            {% elif donation.status == "pending" %}
-                            <span class="badge bg-warning text-dark">
-                                Pending
-                            </span>
-                            {% elif donation.status == "failed" %}
-                            <span class="badge bg-danger">
-                                Failed
-                            </span>
-                            {% else %}
-                            <span class="badge bg-secondary">
-                                {{ donation.get_status_display }}
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ donation.created_at|date:"M d, Y h:i A" }}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5"
-                            class="text-center text-muted py-4">
-                            No donation transactions yet.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
         </div>
 
-        <a href="{% url 'admin:donations_donation_changelist' %}"
-           class="btn btn-outline-primary btn-sm">
-            View All Donation Records
-        </a>
+        <!-- DONATION STATISTICS -->
+        <section id="donations-section">
 
-    </div>
-</div>
-
-<div class="row g-4">
-
-    <!-- RECENT USERS -->
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-
-                <h5 class="fw-bold mb-3">
-                    Recent User Registrations
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <h5 class="fw-bold mb-0">
+                    Donation Statistics
                 </h5>
+
+                <span class="badge bg-warning text-dark">
+                    <i class="bi bi-flask me-1"></i>
+                    Test Mode Only
+                </span>
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card p-4 h-100">
+                        <div class="stat-icon mb-3">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                        <p class="text-muted mb-1">Total Donations</p>
+                        <div class="stat-number">
+                            {{ total_donations|default:0 }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card p-4 h-100">
+                        <div class="stat-icon mb-3 text-success bg-success-subtle">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <p class="text-muted mb-1">
+                            Confirmed Test Amount
+                        </p>
+                        <div class="stat-number text-success">
+                            ₱{{ total_donation_amount|default:0|floatformat:2 }}
+                        </div>
+                        <small class="text-muted">
+                            {{ successful_donations|default:0 }} paid records
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card p-4 h-100">
+                        <div class="stat-icon mb-3 text-warning bg-warning-subtle">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <p class="text-muted mb-1">Pending Donations</p>
+                        <div class="stat-number">
+                            {{ pending_donations|default:0 }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card p-4 h-100">
+                        <div class="stat-icon mb-3 text-danger bg-danger-subtle">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                        <p class="text-muted mb-1">Failed Donations</p>
+                        <div class="stat-number">
+                            {{ failed_donations|default:0 }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECENT DONATIONS -->
+            <div class="panel-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        Recent Donation Transactions
+                    </h5>
+
+                    <span class="badge bg-secondary">
+                        Simulated Payments
+                    </span>
+                </div>
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-
                         <thead class="table-light">
                             <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Date Joined</th>
+                                <th>Transaction</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {% for user in recent_users %}
+                            {% for donation in recent_donations %}
                             <tr>
-                                <td>{{ user.username }}</td>
+                                <td>#{{ donation.id }}</td>
                                 <td>
-                                    {{ user.email|default:"Not provided" }}
+                                    {{ donation.user.username|default:"Unknown" }}
                                 </td>
                                 <td>
-                                    {{ user.date_joined|date:"M d, Y" }}
+                                    ₱{{ donation.amount|floatformat:2 }}
+                                </td>
+                                <td>
+                                    {% if donation.status == "paid" %}
+                                        <span class="badge bg-success">
+                                            Paid (Test)
+                                        </span>
+                                    {% elif donation.status == "pending" %}
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    {% elif donation.status == "failed" %}
+                                        <span class="badge bg-danger">
+                                            Failed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ donation.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ donation.created_at|date:"M d, Y h:i A" }}
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3"
-                                    class="text-center text-muted">
-                                    No registered users found.
+                                <td colspan="5"
+                                    class="text-center text-muted py-4">
+                                    No donation transactions recorded yet.
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
-
                     </table>
                 </div>
 
+                <a href="{% url 'admin:index' %}"
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-gear me-1"></i>
+                    Open Django Admin
+                </a>
             </div>
-        </div>
-    </div>
 
-    <!-- API INTEGRATIONS -->
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
+        </section>
 
-                <h5 class="fw-bold mb-3">
-                    API Integrations
-                </h5>
+        <!-- USERS AND INTEGRATIONS -->
+        <div class="row g-4">
 
-                <p class="text-muted small">
-                    Configured integrations.
-                    Not a live service health check.
-                </p>
+            <div class="col-xl-7" id="users-section">
+                <div class="panel-card p-4 h-100">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-people me-2"></i>
+                        Recent User Registrations
+                    </h5>
 
-                {% for api in api_integrations %}
-                <div class="d-flex justify-content-between
-                            align-items-center border-bottom py-3">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Date Joined</th>
+                                </tr>
+                            </thead>
 
-                    <span>{{ api.name }}</span>
-
-                    {% if api.status == "Testing" %}
-                    <span class="badge bg-warning text-dark">
-                        {{ api.status }}
-                    </span>
-                    {% else %}
-                    <span class="badge bg-success">
-                        {{ api.status }}
-                    </span>
-                    {% endif %}
-
+                            <tbody>
+                                {% for recent_user in recent_users %}
+                                <tr>
+                                    <td class="fw-semibold">
+                                        {{ recent_user.username }}
+                                    </td>
+                                    <td>
+                                        {{ recent_user.email|default:"Not provided" }}
+                                    </td>
+                                    <td>
+                                        {{ recent_user.date_joined|date:"M d, Y" }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3"
+                                        class="text-center text-muted py-4">
+                                        No registered users found.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                {% endfor %}
-
             </div>
+
+            <div class="col-xl-5" id="integrations-section">
+                <div class="panel-card p-4 h-100">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-plug me-2"></i>
+                        API Integrations
+                    </h5>
+
+                    <p class="text-muted small">
+                        Configured integrations, not a live health check.
+                    </p>
+
+                    {% for api in api_integrations %}
+                    <div class="d-flex justify-content-between align-items-center gap-2 border-bottom py-3">
+                        <span class="small">
+                            {{ api.name }}
+                        </span>
+
+                        {% if api.status == "Testing" %}
+                            <span class="badge bg-warning text-dark">
+                                {{ api.status }}
+                            </span>
+                        {% else %}
+                            <span class="badge bg-success">
+                                {{ api.status }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">
+                        No API integrations listed.
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+
         </div>
+
     </div>
-
-</div>
-
-<div class="mt-4">
-    <a href="{% url 'dashboard' %}"
-       class="btn btn-outline-primary">
-        Back to User Dashboard
-    </a>
-
-    <a href="{% url 'admin:index' %}"
-       class="btn btn-primary">
-        Django Admin Panel
-    </a>
 </div>
 
 {% endblock %}

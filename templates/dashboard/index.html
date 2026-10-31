@@ -5,27 +5,76 @@
 
 {% block content %}
 
-<div class="mb-4">
-    <h2 class="fw-bold text-primary">
-        Welcome, {{ user.username }}!
-    </h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h2 class="page-title mb-2">
+            Welcome, {{ user.username }}!
+        </h2>
+        <p class="text-muted mb-0">
+            Stay informed, monitor conditions, and prepare for emergencies.
+        </p>
+    </div>
 
+    {% if user.is_staff %}
+    <a href="{% url 'admin_dashboard' %}"
+       class="btn btn-primary">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Admin Dashboard
+    </a>
+    {% endif %}
+</div>
+
+<div class="p-4 p-lg-5 rounded-4 text-white mb-4"
+     style="background:linear-gradient(120deg,#123b68,#1976d2);">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-9">
+            <span class="badge bg-light text-primary mb-3">
+                SkyAware PH
+            </span>
+
+            <h2 class="fw-bold mb-3">
+                Your Weather & Disaster Information Center
+            </h2>
+
+            <p class="mb-4 opacity-75">
+                Explore weather forecasts, recent earthquakes,
+                air quality information, and safety guidance
+                for locations in the Philippines.
+            </p>
+
+            <a href="{% url 'weather_forecast' %}"
+               class="btn btn-light text-primary fw-semibold">
+                <i class="bi bi-cloud-sun me-2"></i>
+                Check Weather
+            </a>
+        </div>
+
+        <div class="col-lg-3 text-center d-none d-lg-block">
+            <i class="bi bi-cloud-sun-fill"
+               style="font-size:100px;opacity:.85;"></i>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h4 class="fw-bold">Explore Services</h4>
     <p class="text-muted">
-        Stay informed and prepared with SkyAware PH.
+        Access information and tools to help you stay prepared.
     </p>
 </div>
 
 <div class="row g-4">
 
-    <!-- WEATHER FORECAST -->
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
             <div class="card-body p-4">
-                <h3>☀️</h3>
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-cloud-sun"></i>
+                </div>
                 <h5 class="fw-bold">Weather Forecast</h5>
                 <p class="text-muted">
-                    Check current weather conditions
-                    and 7-day forecasts in Philippine cities.
+                    Check current conditions and 7-day weather
+                    forecasts for Philippine cities.
                 </p>
                 <a href="{% url 'weather_forecast' %}"
                    class="btn btn-primary">
@@ -35,16 +84,16 @@
         </div>
     </div>
 
-    <!-- EARTHQUAKE UPDATES -->
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
             <div class="card-body p-4">
-                <h3>🌍</h3>
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-activity"></i>
+                </div>
                 <h5 class="fw-bold">Earthquake Updates</h5>
                 <p class="text-muted">
-                    View recent earthquakes near the
-                    Philippines, including magnitudes,
-                    locations, and depths.
+                    View recent earthquakes near the Philippines,
+                    including magnitude, location, and depth.
                 </p>
                 <a href="{% url 'earthquake_updates' %}"
                    class="btn btn-primary">
@@ -54,34 +103,16 @@
         </div>
     </div>
 
-    <!-- SAVED LOCATIONS -->
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
             <div class="card-body p-4">
-                <h3>📍</h3>
-                <h5 class="fw-bold">Saved Locations</h5>
-                <p class="text-muted">
-                    Add, view, edit, and delete
-                    your favorite Philippine cities.
-                </p>
-                <a href="{% url 'saved_locations' %}"
-                   class="btn btn-primary">
-                    Manage Locations
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- AIR QUALITY -->
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
-            <div class="card-body p-4">
-                <h3>🌫️</h3>
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-wind"></i>
+                </div>
                 <h5 class="fw-bold">Air Quality</h5>
                 <p class="text-muted">
-                    Check European AQI, PM2.5,
-                    PM10, and air pollution levels
-                    for Philippine cities.
+                    Check air quality index, PM2.5, PM10,
+                    and pollution information.
                 </p>
                 <a href="{% url 'air_quality' %}"
                    class="btn btn-primary">
@@ -91,16 +122,16 @@
         </div>
     </div>
 
-    <!-- AI SAFETY ASSISTANT -->
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
             <div class="card-body p-4">
-                <h3>🤖</h3>
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-robot"></i>
+                </div>
                 <h5 class="fw-bold">AI Safety Assistant</h5>
                 <p class="text-muted">
-                    Ask questions about typhoons,
-                    earthquakes, floods, emergency
-                    preparation, and general safety.
+                    Ask about typhoons, earthquakes, floods,
+                    and emergency preparedness.
                 </p>
                 <a href="{% url 'ai_assistant' %}"
                    class="btn btn-primary">
@@ -110,26 +141,54 @@
         </div>
     </div>
 
-    <!-- ADMINISTRATION -->
-    {% if user.is_staff %}
-    <div class="col-md-4">
-        <div class="card feature-card shadow-sm h-100">
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
             <div class="card-body p-4">
-                <h3>⚙️</h3>
-                <h5 class="fw-bold">Administration</h5>
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <h5 class="fw-bold">Saved Locations</h5>
                 <p class="text-muted">
-                    Manage users, saved locations,
-                    and system information.
+                    Add, view, edit, and delete your
+                    favorite Philippine locations.
                 </p>
-                <a href="{% url 'admin:index' %}"
+                <a href="{% url 'saved_locations' %}"
                    class="btn btn-primary">
-                    Open Admin Panel
+                    Manage Locations
                 </a>
             </div>
         </div>
     </div>
-    {% endif %}
 
+    <div class="col-md-6 col-xl-4">
+        <div class="card feature-card h-100">
+            <div class="card-body p-4">
+                <div class="feature-icon mb-3">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h5 class="fw-bold">Disaster Relief Donations</h5>
+                <p class="text-muted">
+                    Explore simulated disaster relief
+                    donations using PayMongo test mode.
+                </p>
+                <a href="{% url 'donate' %}"
+                   class="btn btn-primary">
+                    Test Donation
+                </a>
+                <a href="{% url 'donation_history' %}"
+                   class="btn btn-outline-secondary ms-1">
+                    History
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="alert alert-info border-0 mt-4 mb-0">
+    <i class="bi bi-info-circle me-2"></i>
+    SkyAware PH provides informational data from external services.
+    Always follow official government advisories during emergencies.
 </div>
 
 {% endblock %}
