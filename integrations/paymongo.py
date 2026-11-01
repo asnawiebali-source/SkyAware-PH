@@ -1,6 +1,7 @@
 
 import requests
 
+from urllib.parse import urlparse
 from django.conf import settings
 
 
@@ -9,7 +10,9 @@ class PayMongoError(Exception):
 
 
 def get_secret_key():
-    key = settings.PAYMONGO_SECRET_KEY.strip()
+    key = getattr(
+        settings, "PAYMONGO_SECRET_KEY", ""
+    ).strip()
 
     if not key.startswith("sk_test_"):
         raise PayMongoError(
@@ -22,10 +25,23 @@ def get_secret_key():
 def api_request(method, endpoint, payload=None):
     key = get_secret_key()
 
+    base_url = getattr(
+        settings,
+        "PAYMONGO_API_URL",
+        "https://api.paymongo.com/v1",
+    ).rstrip("/")
+
+    if not base_url.startswith(
+        "https://api.paymongo.com/"
+    ):
+        raise PayMongoError(
+            "Invalid PayMongo API URL configuration."
+        )
+
     try:
         response = requests.request(
             method=method,
-            url=f"{settings.PAYMONGO_API_URL}{endpoint}",
+            url=f"{base_url}{endpoint}",
             auth=(key, ""),
             headers={
                 "Accept": "application/json",
@@ -34,14 +50,33 @@ def api_request(method, endpoint, payload=None):
             json=payload,
             timeout=20,
         )
+
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+
+    except requests.Timeout as exc:
+        raise PayMongoError(
+            "PayMongo request timed out. "
+            "Please try again later."
+        ) from exc
 
     except requests.RequestException as exc:
         raise PayMongoError(
             "Unable to communicate with PayMongo. "
-            "Please check your configuration and try again."
+            "Please try again later."
         ) from exc
+
+    except ValueError as exc:
+        raise PayMongoError(
+            "PayMongo returned an invalid response."
+        ) from exc
+
+    if not isinstance(result, dict):
+        raise PayMongoError(
+            "Unexpected PayMongo response format."
+        )
+
+    return result
 
 
 def create_checkout_session(
@@ -50,6 +85,14 @@ def create_checkout_session(
     success_url,
     cancel_url,
 ):
+    if (
+        not isinstance(amount_centavos, int)
+        or not 2000 <= amount_centavos <= 1000000
+    ):
+        raise PayMongoError(
+            "Invalid donation amount."
+        )
+
     payload = {
         "data": {
             "attributes": {
@@ -61,8 +104,8 @@ def create_checkout_session(
                 "show_description": True,
                 "show_line_items": True,
                 "description": (
-                    "SkyAware PH simulated disaster "
-                    "relief donation"
+                    "SkyAware PH simulated "
+                    "disaster relief donation"
                 ),
                 "line_items": [
                     {
@@ -91,45 +134,107 @@ def create_checkout_session(
         payload,
     )
 
-    data = result.get("data") or {}
+    data = result.get("data")
+
+    if not isinstance(data, dict):
+        raise PayMongoError(
+            "Invalid checkout session response."
+        )
+
     attributes = data.get("attributes") or {}
 
     session_id = data.get("id")
     checkout_url = attributes.get("checkout_url")
 
-    if not session_id or not checkout_url:
+    if (
+        not isinstance(session_id, str)
+        or not session_id.startswith("cs_")
+    ):
         raise PayMongoError(
-            "PayMongo did not return a valid checkout session."
+            "Invalid checkout session ID."
+        )
+
+    if not isinstance(checkout_url, str):
+        raise PayMongoError(
+            "PayMongo did not return a checkout URL."
+        )
+
+    parsed = urlparse(checkout_url)
+
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "checkout.paymongo.com"
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        raise PayMongoError(
+            "PayMongo returned an unsafe checkout URL."
+        )
+
+    if attributes.get("livemode") is not False:
+        raise PayMongoError(
+            "Checkout was not confirmed as test mode."
         )
 
     return session_id, checkout_url
 
 
 def retrieve_checkout_session(session_id):
-    if not session_id or not session_id.startswith("cs_"):
-        raise PayMongoError("Invalid checkout session ID.")
+    if (
+        not isinstance(session_id, str)
+        or not session_id.startswith("cs_")
+        or not session_id[3:].isalnum()
+    ):
+        raise PayMongoError(
+            "Invalid checkout session ID."
+        )
 
     result = api_request(
         "GET",
         f"/checkout_sessions/{session_id}",
     )
 
-    return result.get("data") or {}
+    data = result.get("data")
+
+    if not isinstance(data, dict):
+        raise PayMongoError(
+            "Invalid checkout session response."
+        )
+
+    if data.get("id") != session_id:
+        raise PayMongoError(
+            "Checkout session ID mismatch."
+        )
+
+    attributes = data.get("attributes") or {}
+
+    if attributes.get("livemode") is not False:
+        raise PayMongoError(
+            "Payment is not confirmed as test mode."
+        )
+
+    return data
 
 
 def checkout_is_paid(checkout_data, expected_amount):
     attributes = checkout_data.get("attributes") or {}
     payments = attributes.get("payments") or []
 
-    # Only trust a confirmed PayMongo payment.
-    # Do not use the browser's success URL as proof.
+    if not isinstance(payments, list):
+        return False
+
     for payment in payments:
-        payment_attributes = payment.get("attributes") or {}
+        if not isinstance(payment, dict):
+            continue
+
+        details = payment.get("attributes") or {}
 
         if (
-            payment_attributes.get("status") == "paid"
-            and payment_attributes.get("currency") == "PHP"
-            and payment_attributes.get("amount") == expected_amount
+            details.get("status") == "paid"
+            and details.get("currency") == "PHP"
+            and type(details.get("amount")) is int
+            and details.get("amount") == expected_amount
+            and details.get("livemode") is False
         ):
             return True
 
