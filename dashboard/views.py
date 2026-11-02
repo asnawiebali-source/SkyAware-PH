@@ -1,11 +1,12 @@
 
+from decimal import Decimal
+
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
 from django.db.models import Sum
-from django.db.models.functions import Coalesce
-from django.db.models import DecimalField, Value
+from django.shortcuts import render
 
 from weather.models import SavedLocation
 from donations.models import Donation
@@ -17,7 +18,10 @@ from donations.models import Donation
 
 @login_required
 def dashboard_view(request):
-    return render(request, "dashboard/index.html")
+    return render(
+        request,
+        "dashboard/index.html"
+    )
 
 
 # ==========================================
@@ -43,7 +47,9 @@ def admin_dashboard_view(request):
         is_staff=True
     ).count()
 
-    total_saved_locations = SavedLocation.objects.count()
+    total_saved_locations = (
+        SavedLocation.objects.count()
+    )
 
     recent_users = User.objects.order_by(
         "-date_joined"
@@ -67,22 +73,48 @@ def admin_dashboard_view(request):
         status=Donation.Status.FAILED
     ).count()
 
-    total_donation_amount = Donation.objects.filter(
+    cancelled_donations = Donation.objects.filter(
+        status=Donation.Status.CANCELLED
+    ).count()
+
+    paid_amount = Donation.objects.filter(
         status=Donation.Status.PAID
     ).aggregate(
-        total=Coalesce(
-            Sum("amount"),
-            Value(0),
-            output_field=DecimalField(
-                max_digits=12,
-                decimal_places=2
-            )
-        )
+        total=Sum("amount")
     )["total"]
 
-    recent_donations = Donation.objects.select_related(
-        "user"
-    ).order_by("-created_at")[:5]
+    total_donation_amount = (
+        paid_amount
+        if paid_amount is not None
+        else Decimal("0.00")
+    )
+
+    recent_donations = (
+        Donation.objects
+        .select_related("user")
+        .order_by("-created_at")[:5]
+    )
+
+    # ======================================
+    # PAYMONGO CONFIGURATION
+    # ======================================
+
+    paymongo_key = getattr(
+        settings,
+        "PAYMONGO_SECRET_KEY",
+        ""
+    )
+
+    paymongo_configured = (
+        isinstance(paymongo_key, str)
+        and paymongo_key.startswith("sk_test_")
+        and len(paymongo_key) > len("sk_test_")
+    )
+
+    if paymongo_configured:
+        paymongo_status = "Configured"
+    else:
+        paymongo_status = "Not Configured"
 
     # ======================================
     # API INTEGRATIONS
@@ -111,7 +143,7 @@ def admin_dashboard_view(request):
         },
         {
             "name": "PayMongo Test Checkout",
-            "status": "Testing"
+            "status": paymongo_status
         },
     ]
 
@@ -130,9 +162,11 @@ def admin_dashboard_view(request):
         "successful_donations": successful_donations,
         "pending_donations": pending_donations,
         "failed_donations": failed_donations,
+        "cancelled_donations": cancelled_donations,
         "total_donation_amount": total_donation_amount,
         "recent_donations": recent_donations,
 
+        "paymongo_configured": paymongo_configured,
         "api_integrations": api_integrations,
     }
 

@@ -45,7 +45,9 @@
                 API Integrations
             </a>
 
-            <div class="sidebar-heading">Administration</div>
+            <div class="sidebar-heading">
+                Administration
+            </div>
 
             <a href="{% url 'admin:index' %}">
                 <i class="bi bi-gear"></i>
@@ -62,13 +64,15 @@
     <!-- ADMIN CONTENT -->
     <div class="admin-content">
 
+        <!-- PAGE HEADER -->
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
             <div>
                 <h2 class="page-title mb-1">
                     Admin Overview
                 </h2>
                 <p class="text-muted mb-0">
-                    Monitor your users, donations, and system integrations.
+                    Monitor users, donation records,
+                    and system integrations.
                 </p>
             </div>
 
@@ -79,7 +83,9 @@
         </div>
 
         <!-- SYSTEM STATISTICS -->
-        <h5 class="fw-bold mb-3">System Statistics</h5>
+        <h5 class="fw-bold mb-3">
+            System Statistics
+        </h5>
 
         <div class="row g-3 mb-5">
 
@@ -88,7 +94,9 @@
                     <div class="stat-icon mb-3">
                         <i class="bi bi-people"></i>
                     </div>
-                    <p class="text-muted mb-1">Total Users</p>
+                    <p class="text-muted mb-1">
+                        Total Users
+                    </p>
                     <div class="stat-number">
                         {{ total_users|default:0 }}
                     </div>
@@ -100,7 +108,9 @@
                     <div class="stat-icon mb-3 text-success bg-success-subtle">
                         <i class="bi bi-person-check"></i>
                     </div>
-                    <p class="text-muted mb-1">Active Users</p>
+                    <p class="text-muted mb-1">
+                        Active Users
+                    </p>
                     <div class="stat-number">
                         {{ active_users|default:0 }}
                     </div>
@@ -112,7 +122,9 @@
                     <div class="stat-icon mb-3 text-info bg-info-subtle">
                         <i class="bi bi-geo-alt"></i>
                     </div>
-                    <p class="text-muted mb-1">Saved Locations</p>
+                    <p class="text-muted mb-1">
+                        Saved Locations
+                    </p>
                     <div class="stat-number">
                         {{ total_saved_locations|default:0 }}
                     </div>
@@ -124,7 +136,9 @@
                     <div class="stat-icon mb-3 text-warning bg-warning-subtle">
                         <i class="bi bi-shield-lock"></i>
                     </div>
-                    <p class="text-muted mb-1">Admin Accounts</p>
+                    <p class="text-muted mb-1">
+                        Admin Accounts
+                    </p>
                     <div class="stat-number">
                         {{ admin_users|default:0 }}
                     </div>
@@ -154,7 +168,9 @@
                         <div class="stat-icon mb-3">
                             <i class="bi bi-heart"></i>
                         </div>
-                        <p class="text-muted mb-1">Total Donations</p>
+                        <p class="text-muted mb-1">
+                            Total Donations
+                        </p>
                         <div class="stat-number">
                             {{ total_donations|default:0 }}
                         </div>
@@ -173,7 +189,8 @@
                             ₱{{ total_donation_amount|default:0|floatformat:2 }}
                         </div>
                         <small class="text-muted">
-                            {{ successful_donations|default:0 }} paid records
+                            {{ successful_donations|default:0 }}
+                            paid records
                         </small>
                     </div>
                 </div>
@@ -183,7 +200,9 @@
                         <div class="stat-icon mb-3 text-warning bg-warning-subtle">
                             <i class="bi bi-hourglass-split"></i>
                         </div>
-                        <p class="text-muted mb-1">Pending Donations</p>
+                        <p class="text-muted mb-1">
+                            Pending Donations
+                        </p>
                         <div class="stat-number">
                             {{ pending_donations|default:0 }}
                         </div>
@@ -195,7 +214,9 @@
                         <div class="stat-icon mb-3 text-danger bg-danger-subtle">
                             <i class="bi bi-x-circle"></i>
                         </div>
-                        <p class="text-muted mb-1">Failed Donations</p>
+                        <p class="text-muted mb-1">
+                            Failed Donations
+                        </p>
                         <div class="stat-number">
                             {{ failed_donations|default:0 }}
                         </div>
@@ -204,9 +225,18 @@
 
             </div>
 
+            <!-- CANCELLED DONATIONS -->
+            <div class="alert alert-light border mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                Cancelled donations:
+                <strong>
+                    {{ cancelled_donations|default:0 }}
+                </strong>
+            </div>
+
             <!-- RECENT DONATIONS -->
             <div class="panel-card p-4 mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <h5 class="fw-bold mb-0">
                         Recent Donation Transactions
                     </h5>
@@ -231,36 +261,51 @@
                         <tbody>
                             {% for donation in recent_donations %}
                             <tr>
-                                <td>#{{ donation.id }}</td>
+                                <td>
+                                    #{{ donation.id }}
+                                </td>
+
                                 <td>
                                     {{ donation.user.username|default:"Unknown" }}
                                 </td>
+
                                 <td>
                                     ₱{{ donation.amount|floatformat:2 }}
                                 </td>
+
                                 <td>
                                     {% if donation.status == "paid" %}
                                         <span class="badge bg-success">
                                             Paid (Test)
                                         </span>
+
                                     {% elif donation.status == "pending" %}
                                         <span class="badge bg-warning text-dark">
                                             Pending
                                         </span>
+
                                     {% elif donation.status == "failed" %}
                                         <span class="badge bg-danger">
                                             Failed
                                         </span>
+
+                                    {% elif donation.status == "cancelled" %}
+                                        <span class="badge bg-secondary">
+                                            Cancelled
+                                        </span>
+
                                     {% else %}
                                         <span class="badge bg-secondary">
                                             {{ donation.get_status_display }}
                                         </span>
                                     {% endif %}
                                 </td>
+
                                 <td>
                                     {{ donation.created_at|date:"M d, Y h:i A" }}
                                 </td>
                             </tr>
+
                             {% empty %}
                             <tr>
                                 <td colspan="5"
@@ -282,9 +327,10 @@
 
         </section>
 
-        <!-- USERS AND INTEGRATIONS -->
+        <!-- USERS AND API INTEGRATIONS -->
         <div class="row g-4">
 
+            <!-- RECENT USERS -->
             <div class="col-xl-7" id="users-section">
                 <div class="panel-card p-4 h-100">
                     <h5 class="fw-bold mb-3">
@@ -308,13 +354,16 @@
                                     <td class="fw-semibold">
                                         {{ recent_user.username }}
                                     </td>
+
                                     <td>
                                         {{ recent_user.email|default:"Not provided" }}
                                     </td>
+
                                     <td>
                                         {{ recent_user.date_joined|date:"M d, Y" }}
                                     </td>
                                 </tr>
+
                                 {% empty %}
                                 <tr>
                                     <td colspan="3"
@@ -329,6 +378,7 @@
                 </div>
             </div>
 
+            <!-- API INTEGRATIONS -->
             <div class="col-xl-5" id="integrations-section">
                 <div class="panel-card p-4 h-100">
                     <h5 class="fw-bold mb-3">
@@ -337,25 +387,40 @@
                     </h5>
 
                     <p class="text-muted small">
-                        Configured integrations, not a live health check.
+                        These statuses indicate configured
+                        integrations, not live API health checks.
                     </p>
 
                     {% for api in api_integrations %}
                     <div class="d-flex justify-content-between align-items-center gap-2 border-bottom py-3">
+
                         <span class="small">
                             {{ api.name }}
                         </span>
 
-                        {% if api.status == "Testing" %}
-                            <span class="badge bg-warning text-dark">
-                                {{ api.status }}
-                            </span>
-                        {% else %}
+                        {% if api.status == "Integrated" %}
                             <span class="badge bg-success">
                                 {{ api.status }}
                             </span>
+
+                        {% elif api.status == "Configured" %}
+                            <span class="badge bg-primary">
+                                {{ api.status }}
+                            </span>
+
+                        {% elif api.status == "Testing" %}
+                            <span class="badge bg-warning text-dark">
+                                {{ api.status }}
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                {{ api.status }}
+                            </span>
                         {% endif %}
+
                     </div>
+
                     {% empty %}
                     <p class="text-muted">
                         No API integrations listed.
