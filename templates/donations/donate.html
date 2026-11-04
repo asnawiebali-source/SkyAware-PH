@@ -4,58 +4,133 @@
 {% block title %}Test Donations | SkyAware PH{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm rounded-4">
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8 col-xl-7">
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
             <div class="card-body p-4 p-md-5">
-                <h2 class="fw-bold">❤️ Disaster Relief Donations</h2>
-                <p class="text-muted">
-                    Support disaster preparedness through our
-                    simulated donation checkout.
-                </p>
 
-                <div class="alert alert-warning">
-                    <strong>TEST MODE ONLY:</strong>
-                    This is a school project demonstration.
-                    No real money is collected and no actual
-                    disaster relief funds are distributed.
-                </div>
-
-                <form method="post" action="{% url 'create_donation' %}">
-                    {% csrf_token %}
-
-                    <label for="amount" class="form-label fw-semibold">
-                        Donation amount (PHP)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="amount"
-                        name="amount"
-                        class="form-control form-control-lg"
-                        min="20"
-                        max="10000"
-                        step="0.01"
-                        value="100.00"
-                        required
-                    >
-
-                    <div class="form-text mb-4">
-                        Minimum PHP 20. Maximum PHP 10,000.
+                <div class="text-center mb-4">
+                    <div class="display-5 text-danger mb-3">
+                        <i class="bi bi-heart-pulse"></i>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-3">
-                        Continue to PayMongo Test Checkout
-                    </button>
+                    <h2 class="fw-bold">
+                        Disaster Relief Donations
+                    </h2>
+
+                    <p class="text-muted">
+                        Explore our simulated donation
+                        system for disaster relief support.
+                    </p>
+                </div>
+
+                <div class="alert alert-warning rounded-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>TEST MODE ONLY</strong>
+
+                    <p class="mb-0 mt-2">
+                        This feature is for academic demonstration.
+                        No real money is collected, and no actual
+                        relief funds are distributed.
+                    </p>
+                </div>
+
+                {% if paymongo_configured %}
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-shield-check me-2"></i>
+                        PayMongo test checkout is configured.
+                        Only use PayMongo-provided test payment details.
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-secondary">
+                        <i class="bi bi-tools me-2"></i>
+                        <strong>Payment Checkout Unavailable</strong>
+
+                        <p class="mb-0 mt-2">
+                            The PayMongo test API key has not
+                            been configured yet. You can preview
+                            the donation interface, but checkout
+                            is currently disabled.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+                <form
+                    method="post"
+                    action="{% url 'create_donation' %}"
+                >
+                    {% csrf_token %}
+
+                    <label
+                        for="amount"
+                        class="form-label fw-semibold"
+                    >
+                        Donation Amount (PHP)
+                    </label>
+
+                    <div class="input-group input-group-lg mb-2">
+                        <span class="input-group-text">
+                            ₱
+                        </span>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            class="form-control"
+                            min="20"
+                            max="10000"
+                            step="0.01"
+                            value="100.00"
+                            required
+                            {% if not paymongo_configured %}disabled{% endif %}
+                        >
+                    </div>
+
+                    <p class="text-muted small mb-4">
+                        Minimum ₱20.00 — Maximum ₱10,000.00
+                    </p>
+
+                    <div class="d-grid">
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-lg py-3"
+                            {% if not paymongo_configured %}disabled{% endif %}
+                        >
+                            <i class="bi bi-credit-card me-2"></i>
+
+                            {% if paymongo_configured %}
+                                Continue to Test Checkout
+                            {% else %}
+                                Test Checkout Unavailable
+                            {% endif %}
+                        </button>
+                    </div>
                 </form>
 
-                <div class="mt-4 text-center">
-                    <a href="{% url 'donation_history' %}">
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <a
+                        href="{% url 'donation_history' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="bi bi-clock-history me-2"></i>
                         View My Donation History
                     </a>
                 </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
 {% endblock %}
