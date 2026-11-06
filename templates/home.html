@@ -5,292 +5,564 @@
 
 {% block extra_css %}
 <style>
-    .home-hero {
-        background: linear-gradient(135deg, #102f54, #1769c2);
-        color: white;
-        border-radius: 22px;
-        padding: 75px 25px;
-        text-align: center;
+    .sky-home {
+        --sky-navy: #102f54;
+        --sky-blue: #1769c2;
+        --sky-text: #17385d;
+        --sky-muted: #64748b;
     }
 
-    .home-hero h1 {
-        font-weight: 800;
-        font-size: clamp(32px, 5vw, 52px);
+    .sky-home .hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+            120deg,
+            #102f54 0%,
+            #164b83 55%,
+            #1769c2 100%
+        );
+        border-radius: 24px;
+        padding: 64px 55px;
+        color: #fff;
     }
 
-    .home-hero p {
-        max-width: 650px;
-        margin: 20px auto;
-        color: #e3efff;
+    .sky-home .hero::after {
+        content: "";
+        position: absolute;
+        width: 350px;
+        height: 350px;
+        right: -100px;
+        top: -120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .05);
+        pointer-events: none;
     }
 
-    .home-section-title {
-        font-weight: 750;
-        color: #17385d;
+    .sky-home .hero-content {
+        position: relative;
+        z-index: 1;
     }
 
-    .home-feature-card {
-        background: white;
-        border: 1px solid #e8eef5;
-        border-radius: 18px;
-        padding: 30px;
-        height: 100%;
-        box-shadow: 0 5px 20px rgba(0,0,0,.04);
-        transition: .2s ease;
-    }
-
-    .home-feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,.09);
-    }
-
-    .home-feature-icon {
-        width: 65px;
-        height: 65px;
-        border-radius: 18px;
-        background: #e9f3ff;
-        color: #1769c2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
+    .sky-home .eyebrow {
+        display: inline-block;
+        background: rgba(255,255,255,.13);
+        border: 1px solid rgba(255,255,255,.22);
+        color: #fff;
+        border-radius: 50px;
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .4px;
         margin-bottom: 20px;
     }
 
-    .home-feature-card p {
-        color: #64748b;
-        min-height: 65px;
+    .sky-home .hero h1 {
+        font-size: clamp(34px, 4vw, 54px);
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: -1.5px;
+        margin-bottom: 20px;
     }
 
-    .home-about {
-        background: white;
+    .sky-home .hero-description {
+        color: #dcecff;
+        font-size: 16px;
+        line-height: 1.8;
+        max-width: 580px;
+        margin-bottom: 28px;
+    }
+
+    .sky-home .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .sky-home .hero-actions .btn {
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 650;
+    }
+
+    .sky-home .weather-preview {
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.22);
         border-radius: 20px;
-        padding: 50px 25px;
-        border: 1px solid #e8eef5;
+        padding: 28px;
+        backdrop-filter: blur(8px);
+    }
+
+    .sky-home .weather-preview .preview-icon {
+        font-size: 58px;
+        color: #ffd36b;
+    }
+
+    .sky-home .weather-preview h3 {
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .sky-home .weather-preview p {
+        color: #dcecff;
+    }
+
+    .sky-home .weather-search {
+        display: flex;
+        gap: 8px;
+    }
+
+    .sky-home .weather-search input {
+        min-width: 0;
+        border-radius: 10px;
+        border: 0;
+        padding: 12px;
+    }
+
+    .sky-home .weather-search button {
+        white-space: nowrap;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .sky-home .section-heading {
+        margin-bottom: 28px;
+    }
+
+    .sky-home .section-heading h2 {
+        font-weight: 800;
+        color: var(--sky-text);
+        letter-spacing: -.5px;
+    }
+
+    .sky-home .section-heading p {
+        color: var(--sky-muted);
+        margin-bottom: 0;
+    }
+
+    .sky-home .feature-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #fff;
+        border: 1px solid #e6edf5;
+        border-radius: 18px;
+        padding: 26px;
+        box-shadow: 0 5px 18px rgba(16,47,84,.04);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .sky-home .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(16,47,84,.1);
+    }
+
+    .sky-home .feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: var(--sky-blue);
+        font-size: 25px;
+        margin-bottom: 18px;
+    }
+
+    .sky-home .feature-card h3 {
+        font-size: 19px;
+        font-weight: 750;
+        color: var(--sky-text);
+        margin-bottom: 10px;
+    }
+
+    .sky-home .feature-card p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--sky-muted);
+        margin-bottom: 22px;
+    }
+
+    .sky-home .feature-card .feature-link {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--sky-blue);
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .sky-home .feature-card .feature-link:hover {
+        color: #0b4688;
+        text-decoration: underline;
+    }
+
+    .sky-home .about-panel {
+        background: #fff;
+        border: 1px solid #e6edf5;
+        border-radius: 20px;
+        padding: 42px;
+    }
+
+    .sky-home .about-panel h2 {
+        color: var(--sky-text);
+        font-weight: 800;
+    }
+
+    .sky-home .about-panel p {
+        color: var(--sky-muted);
+        line-height: 1.8;
+    }
+
+    .sky-home .info-note {
+        background: #e9f3ff;
+        color: #214c7a;
+        border: 1px solid #d1e5fc;
+        border-radius: 12px;
+        padding: 18px 22px;
+    }
+
+    @media (max-width: 991px) {
+        .sky-home .hero {
+            padding: 42px 28px;
+        }
+
+        .sky-home .weather-preview {
+            margin-top: 25px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .sky-home .hero {
+            padding: 32px 22px;
+            border-radius: 18px;
+        }
+
+        .sky-home .hero h1 {
+            letter-spacing: -.7px;
+        }
+
+        .sky-home .weather-search {
+            flex-direction: column;
+        }
+
+        .sky-home .weather-search button {
+            width: 100%;
+        }
+
+        .sky-home .about-panel {
+            padding: 26px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- HERO SECTION -->
-<section class="home-hero mb-5">
-    <span class="badge bg-light text-primary mb-3">
-        Weather & Disaster Information Portal
-    </span>
+<div class="sky-home">
 
-    <h1>Stay Informed. Stay Prepared.</h1>
+    <!-- HERO SECTION -->
+    <section class="hero mb-5">
+        <div class="row align-items-center g-5 hero-content">
 
-    <p class="lead">
-        Access weather forecasts, earthquake updates,
-        air quality information, and disaster preparedness
-        resources for communities across the Philippines.
-    </p>
+            <div class="col-lg-7">
 
-    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-        {% if user.is_authenticated %}
-        <a href="{% url 'dashboard' %}"
-           class="btn btn-light btn-lg fw-semibold">
-            <i class="bi bi-speedometer2 me-2"></i>
-            Go to Dashboard
-        </a>
-        {% else %}
-        <a href="{% url 'register' %}"
-           class="btn btn-light btn-lg fw-semibold">
-            Get Started
-        </a>
+                <span class="eyebrow">
+                    <i class="bi bi-cloud-sun me-2"></i>
+                    PHILIPPINE WEATHER & DISASTER PORTAL
+                </span>
 
-        <a href="{% url 'login' %}"
-           class="btn btn-outline-light btn-lg">
-            Login
-        </a>
-        {% endif %}
+                <h1>
+                    Stay Informed.<br>
+                    Stay Prepared.
+                </h1>
 
-        <a href="#features"
-           class="btn btn-outline-light btn-lg">
-            Explore Features
-        </a>
+                <p class="hero-description">
+                    Get weather forecasts, earthquake updates,
+                    air quality information, and disaster safety
+                    resources in one convenient platform.
+                </p>
+
+                <div class="hero-actions">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}"
+                           class="btn btn-light">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            My Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}"
+                           class="btn btn-light">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Get Started
+                        </a>
+
+                        <a href="{% url 'login' %}"
+                           class="btn btn-outline-light">
+                            Login
+                        </a>
+                    {% endif %}
+
+                    <a href="#features"
+                       class="btn btn-outline-light">
+                        Explore Features
+                        <i class="bi bi-arrow-down ms-2"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="col-lg-5">
+
+                <div class="weather-preview">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <small class="text-white-50">
+                                WEATHER SEARCH
+                            </small>
+                            <h3 class="mt-2">
+                                Check Your City
+                            </h3>
+                        </div>
+
+                        <i class="bi bi-cloud-sun preview-icon"></i>
+                    </div>
+
+                    <p class="mb-4">
+                        Search for a Philippine city to view
+                        its current weather and forecast.
+                    </p>
+
+                    <form
+                        action="{% url 'weather_forecast' %}"
+                        method="get"
+                        class="weather-search"
+                    >
+                        <input
+                            type="text"
+                            name="city"
+                            class="form-control"
+                            placeholder="e.g. Iligan City"
+                            maxlength="100"
+                            aria-label="Philippine city"
+                            required
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn btn-light"
+                        >
+                            <i class="bi bi-search me-1"></i>
+                            Search
+                        </button>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top border-light border-opacity-25">
+                        <small class="text-white-50">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Forecasts powered by Open-Meteo
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features" class="mb-5">
+
+        <div class="section-heading text-center">
+            <h2>Explore SkyAware PH</h2>
+            <p>
+                Essential tools for weather awareness
+                and disaster preparedness.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- WEATHER -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-cloud-sun"></i>
+                    </div>
+
+                    <h3>Weather Forecast</h3>
+                    <p>
+                        View current weather conditions
+                        and seven-day forecasts for
+                        Philippine cities.
+                    </p>
+
+                    <a href="{% url 'weather_forecast' %}"
+                       class="feature-link">
+                        View Forecast
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- EARTHQUAKES -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <h3>Earthquake Updates</h3>
+                    <p>
+                        Explore recent earthquake information,
+                        including magnitude, location,
+                        and depth.
+                    </p>
+
+                    <a href="{% url 'earthquake_updates' %}"
+                       class="feature-link">
+                        View Earthquakes
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AIR QUALITY -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-wind"></i>
+                    </div>
+
+                    <h3>Air Quality</h3>
+                    <p>
+                        Monitor air quality index, PM2.5,
+                        PM10, and pollution conditions.
+                    </p>
+
+                    <a href="{% url 'air_quality' %}"
+                       class="feature-link">
+                        View Air Quality
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AI ASSISTANT -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-robot"></i>
+                    </div>
+
+                    <h3>AI Safety Assistant</h3>
+                    <p>
+                        Ask questions about typhoons,
+                        floods, earthquakes, and
+                        disaster preparedness.
+                    </p>
+
+                    <a href="{% url 'ai_assistant' %}"
+                       class="feature-link">
+                        Ask AI Assistant
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SAVED LOCATIONS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <h3>Saved Locations</h3>
+                    <p>
+                        Save and manage your favorite
+                        Philippine cities for quick access
+                        to weather information.
+                    </p>
+
+                    <a href="{% url 'saved_locations' %}"
+                       class="feature-link">
+                        Manage Locations
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- DONATIONS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+
+                    <h3>Disaster Relief Donations</h3>
+                    <p>
+                        Explore the simulated donation
+                        workflow using PayMongo test mode.
+                        No real payments are collected.
+                    </p>
+
+                    <a href="{% url 'donate' %}"
+                       class="feature-link">
+                        Test Donation
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about-panel mb-4">
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-4">
+                <span class="text-primary fw-bold small">
+                    ABOUT THE PLATFORM
+                </span>
+
+                <h2 class="mt-2 mb-0">
+                    Preparedness starts
+                    with information.
+                </h2>
+            </div>
+
+            <div class="col-lg-8">
+                <p class="mb-3">
+                    SkyAware PH is a weather and disaster
+                    information portal designed to help
+                    communities in the Philippines access
+                    forecasts, earthquake information,
+                    air quality updates, and safety resources.
+                </p>
+
+                <p class="mb-0">
+                    Our goal is to make essential information
+                    easier to access and encourage informed
+                    decision-making during changing weather
+                    and disaster conditions.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SAFETY NOTICE -->
+    <div class="info-note mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Important:</strong>
+        SkyAware PH provides information from external
+        services. During emergencies, always follow
+        official government advisories and local authorities.
     </div>
-</section>
 
-<!-- FEATURES -->
-<section id="features" class="mb-5">
-
-    <div class="text-center mb-5">
-        <h2 class="home-section-title">
-            Explore SkyAware PH
-        </h2>
-        <p class="text-muted">
-            Your essential tools for weather awareness
-            and disaster preparedness.
-        </p>
-    </div>
-
-    <div class="row g-4">
-
-        <!-- WEATHER -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-cloud-sun"></i>
-                </div>
-
-                <h4 class="fw-bold">Weather Forecast</h4>
-
-                <p>
-                    Check current weather conditions
-                    and 7-day forecasts for Philippine cities.
-                </p>
-
-                <a href="{% url 'weather_forecast' %}"
-                   class="btn btn-primary">
-                    View Weather
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- EARTHQUAKE -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-activity"></i>
-                </div>
-
-                <h4 class="fw-bold">Earthquake Updates</h4>
-
-                <p>
-                    View recent earthquake information,
-                    including magnitude, location, and depth.
-                </p>
-
-                <a href="{% url 'earthquake_updates' %}"
-                   class="btn btn-primary">
-                    View Earthquakes
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- AIR QUALITY -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-wind"></i>
-                </div>
-
-                <h4 class="fw-bold">Air Quality</h4>
-
-                <p>
-                    Monitor air quality index, PM2.5,
-                    PM10, and air pollution information.
-                </p>
-
-                <a href="{% url 'air_quality' %}"
-                   class="btn btn-primary">
-                    View Air Quality
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- AI ASSISTANT -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-robot"></i>
-                </div>
-
-                <h4 class="fw-bold">AI Safety Assistant</h4>
-
-                <p>
-                    Ask questions about typhoons,
-                    earthquakes, floods, and emergency safety.
-                </p>
-
-                <a href="{% url 'ai_assistant' %}"
-                   class="btn btn-primary">
-                    Ask AI Assistant
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- SAVED LOCATIONS -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-geo-alt"></i>
-                </div>
-
-                <h4 class="fw-bold">Saved Locations</h4>
-
-                <p>
-                    Save and manage your favorite
-                    Philippine cities for quick access.
-                </p>
-
-                <a href="{% url 'saved_locations' %}"
-                   class="btn btn-primary">
-                    Manage Locations
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- DONATIONS -->
-        <div class="col-md-6 col-xl-4">
-            <div class="home-feature-card">
-                <div class="home-feature-icon">
-                    <i class="bi bi-heart"></i>
-                </div>
-
-                <h4 class="fw-bold">Disaster Relief Donations</h4>
-
-                <p>
-                    Explore simulated disaster relief
-                    donations using PayMongo test mode.
-                </p>
-
-                <a href="{% url 'donate' %}"
-                   class="btn btn-primary">
-                    Test Donation
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-            </div>
-        </div>
-
-    </div>
-</section>
-
-<!-- ABOUT -->
-<section id="about" class="home-about text-center mb-4">
-    <h2 class="home-section-title mb-3">
-        About SkyAware PH
-    </h2>
-
-    <p class="text-muted mx-auto mb-3"
-       style="max-width:750px;">
-        SkyAware PH is a web-based weather and disaster
-        information portal designed to help Philippine
-        residents access weather forecasts, earthquake
-        information, air quality updates, and emergency
-        preparedness resources in one convenient platform.
-    </p>
-
-    <p class="text-muted mx-auto mb-0"
-       style="max-width:750px;">
-        Our goal is to promote awareness, preparedness,
-        and informed decision-making through accessible
-        information and modern technology.
-    </p>
-</section>
-
-<div class="alert alert-info border-0 rounded-3">
-    <i class="bi bi-info-circle me-2"></i>
-    SkyAware PH provides informational data from external
-    services. Always follow official government advisories
-    during emergencies.
 </div>
 
 {% endblock %}
