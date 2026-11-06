@@ -18,9 +18,41 @@ from donations.models import Donation
 
 @login_required
 def dashboard_view(request):
+
+    # Only show the logged-in user's locations.
+    user_locations = SavedLocation.objects.filter(
+        user=request.user
+    )
+
+    total_user_locations = user_locations.count()
+
+    # Latest five saved locations.
+    recent_locations = user_locations.order_by(
+        "-pk"
+    )[:5]
+
+    # User's donation statistics.
+    user_donations = Donation.objects.filter(
+        user=request.user
+    )
+
+    total_user_donations = user_donations.count()
+
+    pending_user_donations = user_donations.filter(
+        status=Donation.Status.PENDING
+    ).count()
+
+    context = {
+        "total_user_locations": total_user_locations,
+        "recent_locations": recent_locations,
+        "total_user_donations": total_user_donations,
+        "pending_user_donations": pending_user_donations,
+    }
+
     return render(
         request,
-        "dashboard/index.html"
+        "dashboard/index.html",
+        context
     )
 
 
@@ -148,7 +180,7 @@ def admin_dashboard_view(request):
     ]
 
     # ======================================
-    # DASHBOARD CONTEXT
+    # ADMIN DASHBOARD CONTEXT
     # ======================================
 
     context = {

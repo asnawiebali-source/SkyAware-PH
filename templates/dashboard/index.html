@@ -1,75 +1,227 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | SkyAware PH{% endblock %}
+{% block title %}My Dashboard | SkyAware PH{% endblock %}
 
 {% block extra_css %}
 <style>
-    .dashboard-welcome {
-        background: linear-gradient(120deg, #102f54, #1976d2);
+    .user-dashboard {
+        --primary-navy: #102f54;
+        --primary-blue: #1769c2;
+        --muted-text: #64748b;
+    }
+
+    .user-dashboard .welcome-banner {
+        background: linear-gradient(
+            120deg,
+            #102f54 0%,
+            #164d89 55%,
+            #1976d2 100%
+        );
         color: white;
-        border-radius: 20px;
-        padding: 45px;
-        margin-bottom: 35px;
-        position: relative;
+        border-radius: 22px;
+        padding: 40px;
         overflow: hidden;
+        position: relative;
     }
 
-    .dashboard-welcome h2 {
+    .user-dashboard .welcome-banner::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.06);
+        right: -70px;
+        top: -100px;
+        pointer-events: none;
+    }
+
+    .user-dashboard .welcome-banner h1 {
+        font-size: clamp(26px, 3vw, 38px);
         font-weight: 800;
+        letter-spacing: -.8px;
     }
 
-    .dashboard-welcome p {
+    .user-dashboard .welcome-banner p {
         color: #dceaff;
-        max-width: 650px;
+        max-width: 600px;
+        line-height: 1.7;
     }
 
-    .dashboard-welcome-icon {
-        font-size: 110px;
-        opacity: .8;
+    .user-dashboard .welcome-icon {
+        font-size: 100px;
+        color: #ffdc83;
+        opacity: .9;
     }
 
-    .dashboard-service-card {
+    .user-dashboard .dashboard-panel {
         background: #fff;
-        border: 1px solid #e8eef5;
+        border: 1px solid #e6edf5;
         border-radius: 18px;
-        padding: 28px;
+        padding: 24px;
         height: 100%;
-        transition: .2s ease;
-        box-shadow: 0 5px 20px rgba(0,0,0,.04);
+        box-shadow: 0 5px 18px rgba(16,47,84,.04);
     }
 
-    .dashboard-service-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,.09);
-    }
-
-    .dashboard-service-icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 60px;
-        height: 60px;
+    .user-dashboard .stat-card {
+        background: #fff;
+        border: 1px solid #e6edf5;
         border-radius: 16px;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 5px 18px rgba(16,47,84,.04);
+    }
+
+    .user-dashboard .stat-card .stat-label {
+        color: var(--muted-text);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .user-dashboard .stat-card .stat-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--primary-navy);
+        line-height: 1.2;
+    }
+
+    .user-dashboard .stat-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: var(--primary-blue);
+        font-size: 22px;
+    }
+
+    .user-dashboard .section-title {
+        color: #17385d;
+        font-weight: 800;
+        font-size: 23px;
+    }
+
+    .user-dashboard .weather-search {
+        display: flex;
+        gap: 10px;
+    }
+
+    .user-dashboard .weather-search input {
+        min-width: 0;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .user-dashboard .weather-search button {
+        border-radius: 10px;
+        white-space: nowrap;
+    }
+
+    .user-dashboard .location-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .user-dashboard .location-item:last-child {
+        border-bottom: none;
+    }
+
+    .user-dashboard .location-name {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        font-weight: 600;
+        color: #17385d;
+    }
+
+    .user-dashboard .service-card {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border: 1px solid #e6edf5;
+        border-radius: 18px;
+        padding: 25px;
+        height: 100%;
+        box-shadow: 0 5px 18px rgba(16,47,84,.04);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .user-dashboard .service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(16,47,84,.10);
+    }
+
+    .user-dashboard .service-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
         background: #e9f3ff;
         color: #1769c2;
-        font-size: 28px;
-        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        margin-bottom: 18px;
     }
 
-    .dashboard-service-card h5 {
-        color: #17385d;
+    .user-dashboard .service-card h3 {
+        font-size: 19px;
         font-weight: 750;
+        color: #17385d;
+        margin-bottom: 10px;
     }
 
-    .dashboard-service-card p {
-        color: #64748b;
-        min-height: 70px;
+    .user-dashboard .service-card p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--muted-text);
+        margin-bottom: 22px;
+    }
+
+    .user-dashboard .service-link {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .user-dashboard .service-link:hover {
+        text-decoration: underline;
+    }
+
+    .user-dashboard .notice-panel {
+        border-radius: 14px;
+        background: #e9f3ff;
+        color: #214c7a;
+        padding: 18px 22px;
+        border: 1px solid #d1e5fc;
     }
 
     @media (max-width: 767px) {
-        .dashboard-welcome {
-            padding: 30px 22px;
+        .user-dashboard .welcome-banner {
+            padding: 28px 22px;
+        }
+
+        .user-dashboard .weather-search {
+            flex-direction: column;
+        }
+
+        .user-dashboard .weather-search button {
+            width: 100%;
+        }
+
+        .user-dashboard .dashboard-panel {
+            padding: 20px;
         }
     }
 </style>
@@ -77,241 +229,407 @@
 
 {% block content %}
 
-<!-- DASHBOARD HEADER -->
-<div class="d-flex flex-wrap justify-content-between
-            align-items-center gap-3 mb-4">
+<div class="user-dashboard">
 
-    <div>
-        <h2 class="page-title mb-2">
-            Welcome, {{ user.username }}!
-        </h2>
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between
+                align-items-center gap-3 mb-4">
 
-        <p class="text-muted mb-0">
-            Stay informed, monitor conditions,
-            and prepare for emergencies.
-        </p>
-    </div>
-
-    {% if user.is_staff %}
-    <a href="{% url 'admin_dashboard' %}"
-       class="btn btn-primary">
-        <i class="bi bi-speedometer2 me-2"></i>
-        Admin Dashboard
-    </a>
-    {% endif %}
-
-</div>
-
-<!-- WELCOME BANNER -->
-<div class="dashboard-welcome">
-
-    <div class="row align-items-center g-4">
-
-        <div class="col-lg-9">
-
-            <span class="badge bg-light text-primary mb-3">
-                SkyAware PH
-            </span>
-
-            <h2 class="mb-3">
-                Your Weather & Disaster Information Center
+        <div>
+            <h2 class="page-title mb-1">
+                My Dashboard
             </h2>
-
-            <p class="mb-4">
-                Explore weather forecasts, recent earthquakes,
-                air quality information, and safety guidance
-                for locations across the Philippines.
+            <p class="text-muted mb-0">
+                Your personal weather and disaster
+                information center.
             </p>
-
-            <a href="{% url 'weather_forecast' %}"
-               class="btn btn-light text-primary fw-semibold">
-                <i class="bi bi-cloud-sun me-2"></i>
-                Check Weather
-            </a>
-
         </div>
 
-        <div class="col-lg-3 text-center d-none d-lg-block">
-            <i class="bi bi-cloud-sun-fill dashboard-welcome-icon"></i>
-        </div>
-
+        {% if user.is_staff %}
+        <a href="{% url 'admin_dashboard' %}"
+           class="btn btn-primary">
+            <i class="bi bi-shield-check me-2"></i>
+            Admin Dashboard
+        </a>
+        {% endif %}
     </div>
 
-</div>
+    <!-- WELCOME BANNER -->
+    <section class="welcome-banner mb-4">
 
-<!-- SERVICES HEADER -->
-<div class="mb-4">
-    <h4 class="fw-bold" style="color:#17385d;">
-        Explore Services
-    </h4>
+        <div class="row align-items-center g-3">
+            <div class="col-lg-9">
 
-    <p class="text-muted">
-        Access tools and information to help
-        you stay safe and prepared.
-    </p>
-</div>
+                <span class="badge bg-light text-primary mb-3">
+                    <i class="bi bi-cloud-sun me-1"></i>
+                    SkyAware PH
+                </span>
 
-<!-- SERVICES -->
-<div class="row g-4">
+                <h1 class="mb-3">
+                    Welcome back, {{ user.username }}!
+                </h1>
 
-    <!-- WEATHER -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
+                <p class="mb-4">
+                    Stay updated with weather forecasts,
+                    earthquake activity, air quality
+                    information, and disaster preparedness
+                    resources across the Philippines.
+                </p>
 
-            <div class="dashboard-service-icon">
-                <i class="bi bi-cloud-sun"></i>
-            </div>
-
-            <h5>Weather Forecast</h5>
-
-            <p>
-                Check current weather conditions
-                and 7-day forecasts for Philippine cities.
-            </p>
-
-            <a href="{% url 'weather_forecast' %}"
-               class="btn btn-primary">
-                View Weather
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- EARTHQUAKE -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
-
-            <div class="dashboard-service-icon">
-                <i class="bi bi-activity"></i>
-            </div>
-
-            <h5>Earthquake Updates</h5>
-
-            <p>
-                View recent earthquakes near the Philippines,
-                including magnitude, location, and depth.
-            </p>
-
-            <a href="{% url 'earthquake_updates' %}"
-               class="btn btn-primary">
-                View Earthquakes
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- AIR QUALITY -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
-
-            <div class="dashboard-service-icon">
-                <i class="bi bi-wind"></i>
-            </div>
-
-            <h5>Air Quality</h5>
-
-            <p>
-                Check air quality index, PM2.5,
-                PM10, and pollution information.
-            </p>
-
-            <a href="{% url 'air_quality' %}"
-               class="btn btn-primary">
-                View Air Quality
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- AI ASSISTANT -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
-
-            <div class="dashboard-service-icon">
-                <i class="bi bi-robot"></i>
-            </div>
-
-            <h5>AI Safety Assistant</h5>
-
-            <p>
-                Ask about typhoons, earthquakes,
-                floods, and emergency preparedness.
-            </p>
-
-            <a href="{% url 'ai_assistant' %}"
-               class="btn btn-primary">
-                Ask AI Assistant
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- SAVED LOCATIONS -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
-
-            <div class="dashboard-service-icon">
-                <i class="bi bi-geo-alt"></i>
-            </div>
-
-            <h5>Saved Locations</h5>
-
-            <p>
-                Add, view, edit, and delete
-                your favorite Philippine locations.
-            </p>
-
-            <a href="{% url 'saved_locations' %}"
-               class="btn btn-primary">
-                Manage Locations
-                <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- DONATIONS -->
-    <div class="col-md-6 col-xl-4">
-        <div class="dashboard-service-card">
-
-            <div class="dashboard-service-icon">
-                <i class="bi bi-heart"></i>
-            </div>
-
-            <h5>Disaster Relief Donations</h5>
-
-            <p>
-                Explore simulated disaster relief
-                donations using PayMongo test mode.
-            </p>
-
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'donate' %}"
-                   class="btn btn-primary">
-                    Test Donation
+                <a href="{% url 'weather_forecast' %}"
+                   class="btn btn-light fw-semibold">
+                    <i class="bi bi-cloud-sun me-2"></i>
+                    Check Weather
                 </a>
 
-                <a href="{% url 'donation_history' %}"
-                   class="btn btn-outline-secondary">
-                    History
-                </a>
+            </div>
+
+            <div class="col-lg-3 text-center d-none d-lg-block">
+                <i class="bi bi-cloud-sun-fill welcome-icon"></i>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- USER STATISTICS -->
+    <section class="mb-4">
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between
+                                align-items-start mb-3">
+                        <span class="stat-label">
+                            My Saved Locations
+                        </span>
+                        <div class="stat-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_user_locations|default:0 }}
+                    </div>
+
+                    <small class="text-muted">
+                        Locations in your account
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between
+                                align-items-start mb-3">
+                        <span class="stat-label">
+                            My Test Donations
+                        </span>
+                        <div class="stat-icon">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_user_donations|default:0 }}
+                    </div>
+
+                    <small class="text-muted">
+                        Simulated transaction records
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between
+                                align-items-start mb-3">
+                        <span class="stat-label">
+                            Pending Test Donations
+                        </span>
+                        <div class="stat-icon">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">
+                        {{ pending_user_donations|default:0 }}
+                    </div>
+
+                    <small class="text-muted">
+                        Awaiting payment confirmation
+                    </small>
+                </div>
             </div>
 
         </div>
+    </section>
+
+    <!-- WEATHER SEARCH AND SAVED LOCATIONS -->
+    <section class="mb-5">
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <div class="dashboard-panel">
+
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="stat-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <div>
+                            <h3 class="h5 fw-bold mb-1">
+                                Quick Weather Search
+                            </h3>
+                            <p class="text-muted small mb-0">
+                                Find weather conditions for a city.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form
+                        method="get"
+                        action="{% url 'weather_forecast' %}"
+                        class="weather-search"
+                    >
+                        <input
+                            type="text"
+                            name="city"
+                            class="form-control"
+                            placeholder="Enter city, e.g. Iligan City"
+                            maxlength="100"
+                            aria-label="City name"
+                            required
+                        >
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            <i class="bi bi-search me-1"></i>
+                            Search
+                        </button>
+                    </form>
+
+                    <p class="text-muted small mt-3 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Weather information is provided by Open-Meteo.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="dashboard-panel">
+
+                    <div class="d-flex justify-content-between
+                                align-items-center gap-2 mb-3">
+                        <div>
+                            <h3 class="h5 fw-bold mb-1">
+                                Recent Saved Locations
+                            </h3>
+                            <p class="text-muted small mb-0">
+                                Your latest saved places
+                            </p>
+                        </div>
+
+                        <a href="{% url 'saved_locations' %}"
+                           class="btn btn-outline-primary btn-sm">
+                            View All
+                        </a>
+                    </div>
+
+                    {% for location in recent_locations %}
+                    <div class="location-item">
+                        <div class="location-name">
+                            <i class="bi bi-geo-alt text-primary me-2"></i>
+                            {{ location }}
+                        </div>
+
+                        <span class="badge bg-light text-secondary border">
+                            Saved
+                        </span>
+                    </div>
+
+                    {% empty %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-geo-alt text-muted fs-2"></i>
+                        <p class="text-muted small mt-2 mb-3">
+                            You haven't saved any locations yet.
+                        </p>
+
+                        <a href="{% url 'saved_locations' %}"
+                           class="btn btn-outline-primary btn-sm">
+                            Manage Locations
+                        </a>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="mb-5">
+
+        <div class="mb-4">
+            <h2 class="section-title mb-1">
+                Explore Services
+            </h2>
+            <p class="text-muted mb-0">
+                Quick access to your weather and disaster
+                preparedness tools.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- WEATHER -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-cloud-sun"></i>
+                    </div>
+
+                    <h3>Weather Forecast</h3>
+                    <p>
+                        View current weather conditions and
+                        seven-day forecasts for Philippine cities.
+                    </p>
+
+                    <a href="{% url 'weather_forecast' %}"
+                       class="service-link">
+                        View Forecast
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- EARTHQUAKES -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <h3>Earthquake Updates</h3>
+                    <p>
+                        View recent earthquake activity,
+                        magnitudes, locations, and depths.
+                    </p>
+
+                    <a href="{% url 'earthquake_updates' %}"
+                       class="service-link">
+                        View Earthquakes
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AIR QUALITY -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-wind"></i>
+                    </div>
+
+                    <h3>Air Quality</h3>
+                    <p>
+                        Check air quality index, PM2.5,
+                        PM10, and pollution information.
+                    </p>
+
+                    <a href="{% url 'air_quality' %}"
+                       class="service-link">
+                        View Air Quality
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AI ASSISTANT -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-robot"></i>
+                    </div>
+
+                    <h3>AI Safety Assistant</h3>
+                    <p>
+                        Ask questions about typhoons,
+                        floods, earthquakes, and safety.
+                    </p>
+
+                    <a href="{% url 'ai_assistant' %}"
+                       class="service-link">
+                        Ask AI Assistant
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SAVED LOCATIONS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <h3>Saved Locations</h3>
+                    <p>
+                        Add, view, edit, and delete your
+                        favorite Philippine locations.
+                    </p>
+
+                    <a href="{% url 'saved_locations' %}"
+                       class="service-link">
+                        Manage Locations
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- DONATIONS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+
+                    <h3>Disaster Relief Donations</h3>
+                    <p>
+                        Explore simulated disaster relief
+                        donations using PayMongo test mode.
+                        No real payments are collected.
+                    </p>
+
+                    <div class="mt-auto d-flex flex-wrap gap-3">
+                        <a href="{% url 'donate' %}"
+                           class="service-link">
+                            Test Donation
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+
+                        <a href="{% url 'donation_history' %}"
+                           class="service-link">
+                            History
+                            <i class="bi bi-clock-history"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SAFETY NOTICE -->
+    <div class="notice-panel mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Important:</strong>
+        SkyAware PH provides information from external
+        services. During emergencies, always follow
+        official government advisories and local authorities.
     </div>
 
-</div>
-
-<!-- DISCLAIMER -->
-<div class="alert alert-info border-0 rounded-3 mt-4 mb-0">
-    <i class="bi bi-info-circle me-2"></i>
-    SkyAware PH provides informational data from external
-    services. Always follow official government advisories
-    during emergencies.
 </div>
 
 {% endblock %}
