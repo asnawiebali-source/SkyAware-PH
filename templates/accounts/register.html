@@ -1,45 +1,348 @@
 
 {% extends 'base.html' %}
 
+{% block title %}Create Account | SkyAware PH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-section {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px 15px;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 520px;
+        background: #ffffff;
+        border: 1px solid #e6edf5;
+        border-radius: 22px;
+        padding: 38px;
+        box-shadow: 0 15px 45px rgba(16, 47, 84, 0.08);
+    }
+
+    .register-logo {
+        width: 62px;
+        height: 62px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
+        background: #e9f3ff;
+        color: #1769c2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .register-title {
+        font-size: 29px;
+        font-weight: 800;
+        color: #102f54;
+        letter-spacing: -0.6px;
+    }
+
+    .register-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .register-card .form-label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .register-card input:not([type="checkbox"]) {
+        display: block;
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid #d6e0eb;
+        border-radius: 11px;
+        padding: 11px 14px;
+        font-size: 15px;
+        background: #fff;
+        color: #1e293b;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .register-card input:focus {
+        border-color: #1769c2;
+        box-shadow: 0 0 0 4px rgba(23, 105, 194, .12);
+    }
+
+    .register-card .field-group {
+        margin-bottom: 20px;
+    }
+
+    .register-card .field-error {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .register-card .helptext {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-top: 7px;
+    }
+
+    .register-card .helptext ul {
+        padding-left: 18px;
+        margin: 7px 0 0;
+    }
+
+    /* PASSWORD VISIBILITY */
+    .register-card .password-wrapper {
+        position: relative;
+    }
+
+    .register-card .password-wrapper input {
+        padding-right: 52px !important;
+    }
+
+    .register-card .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #64748b;
+        cursor: pointer;
+        font-size: 19px;
+    }
+
+    .register-card .password-toggle:hover {
+        background: #e9f3ff;
+        color: #1769c2;
+    }
+
+    .register-card .password-toggle:focus-visible {
+        outline: 2px solid #1769c2;
+        outline-offset: 2px;
+    }
+
+    .register-card .register-btn {
+        width: 100%;
+        background: #1769c2;
+        border: none;
+        color: #fff;
+        padding: 14px;
+        border-radius: 11px;
+        font-weight: 700;
+        font-size: 15px;
+        transition: background .2s;
+    }
+
+    .register-card .register-btn:hover {
+        background: #10549f;
+    }
+
+    .register-footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .register-footer a {
+        color: #1769c2;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .register-footer a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 575px) {
+        .register-section {
+            padding: 25px 8px;
+        }
+
+        .register-card {
+            padding: 28px 22px;
+            border-radius: 17px;
+        }
+
+        .register-title {
+            font-size: 25px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h3 class="fw-bold text-center mb-4">
-                    Create Account
-                </h3>
 
-                <form method="POST">
-                    {% csrf_token %}
+<section class="register-section">
 
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label">
-                                {{ field.label }}
-                            </label>
+    <div class="register-card">
 
-                            <div>{{ field }}</div>
+        <!-- HEADER -->
+        <div class="text-center mb-4">
 
-                            {% for error in field.errors %}
-                                <div class="text-danger small">
-                                    {{ error }}
-                                </div>
-                            {% endfor %}
+            <div class="register-logo">
+                <i class="bi bi-person-plus"></i>
+            </div>
+
+            <h1 class="register-title mb-2">
+                Create Your Account
+            </h1>
+
+            <p class="register-subtitle mb-0">
+                Join SkyAware PH to access weather forecasts,
+                disaster updates, and personalized features.
+            </p>
+
+        </div>
+
+        <!-- REGISTRATION FORM -->
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger rounded-3">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+
+                <div class="field-group">
+
+                    <label
+                        for="{{ field.id_for_label }}"
+                        class="form-label"
+                    >
+                        {{ field.label }}
+
+                        {% if field.field.required %}
+                            <span class="text-danger">*</span>
+                        {% endif %}
+                    </label>
+
+                    {% if field.name == "password1" or field.name == "password2" or field.name == "password" %}
+
+                        <div class="password-wrapper">
+
+                            {{ field }}
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                aria-label="Show password"
+                                aria-pressed="false"
+                                onclick="togglePassword(this)"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                        </div>
+
+                    {% else %}
+
+                        {{ field }}
+
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <div class="helptext">
+                            {{ field.help_text|safe }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <div class="field-error">
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            {{ error }}
                         </div>
                     {% endfor %}
 
-                    <button class="btn btn-primary w-100">
-                        Register
-                    </button>
-                </form>
+                </div>
 
-                <p class="text-center mt-3">
-                    Already have an account?
-                    <a href="{% url 'login' %}">Login</a>
-                </p>
-            </div>
+            {% endfor %}
+
+            <button
+                type="submit"
+                class="register-btn"
+            >
+                <i class="bi bi-person-check me-2"></i>
+                Create Account
+            </button>
+
+        </form>
+
+        <!-- LOGIN LINK -->
+        <div class="register-footer">
+            Already have an account?
+            <a href="{% url 'login' %}">
+                Sign In
+            </a>
         </div>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                <i class="bi bi-shield-lock me-1"></i>
+                Your account is protected by Django authentication.
+            </small>
+        </div>
+
     </div>
-</div>
+
+</section>
+
+<script>
+    function togglePassword(button) {
+        const wrapper = button.closest(".password-wrapper");
+        const input = wrapper.querySelector("input");
+        const icon = button.querySelector("i");
+
+        if (!input) {
+            return;
+        }
+
+        const isHidden = input.type === "password";
+
+        input.type = isHidden ? "text" : "password";
+
+        icon.className = isHidden
+            ? "bi bi-eye-slash"
+            : "bi bi-eye";
+
+        button.setAttribute(
+            "aria-label",
+            isHidden ? "Hide password" : "Show password"
+        );
+
+        button.setAttribute(
+            "aria-pressed",
+            isHidden ? "true" : "false"
+        );
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(
+            ".password-wrapper input"
+        ).forEach(function (input) {
+            input.type = "password";
+            input.setAttribute("autocomplete", "new-password");
+        });
+    });
+</script>
+
 {% endblock %}
