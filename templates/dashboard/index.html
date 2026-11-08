@@ -1,501 +1,274 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | SkyAware PH{% endblock %}
+{% block title %}My Dashboard | SkyAware PH{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzxPhhYQvQbwDzSl76KkP0s1qM=" crossorigin="">
 <style>
-    .navbar {
-        background: #fff !important;
-        border-bottom: 1px solid #e4eaf2;
-        box-shadow: none;
-    }
-    .navbar-brand { color: #1b3049 !important; }
-    .navbar .nav-link { color: #40546c !important; }
-    .navbar .nav-link:hover,
-    .navbar .nav-link:focus {
-        color: #1769c2 !important;
-        background: #eef5ff;
-    }
-    .navbar .navbar-toggler { background: #1769c2; }
-
-    body { background: #f3f6fb; }
-    main.container-fluid {
-        max-width: 1536px;
-        padding-top: 24px !important;
+    .sky-dashboard {
+        --blue: #1769c2;
+        --navy: #17385d;
+        --muted: #64748b;
     }
 
-    .sa-dashboard {
-        color: #1c2d43;
-        --sa-blue: #1769c2;
-        --sa-muted: #718096;
-    }
-
-    .sa-topline {
+    .sky-dashboard .dashboard-heading {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 14px;
+        align-items: center;
         flex-wrap: wrap;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 24px;
     }
-    .sa-topline h1 {
-        font-size: 24px;
+
+    .sky-dashboard .dashboard-heading h1 {
+        font-size: 27px;
         font-weight: 800;
-        letter-spacing: -.6px;
+        color: var(--navy);
         margin: 0;
     }
-    .sa-topline small { color: #718096; }
 
-    .sa-chips {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    .sa-chip {
-        background: #e7f4ec;
-        color: #26734c;
-        font-size: 12px;
-        padding: 7px 12px;
-        border-radius: 30px;
-        font-weight: 700;
-    }
-    .sa-chip.admin {
-        background: #eaf1ff;
-        color: #205cb0;
-        text-decoration: none;
+    .sky-dashboard .dashboard-heading p {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 5px 0 0;
     }
 
-    .sa-card {
+    .sky-dashboard .dashboard-card {
         background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 15px;
-        padding: 22px;
+        border: 1px solid #e3eaf2;
+        border-radius: 17px;
+        padding: 24px;
         height: 100%;
-        box-shadow: 0 2px 9px rgba(22,43,73,.025);
+        box-shadow: 0 5px 20px rgba(16,47,84,.035);
     }
-    .sa-card h2 {
+
+    .sky-dashboard .dashboard-card h2 {
         font-size: 19px;
         font-weight: 800;
-        letter-spacing: -.3px;
-        margin: 0;
+        color: #17385d;
+        margin-bottom: 5px;
     }
-    .sa-muted {
-        color: #778497;
+
+    .sky-dashboard .section-subtitle {
         font-size: 12px;
+        color: #778497;
     }
 
-    .sa-search { display: flex; gap: 10px; }
-    .sa-search .form-control {
-        border-radius: 10px;
-        min-height: 46px;
-        border-color: #dce4ee;
-    }
-    .sa-search .btn {
-        padding: 0 25px;
-        font-weight: 700;
+    .sky-dashboard .city-search {
+        background: white;
+        border: 1px solid #e3eaf2;
+        border-radius: 15px;
+        padding: 18px;
     }
 
-    .sa-section-head {
+    .sky-dashboard .city-search form {
         display: flex;
-        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .sky-dashboard .city-search input {
+        min-height: 46px;
+        border-radius: 9px;
+    }
+
+    .sky-dashboard .city-search button {
+        padding: 0 26px;
+    }
+
+    .sky-dashboard .temperature {
+        font-size: 68px;
+        font-weight: 800;
+        letter-spacing: -3px;
+        color: #102f54;
+        line-height: 1.1;
+    }
+
+    .sky-dashboard .weather-condition {
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .sky-dashboard .weather-condition i {
+        color: #e4a83c;
+        font-size: 28px;
+    }
+
+    .sky-dashboard .weather-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .sky-dashboard .metric {
+        background: #f3f6fb;
+        border-radius: 11px;
+        padding: 14px;
+    }
+
+    .sky-dashboard .metric small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    .sky-dashboard .metric strong {
+        font-size: 18px;
+        color: var(--navy);
+    }
+
+    .sky-dashboard .forecast {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(75px, 1fr));
+        gap: 8px;
+        overflow-x: auto;
+    }
+
+    .sky-dashboard .forecast-day {
+        background: #f3f6fb;
+        padding: 14px 8px;
+        border-radius: 11px;
+        text-align: center;
+        min-width: 75px;
+    }
+
+    .sky-dashboard .forecast-day strong {
+        color: #17385d;
+    }
+
+    .sky-dashboard .forecast-day small {
+        display: block;
+        color: #64748b;
+        margin-top: 7px;
+    }
+
+    .sky-dashboard .forecast-day i {
+        display: block;
+        color: #e2a33b;
+        font-size: 21px;
+        margin: 8px 0;
+    }
+
+    .sky-dashboard .air-value {
+        font-size: 44px;
+        font-weight: 800;
+        color: #17385d;
+        line-height: 1.2;
+    }
+
+    .sky-dashboard .air-metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .sky-dashboard .air-metric {
+        padding: 15px;
+        border-radius: 11px;
+        background: #f3f6fb;
+    }
+
+    .sky-dashboard .air-metric small {
+        display: block;
+        color: #64748b;
+    }
+
+    .sky-dashboard .air-metric strong {
+        color: #17385d;
+        font-size: 20px;
+    }
+
+    .sky-dashboard .quake-item,
+    .sky-dashboard .place-item {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
         gap: 12px;
-        flex-wrap: wrap;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf1f5;
+    }
+
+    .sky-dashboard .quake-item:last-child,
+    .sky-dashboard .place-item:last-child {
+        border-bottom: 0;
+    }
+
+    .sky-dashboard .quake-mag {
+        background: #e8f2ff;
+        color: #1769c2;
+        font-weight: 800;
+        border-radius: 9px;
+        padding: 10px;
+        min-width: 52px;
+        text-align: center;
+    }
+
+    .sky-dashboard .quake-name,
+    .sky-dashboard .place-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #233a56;
+        overflow-wrap: anywhere;
+    }
+
+    .sky-dashboard .quake-meta {
+        color: #778497;
+        font-size: 11px;
+    }
+
+    .sky-dashboard .assistant-preview {
+        background: #f3f6fb;
+        padding: 18px;
+        border-radius: 12px;
+        margin-top: 15px;
         margin-bottom: 17px;
     }
 
-    .sa-weather-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-    }
-    .sa-weather-current {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin: 15px 0 22px;
-    }
-    .sa-temp {
-        font-size: 70px;
-        line-height: 1;
-        letter-spacing: -4px;
-        font-weight: 800;
-        color: #172337;
-    }
-    .sa-condition {
-        color: #3d4c63;
-        font-size: 14px;
-        font-weight: 650;
-    }
-    .sa-condition i {
-        color: #f4b94f;
-        font-size: 26px;
-        margin-right: 4px;
-        vertical-align: middle;
-    }
-
-    .sa-metrics {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(85px,1fr));
-        gap: 8px;
-        min-width: 180px;
-    }
-    .sa-metric {
-        background: #f3f6fb;
-        padding: 10px 12px;
+    .sky-dashboard .assistant-question {
+        background: #1769c2;
+        color: white;
         border-radius: 10px;
-    }
-    .sa-metric span {
-        display: block;
-        color: #7b8797;
-        font-size: 11px;
-    }
-    .sa-metric strong {
-        display: block;
-        font-size: 16px;
-        font-weight: 800;
-        color: #253249;
-        margin-top: 1px;
-    }
-
-    .sa-forecast-label {
-        font-weight: 800;
+        padding: 12px;
         font-size: 13px;
-        margin-bottom: 10px;
-    }
-    .sa-forecast {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0,1fr));
-        gap: 5px;
-    }
-    .sa-day {
-        min-width: 0;
-        background: #f4f6fb;
-        border-radius: 10px;
-        text-align: center;
-        padding: 12px 4px 10px;
-    }
-    .sa-day .name {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-    }
-    .sa-day i {
-        display: block;
-        font-size: 22px;
-        color: #f2ad47;
-        margin: 5px 0;
-    }
-    .sa-day strong {
-        display: block;
-        font-size: 15px;
-        font-weight: 800;
-    }
-    .sa-day .low {
-        display: block;
-        font-size: 12px;
-        color: #8693a6;
-    }
-    .sa-rain-bar {
-        height: 4px;
-        border-radius: 5px;
-        background: #dbe6f8;
-        overflow: hidden;
-        margin: 10px 5px 6px;
-    }
-    .sa-rain-bar span {
-        display: block;
-        height: 100%;
-        background: #2d88df;
-    }
-    .sa-rain-label {
-        display: block;
-        font-size: 10px;
-        color: #6e7b8c;
-        white-space: nowrap;
+        margin-bottom: 12px;
     }
 
-    .sa-air-badge {
-        display: inline-block;
-        max-width: 100%;
-        font-weight: 800;
-        font-size: 14px;
-        border-radius: 8px;
-        padding: 8px 12px;
-        margin: 11px 0;
-    }
-    .sa-air-badge.good {
-        background: #e6f5eb;
-        color: #218254;
-    }
-    .sa-air-badge.moderate {
-        background: #fff1db;
-        color: #93601b;
-    }
-    .sa-air-badge.sensitive {
-        background: #fff0db;
-        color: #a45e15;
-    }
-    .sa-air-badge.unhealthy,
-    .sa-air-badge.very-unhealthy,
-    .sa-air-badge.hazardous {
-        background: #fce5e5;
-        color: #b2353e;
-    }
-    .sa-air-badge.secondary {
-        background: #eef1f5;
-        color: #546273;
-    }
-    .sa-air-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 9px;
-        margin: 14px 0 19px;
-    }
-    .sa-air-grid div {
+    .sky-dashboard .assistant-answer {
+        background: white;
         border-radius: 10px;
-        background: #f4f6fa;
         padding: 13px;
-    }
-    .sa-air-grid small {
-        display: block;
-        color: #728096;
-        font-size: 11px;
-    }
-    .sa-air-grid strong { font-size: 21px; }
-    .sa-aqi-scale {
-        height: 9px;
-        border-radius: 6px;
-        position: relative;
-        background: linear-gradient(
-            90deg,
-            #45b96b, #d8ca49, #f0a34e,
-            #e15d3f, #9b3c99, #7b2947
-        );
-    }
-    .sa-scale-pin {
-        position: absolute;
-        top: -4px;
-        width: 4px;
-        height: 17px;
-        background: #1b2638;
-        border-radius: 3px;
-        transform: translateX(-50%);
-    }
-    .sa-scale-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        color: #788497;
-        margin-top: 5px;
-    }
-    .sa-aqi-advice {
-        color: #637286;
-        font-size: 12px;
+        color: #475569;
+        font-size: 13px;
         line-height: 1.7;
-        margin: 16px 0 0;
     }
 
-    .sa-quake-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: inherit;
-        text-decoration: none;
-        border: 1px solid #e6eaf0;
-        border-radius: 11px;
-        padding: 10px;
-        margin-top: 8px;
-        transition: background .2s;
-    }
-    .sa-quake-item:hover { background: #f6f9fd; }
-    .sa-mag {
-        min-width: 48px;
+    .sky-dashboard .empty-state {
+        color: #718096;
+        font-size: 14px;
         text-align: center;
-        border-radius: 9px;
-        padding: 9px 7px;
-        font-size: 16px;
-        font-weight: 800;
-    }
-    .sa-mag.strong {
-        background: #fde7e6;
-        color: #b73937;
-    }
-    .sa-mag.medium {
-        background: #fff1dc;
-        color: #a37020;
-    }
-    .sa-mag.low {
-        background: #e5f6ed;
-        color: #2b8560;
-    }
-    .sa-quake-name {
-        font-size: 13px;
-        font-weight: 750;
-        line-height: 1.3;
-        margin-bottom: 3px;
-    }
-    .sa-quake-detail {
-        color: #8290a1;
-        font-size: 11px;
+        padding: 25px 10px;
     }
 
-    .sa-map-toggle {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
-    .sa-map-toggle button {
-        border: 1px solid #dfe6ee;
-        background: #fff;
-        padding: 7px 12px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 650;
-    }
-    .sa-map-toggle button.active {
-        background: #10233b;
-        color: #fff;
-        border-color: #10233b;
-    }
-    #saMap {
-        height: 330px;
-        border-radius: 12px;
-        background: #dae8f3;
-        z-index: 1;
-    }
-    .sa-map-key {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-        color: #677789;
-        font-size: 11px;
-        margin-top: 12px;
-    }
-    .sa-dot {
-        display: inline-block;
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-
-    .sa-assistant-demo {
-        background: #f4f6fa;
-        border-radius: 11px;
-        padding: 18px;
-        margin: 12px 0 14px;
-    }
-    .sa-question {
-        background: #1769c2;
-        color: #fff;
-        border-radius: 12px 12px 2px 12px;
-        padding: 11px 14px;
-        font-size: 13px;
-        margin-left: auto;
-        max-width: 88%;
-        width: max-content;
-    }
-    .sa-response {
-        background: #fff;
-        padding: 13px;
-        border-radius: 10px 10px 10px 2px;
-        margin-top: 12px;
-        font-size: 13px;
-        line-height: 1.6;
-        max-width: 90%;
-        color: #35465c;
-    }
-    .sa-assistant-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: #1769c2;
-        color: #fff;
-        border-radius: 9px;
-        padding: 12px;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 750;
-    }
-    .sa-assistant-link:hover {
-        color: #fff;
-        background: #10549e;
-    }
-
-    .sa-place {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        border: 1px solid #e6eaf0;
-        border-radius: 10px;
-        padding: 12px;
-        margin-top: 8px;
-    }
-    .sa-place-name {
-        font-size: 13px;
-        font-weight: 750;
-        overflow-wrap: anywhere;
-    }
-    .sa-compact-link {
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration: none;
-    }
-    .sa-empty {
-        padding: 20px 10px;
-        text-align: center;
-        color: #7d8a9b;
-        font-size: 13px;
-    }
-    .sa-bottom-note {
-        display: flex;
-        gap: 8px;
-        align-items: flex-start;
-        color: #778497;
-        font-size: 12px;
-        line-height: 1.6;
-        margin-top: 12px;
-    }
-    .sa-footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin: 22px 0 6px;
-    }
-    .sa-footer-links a {
-        font-size: 12px;
-        color: #1769c2;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
-    @media(max-width: 1100px) {
-        .sa-forecast {
-            overflow-x: auto;
-            grid-template-columns: repeat(7, minmax(69px,1fr));
-        }
-    }
     @media(max-width: 575px) {
-        .sa-card { padding: 17px; }
-        .sa-search { flex-direction: column; }
-        .sa-search .btn { min-height: 42px; }
-        .sa-weather-header { flex-direction: column; }
-        .sa-weather-current {
-            align-items: flex-start;
+        .sky-dashboard .dashboard-card {
+            padding: 18px;
+        }
+
+        .sky-dashboard .city-search form {
             flex-direction: column;
         }
-        .sa-metrics { width: 100%; }
-        .sa-temp { font-size: 62px; }
-        #saMap { height: 285px; }
+
+        .sky-dashboard .city-search button {
+            min-height: 44px;
+        }
+
+        .sky-dashboard .weather-metrics {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .sky-dashboard .temperature {
+            font-size: 55px;
+        }
     }
 </style>
 {% endblock %}
@@ -503,447 +276,383 @@
 
 {% block content %}
 
-<div class="sa-dashboard">
+<div class="sky-dashboard">
 
-    <!-- PAGE HEADING -->
-    <div class="sa-topline">
+    <!-- HEADER -->
+    <div class="dashboard-heading">
+
         <div>
-            <h1>My dashboard</h1>
-            <small>Weather and disaster information for the Philippines</small>
+            <h1>My Dashboard</h1>
+
+            <p>
+                Weather and disaster information
+                for the Philippines.
+            </p>
         </div>
 
-        <div class="sa-chips">
-            <span class="sa-chip">
+        <div class="d-flex align-items-center gap-2">
+
+            <span class="badge bg-primary px-3 py-2">
                 <i class="bi bi-person me-1"></i>
                 {{ user.username }}
             </span>
 
             {% if user.is_staff %}
-            <a href="{% url 'admin_dashboard' %}" class="sa-chip admin">
-                Admin overview
-                <i class="bi bi-arrow-right"></i>
+            <a
+                href="{% url 'admin_dashboard' %}"
+                class="btn btn-outline-primary btn-sm"
+            >
+                Admin Dashboard
             </a>
             {% endif %}
+
         </div>
+
     </div>
 
     <!-- CITY SEARCH -->
-    <form
-        class="sa-search mb-3"
-        action="{% url 'dashboard' %}"
-        method="get"
-    >
-        <input
-            class="form-control"
-            name="city"
-            value="{{ searched_city }}"
-            maxlength="80"
-            minlength="2"
-            placeholder="Search a Philippine city or town"
-            aria-label="Search city"
-            required
+    <section class="city-search mb-4">
+
+        <form
+            method="get"
+            action="{% url 'dashboard' %}"
         >
 
-        <button class="btn btn-primary" type="submit">
-            <i class="bi bi-search me-2"></i>Search
-        </button>
-    </form>
+            <input
+                type="text"
+                name="city"
+                value="{{ searched_city }}"
+                class="form-control"
+                placeholder="Search a Philippine city"
+                maxlength="80"
+                aria-label="City"
+                required
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-search me-2"></i>
+                Search
+            </button>
+
+        </form>
+
+    </section>
 
     {% if not city %}
-    <div class="alert alert-warning py-2 small" role="status">
-        We couldn't find "{{ searched_city }}" in the Philippine location search,
-        or geocoding is temporarily unavailable.
-        Try a nearby city such as Manila, Cebu, or Iligan.
-    </div>
-    {% elif not weather or not air_quality %}
-    <div class="alert alert-info py-2 small" role="status">
-        Some live weather or air quality data is temporarily unavailable.
-        The other dashboard features remain accessible.
+    <div class="alert alert-warning">
+        The city could not be found, or the
+        location service is temporarily unavailable.
     </div>
     {% endif %}
 
     <!-- WEATHER AND AIR QUALITY -->
-    <div class="row g-3 mb-3">
+    <div class="row g-4 mb-4">
 
+        <!-- WEATHER -->
         <div class="col-xl-8">
-            <section class="sa-card">
-                <div class="sa-weather-header">
-                    <div>
-                        <h2>
-                            {% if city %}
-                                {{ city.name }}, {{ city.region }}
-                            {% else %}
-                                Weather unavailable
-                            {% endif %}
-                        </h2>
-                        <div class="sa-muted">
-                            Current weather · Open-Meteo Weather API
-                        </div>
+
+            <section class="dashboard-card">
+
+                <div class="mb-4">
+
+                    <h2>
+                        {% if city %}
+                            <i class="bi bi-geo-alt-fill text-primary"></i>
+                            {{ city.name }}, {{ city.region }}
+                        {% else %}
+                            Weather Unavailable
+                        {% endif %}
+                    </h2>
+
+                    <div class="section-subtitle">
+                        Current Weather · Open-Meteo API
                     </div>
 
-                    {% if weather %}
-                    <div class="sa-metrics">
-                        <div class="sa-metric">
-                            <span>Feels like</span>
-                            <strong>
-                                {% if weather.feels_like != None %}
-                                {{ weather.feels_like|floatformat:0 }}°
-                                {% else %}—{% endif %}
-                            </strong>
-                        </div>
-
-                        <div class="sa-metric">
-                            <span>Humidity</span>
-                            <strong>
-                                {% if weather.humidity != None %}
-                                {{ weather.humidity|floatformat:0 }}%
-                                {% else %}—{% endif %}
-                            </strong>
-                        </div>
-
-                        <div class="sa-metric">
-                            <span>Wind</span>
-                            <strong>
-                                {% if weather.wind != None %}
-                                {{ weather.wind|floatformat:0 }} km/h
-                                {% else %}—{% endif %}
-                            </strong>
-                        </div>
-
-                        <div class="sa-metric">
-                            <span>Rain chance today</span>
-                            <strong>
-                                {% if weather.rain_chance != None %}
-                                {{ weather.rain_chance|floatformat:0 }}%
-                                {% else %}—{% endif %}
-                            </strong>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
 
                 {% if weather %}
-                <div class="sa-weather-current">
-                    <div class="sa-temp">
+
+                <div class="d-flex align-items-center gap-3 mb-4">
+
+                    <div class="temperature">
                         {% if weather.temperature != None %}
                         {{ weather.temperature|floatformat:0 }}°
-                        {% else %}—{% endif %}
+                        {% else %}
+                        —
+                        {% endif %}
                     </div>
 
-                    <div class="sa-condition">
+                    <div class="weather-condition">
                         <i class="bi {{ weather.icon }}"></i>
                         {{ weather.condition }}
                     </div>
+
                 </div>
 
-                <div class="sa-forecast-label">7-day forecast</div>
+                <!-- WEATHER METRICS -->
+                <div class="weather-metrics mb-4">
 
-                <div class="sa-forecast">
-                    {% for day in weather.days %}
-                    <div class="sa-day" title="{{ day.condition }}">
-                        <span class="name">{{ day.day }}</span>
-                        <i class="bi {{ day.icon }}"></i>
-
+                    <div class="metric">
+                        <small>Feels Like</small>
                         <strong>
+                            {% if weather.feels_like != None %}
+                            {{ weather.feels_like|floatformat:0 }}°C
+                            {% else %}—{% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="metric">
+                        <small>Humidity</small>
+                        <strong>
+                            {% if weather.humidity != None %}
+                            {{ weather.humidity|floatformat:0 }}%
+                            {% else %}—{% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="metric">
+                        <small>Wind Speed</small>
+                        <strong>
+                            {% if weather.wind != None %}
+                            {{ weather.wind|floatformat:0 }} km/h
+                            {% else %}—{% endif %}
+                        </strong>
+                    </div>
+
+                </div>
+
+                <!-- FORECAST -->
+                <h6 class="fw-bold mb-3">
+                    7-Day Weather Forecast
+                </h6>
+
+                <div class="forecast">
+
+                    {% for day in weather.forecast %}
+
+                    <div class="forecast-day">
+
+                        <strong>{{ day.day }}</strong>
+
+                        <i class="bi bi-cloud-sun"></i>
+
+                        <strong class="d-block">
                             {% if day.high != None %}
                             {{ day.high|floatformat:0 }}°
                             {% else %}—{% endif %}
                         </strong>
 
-                        <span class="low">
+                        <small>
                             {% if day.low != None %}
                             {{ day.low|floatformat:0 }}°
                             {% else %}—{% endif %}
-                        </span>
+                        </small>
 
-                        <div class="sa-rain-bar">
-                            <span style="width:{% if day.rain != None %}{{ day.rain }}{% else %}0{% endif %}%;"></span>
-                        </div>
-
-                        <span class="sa-rain-label">
+                        <small>
                             {% if day.rain != None %}
                             {{ day.rain|floatformat:0 }}% rain
-                            {% else %}No data{% endif %}
-                        </span>
+                            {% else %}—{% endif %}
+                        </small>
+
                     </div>
 
                     {% empty %}
-                    <div class="sa-empty">
-                        Forecast not available.
+                    <div class="empty-state">
+                        Forecast unavailable.
                     </div>
                     {% endfor %}
+
                 </div>
 
                 {% else %}
-                <div class="sa-empty py-5">
+
+                <div class="empty-state">
                     <i class="bi bi-cloud-slash fs-2 d-block mb-2"></i>
-                    Weather data unavailable right now.
+                    Weather data is currently unavailable.
                 </div>
+
                 {% endif %}
+
             </section>
+
         </div>
 
         <!-- AIR QUALITY -->
         <div class="col-xl-4">
-            <section class="sa-card">
-                <h2>Air quality</h2>
 
-                <div class="sa-muted">
-                    Open-Meteo Air Quality API · US AQI
+            <section class="dashboard-card">
+
+                <h2>Air Quality</h2>
+
+                <div class="section-subtitle mb-4">
+                    Open-Meteo Air Quality API
                 </div>
 
                 {% if air_quality %}
-                <span class="sa-air-badge {{ air_quality.tone }}">
-                    {{ air_quality.category }}
+
+                <div class="air-value">
                     {% if air_quality.aqi != None %}
-                    · {{ air_quality.aqi|floatformat:0 }}
+                    {{ air_quality.aqi|floatformat:0 }}
+                    {% else %}
+                    —
                     {% endif %}
+                </div>
+
+                <span class="badge bg-{{ air_quality.status_class }} mt-2 p-2">
+                    {{ air_quality.category }}
                 </span>
 
-                <div class="sa-air-grid">
-                    <div>
+                <div class="air-metrics">
+
+                    <div class="air-metric">
+
                         <small>PM2.5</small>
+
                         <strong>
                             {% if air_quality.pm25 != None %}
                             {{ air_quality.pm25|floatformat:1 }}
                             {% else %}—{% endif %}
                         </strong>
+
                         <small>µg/m³</small>
+
                     </div>
 
-                    <div>
+                    <div class="air-metric">
+
                         <small>PM10</small>
+
                         <strong>
                             {% if air_quality.pm10 != None %}
                             {{ air_quality.pm10|floatformat:1 }}
                             {% else %}—{% endif %}
                         </strong>
+
                         <small>µg/m³</small>
+
                     </div>
+
                 </div>
 
-                <div class="sa-aqi-scale">
-                    {% if air_quality.aqi != None %}
-                    <span
-                        class="sa-scale-pin"
-                        style="left:{{ air_quality.marker_pct }}%;"
-                    ></span>
-                    {% endif %}
-                </div>
-
-                <div class="sa-scale-labels">
-                    <span>Good</span>
-                    <span>Unhealthy</span>
-                    <span>Hazardous</span>
-                </div>
-
-                <p class="sa-aqi-advice">
-                    {{ air_quality.advice }}
+                <p class="section-subtitle mt-4 mb-0">
+                    Air quality is based on the US AQI scale.
+                    Follow official health guidance when
+                    pollution levels are elevated.
                 </p>
 
                 {% else %}
-                <div class="sa-empty py-5">
-                    <i class="bi bi-wind fs-2 d-block mb-2"></i>
-                    Air quality data unavailable right now.
+
+                <div class="empty-state">
+                    Air quality information is unavailable.
                 </div>
+
                 {% endif %}
+
+                <a
+                    href="{% url 'air_quality' %}"
+                    class="btn btn-outline-primary btn-sm mt-4"
+                >
+                    View Details
+                </a>
+
             </section>
+
         </div>
+
     </div>
 
-    <!-- EARTHQUAKES AND MAP -->
-    <div class="row g-3 mb-3">
+    <!-- EARTHQUAKES AND SAVED LOCATIONS -->
+    <div class="row g-4 mb-4">
 
-        <div class="col-xl-5">
-            <section class="sa-card">
+        <!-- EARTHQUAKES -->
+        <div class="col-xl-7">
 
-                <div class="sa-section-head">
+            <section class="dashboard-card">
+
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+
                     <div>
-                        <h2>Recent earthquakes</h2>
-                        <div class="sa-muted">
-                            USGS · Philippines area · Magnitude 3+ · Last 14 days
+                        <h2>Recent Earthquakes</h2>
+                        <div class="section-subtitle">
+                            USGS Earthquake API
                         </div>
                     </div>
 
                     <a
-                        class="sa-compact-link"
                         href="{% url 'earthquake_updates' %}"
+                        class="btn btn-outline-primary btn-sm"
                     >
-                        See all <i class="bi bi-arrow-right"></i>
+                        View All
                     </a>
+
                 </div>
 
-                {% for quake in earthquakes|slice:':5' %}
-                <a
-                    class="sa-quake-item"
-                    href="{% if quake.url %}{{ quake.url }}{% else %}{% url 'earthquake_updates' %}{% endif %}"
-                    {% if quake.url %}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    {% endif %}
-                >
-                    <span class="sa-mag {{ quake.tone }}">
+                {% for quake in earthquakes|slice:":5" %}
+
+                <div class="quake-item">
+
+                    <div class="quake-mag">
                         {{ quake.magnitude|floatformat:1 }}
-                    </span>
+                    </div>
 
-                    <span class="flex-grow-1" style="min-width:0;">
-                        <span class="sa-quake-name d-block">
+                    <div class="flex-grow-1">
+
+                        <div class="quake-name">
                             {{ quake.place }}
-                        </span>
+                        </div>
 
-                        <span class="sa-quake-detail">
+                        <div class="quake-meta">
                             Depth {{ quake.depth|floatformat:1 }} km
                             · {{ quake.time }} PHT
-                        </span>
-                    </span>
+                        </div>
 
-                    <i class="bi bi-chevron-right sa-muted"></i>
-                </a>
+                    </div>
+
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&amp;query={{ quake.latitude }},{{ quake.longitude }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn btn-outline-primary btn-sm"
+                        title="View earthquake location"
+                        aria-label="View location of {{ quake.place }}"
+                    >
+                        <i class="bi bi-geo-alt"></i>
+                    </a>
+
+                </div>
 
                 {% empty %}
-                <div class="sa-empty">
-                    {% if earthquake_available %}
-                    No matching earthquakes in the last 14 days.
+
+                <div class="empty-state">
+                    {% if earthquakes == None %}
+                    Earthquake data is temporarily unavailable.
                     {% else %}
-                    Earthquake feed temporarily unavailable.
+                    No matching recent earthquakes.
                     {% endif %}
                 </div>
+
                 {% endfor %}
+
             </section>
+
         </div>
 
-        <!-- INTERACTIVE MAP -->
-        <div class="col-xl-7">
-            <section class="sa-card">
-                <div class="sa-section-head">
-                    <div>
-                        <h2>Situation map</h2>
-                        <div class="sa-muted">
-                            Leaflet + OpenStreetMap · Earthquake markers and city conditions
-                        </div>
-                    </div>
-
-                    <div
-                        class="sa-map-toggle"
-                        role="group"
-                        aria-label="Map display"
-                    >
-                        <button
-                            type="button"
-                            class="active"
-                            data-sa-layer="earthquakes"
-                            aria-pressed="true"
-                        >
-                            Earthquakes
-                        </button>
-
-                        <button
-                            type="button"
-                            data-sa-layer="rain"
-                            aria-pressed="false"
-                        >
-                            Rain (city)
-                        </button>
-
-                        <button
-                            type="button"
-                            data-sa-layer="air"
-                            aria-pressed="false"
-                        >
-                            Air quality (city)
-                        </button>
-                    </div>
-                </div>
-
-                <div
-                    id="saMap"
-                    role="region"
-                    aria-label="Map showing earthquakes or selected city conditions"
-                ></div>
-
-                <div class="sa-map-key">
-                    <span>
-                        <i class="sa-dot" style="background:#d34340"></i>
-                        M5.0+
-                    </span>
-
-                    <span>
-                        <i class="sa-dot" style="background:#d89c3a"></i>
-                        M4.0–4.9
-                    </span>
-
-                    <span>
-                        <i class="sa-dot" style="background:#348a61"></i>
-                        Below M4.0
-                    </span>
-
-                    <span class="ms-auto">
-                        Map data © OpenStreetMap contributors
-                    </span>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- SAFETY ASSISTANT AND SAVED PLACES -->
-    <div class="row g-3 mb-3">
-
-        <div class="col-xl-7">
-            <section class="sa-card">
-                <div class="sa-section-head">
-                    <div>
-                        <h2>Safety assistant</h2>
-                        <div class="sa-muted">
-                            Powered by Groq AI
-                        </div>
-                    </div>
-
-                    <span class="sa-chip admin">
-                        AI assistance
-                    </span>
-                </div>
-
-                <div class="sa-assistant-demo">
-                    <div class="sa-question">
-                        What should I do during an earthquake?
-                    </div>
-
-                    <div class="sa-response">
-                        Drop, cover, and hold on during the shaking.
-                        Stay away from windows. After the shaking stops,
-                        follow evacuation instructions and expect aftershocks.
-                    </div>
-
-                    <div class="sa-muted mt-2">
-                        Example guidance · Open the assistant for a live AI response.
-                    </div>
-                </div>
-
-                <a
-                    class="sa-assistant-link"
-                    href="{% url 'ai_assistant' %}"
-                >
-                    <i class="bi bi-robot"></i>
-                    Open AI Safety Assistant
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-
-                <div class="sa-bottom-note">
-                    <i class="bi bi-info-circle"></i>
-                    AI responses are general guidance, not official PAGASA
-                    or PHIVOLCS advisories.
-                </div>
-            </section>
-        </div>
-
+        <!-- SAVED LOCATIONS -->
         <div class="col-xl-5">
-            <section class="sa-card">
-                <div class="sa-section-head">
+
+            <section class="dashboard-card">
+
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+
                     <div>
-                        <h2>Saved places</h2>
-                        <div class="sa-muted">
+                        <h2>Saved Locations</h2>
+
+                        <div class="section-subtitle">
                             {{ total_user_locations }}
-                            saved location{{ total_user_locations|pluralize }}
+                            location{{ total_user_locations|pluralize }}
                         </div>
                     </div>
 
@@ -951,241 +660,134 @@
                         href="{% url 'saved_locations' %}"
                         class="btn btn-primary btn-sm"
                     >
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Add place
+                        <i class="bi bi-plus-lg"></i>
+                        Manage
                     </a>
+
                 </div>
 
                 {% for location in recent_locations %}
-                <div class="sa-place">
-                    <span class="sa-place-name">
+
+                <div class="place-item">
+
+                    <span class="place-name">
                         <i class="bi bi-geo-alt text-primary me-2"></i>
                         {{ location }}
                     </span>
 
                     <a
-                        class="sa-compact-link text-nowrap"
                         href="{% url 'saved_locations' %}"
+                        class="btn btn-outline-secondary btn-sm"
                     >
-                        Manage
-                        <i class="bi bi-arrow-right"></i>
+                        Edit
                     </a>
+
                 </div>
 
                 {% empty %}
-                <div class="sa-empty">
-                    <i class="bi bi-bookmark fs-3 d-block mb-2"></i>
-                    No saved places yet.
-                    Add one to start tracking locations.
+
+                <div class="empty-state">
+                    <i class="bi bi-bookmark fs-2 d-block mb-2"></i>
+                    No saved locations yet.
                 </div>
+
                 {% endfor %}
 
-                <div class="sa-bottom-note">
-                    <i class="bi bi-pin-map"></i>
-                    Use Manage to edit or delete your saved locations.
-                </div>
             </section>
+
         </div>
+
     </div>
 
-    <!-- OTHER FEATURES -->
-    <div class="sa-footer-links">
-        <a href="{% url 'weather_forecast' %}">
-            Detailed weather <i class="bi bi-arrow-up-right"></i>
-        </a>
+    <!-- AI SAFETY ASSISTANT -->
+    <div class="row g-4 mb-4">
 
-        <a href="{% url 'air_quality' %}">
-            Detailed air quality <i class="bi bi-arrow-up-right"></i>
-        </a>
+        <div class="col-lg-8">
 
-        <a href="{% url 'donate' %}">
-            Test donations <i class="bi bi-arrow-up-right"></i>
-        </a>
+            <section class="dashboard-card">
 
-        <a href="{% url 'donation_history' %}">
-            Donation history <i class="bi bi-arrow-up-right"></i>
-        </a>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+
+                    <div>
+                        <h2>AI Safety Assistant</h2>
+                        <div class="section-subtitle">
+                            Powered by Groq AI
+                        </div>
+                    </div>
+
+                    <i class="bi bi-robot text-primary fs-3"></i>
+
+                </div>
+
+                <div class="assistant-preview">
+
+                    <div class="assistant-question">
+                        What should I do during an earthquake?
+                    </div>
+
+                    <div class="assistant-answer">
+                        Drop, cover, and hold on during
+                        shaking. Stay away from windows.
+                        Follow official evacuation
+                        instructions when it is safe to move.
+                    </div>
+
+                    <small class="section-subtitle d-block mt-2">
+                        Example safety guidance.
+                        Open the assistant for an actual AI response.
+                    </small>
+
+                </div>
+
+                <a
+                    href="{% url 'ai_assistant' %}"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-chat-dots me-2"></i>
+                    Open AI Safety Assistant
+                </a>
+
+            </section>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <section class="dashboard-card">
+
+                <h2>Natural Events</h2>
+
+                <div class="section-subtitle mb-3">
+                    NASA EONET API
+                </div>
+
+                <p class="text-muted small">
+                    Natural event monitoring will be
+                    available after NASA EONET is integrated.
+                </p>
+
+                <span class="badge bg-light text-secondary border">
+                    Coming Soon
+                </span>
+
+            </section>
+
+        </div>
+
     </div>
 
-    <div class="sa-bottom-note mb-3">
-        <i class="bi bi-shield-exclamation"></i>
-        For emergencies, follow local authorities and official government
-        bulletins. Map markers do not represent official hazard warnings.
+    <!-- SAFETY DISCLAIMER -->
+    <div class="alert alert-info">
+
+        <i class="bi bi-info-circle me-2"></i>
+
+        SkyAware PH provides information from external
+        data services. During emergencies, always
+        follow official government advisories
+        and local authorities.
+
     </div>
 
 </div>
-
-{{ map_data|json_script:"sa-map-data" }}
-
-{% endblock %}
-
-
-{% block extra_js %}
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-
-<script>
-(function () {
-    const container = document.getElementById("saMap");
-    const payload = document.getElementById("sa-map-data");
-
-    if (!container || !payload) {
-        return;
-    }
-
-    if (typeof L === "undefined") {
-        container.textContent =
-            "Map could not load. Please check your internet connection.";
-        return;
-    }
-
-    const data = JSON.parse(payload.textContent);
-
-    const lat = data.city ? data.city.latitude : 12.5;
-    const lon = data.city ? data.city.longitude : 122.0;
-
-    const map = L.map(container, {
-        scrollWheelZoom: false
-    }).setView(
-        [lat, lon],
-        data.city ? 8 : 5
-    );
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 18,
-            attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }
-    ).addTo(map);
-
-    const earthquakeLayer = L.layerGroup();
-    const rainLayer = L.layerGroup();
-    const airLayer = L.layerGroup();
-
-    const quakeBounds = [];
-
-    (data.earthquakes || []).forEach(function (q) {
-        const color = q.magnitude >= 5
-            ? "#d34340"
-            : (q.magnitude >= 4 ? "#d89c3a" : "#348a61");
-
-        const marker = L.circleMarker(
-            [q.latitude, q.longitude],
-            {
-                radius: Math.min(16, 5 + q.magnitude * 1.2),
-                color: color,
-                fillColor: color,
-                weight: 2,
-                fillOpacity: 0.30
-            }
-        );
-
-        const popup = document.createElement("div");
-
-        const bold = document.createElement("strong");
-        bold.textContent = "Magnitude " + q.magnitude;
-
-        const place = document.createElement("div");
-        place.textContent = q.place;
-
-        const depth = document.createElement("small");
-        depth.textContent = "Depth " + q.depth + " km";
-
-        popup.append(bold, place, depth);
-
-        marker.bindPopup(popup);
-        marker.addTo(earthquakeLayer);
-
-        quakeBounds.push([q.latitude, q.longitude]);
-    });
-
-    if (data.city) {
-        const location = [
-            data.city.latitude,
-            data.city.longitude
-        ];
-
-        const rainValue = data.rain_mm == null
-            ? "not available"
-            : data.rain_mm + " mm";
-
-        const aqiValue = data.aqi == null
-            ? "not available"
-            : data.aqi;
-
-        L.marker(location)
-            .bindPopup(
-                "Current precipitation at " +
-                data.city.name + ": " + rainValue
-            )
-            .addTo(rainLayer);
-
-        L.marker(location)
-            .bindPopup(
-                "Current US AQI at " +
-                data.city.name + ": " + aqiValue
-            )
-            .addTo(airLayer);
-    }
-
-    const layers = {
-        earthquakes: earthquakeLayer,
-        rain: rainLayer,
-        air: airLayer
-    };
-
-    function switchLayer(name) {
-        Object.keys(layers).forEach(function (key) {
-            map.removeLayer(layers[key]);
-        });
-
-        layers[name].addTo(map);
-
-        document.querySelectorAll("[data-sa-layer]")
-            .forEach(function (button) {
-                const selected =
-                    button.dataset.saLayer === name;
-
-                button.classList.toggle("active", selected);
-
-                button.setAttribute(
-                    "aria-pressed",
-                    selected ? "true" : "false"
-                );
-            });
-
-        if (
-            name === "earthquakes" &&
-            quakeBounds.length
-        ) {
-            map.fitBounds(quakeBounds, {
-                padding: [26, 26],
-                maxZoom: 8
-            });
-        } else if (data.city) {
-            map.setView([lat, lon], 9);
-        } else {
-            map.setView([12.5, 122], 5);
-        }
-    }
-
-    document.querySelectorAll("[data-sa-layer]")
-        .forEach(function (button) {
-            button.addEventListener("click", function () {
-                switchLayer(button.dataset.saLayer);
-            });
-        });
-
-    switchLayer("earthquakes");
-
-    setTimeout(function () {
-        map.invalidateSize();
-    }, 150);
-})();
-</script>
 
 {% endblock %}

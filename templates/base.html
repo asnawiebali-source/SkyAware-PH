@@ -3,35 +3,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SkyAware PH{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}SkyAware PH{% endblock %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
 
     <style>
         :root {
             --primary: #1769c2;
             --navy: #102f54;
-            --sidebar: #15365c;
             --page-bg: #f3f6fb;
             --text-dark: #25354a;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
             background: var(--page-bg);
-            font-family: "Segoe UI", Arial, sans-serif;
             color: var(--text-dark);
+            font-family: "Segoe UI", Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* NAVIGATION */
         .navbar {
             background: var(--navy);
             min-height: 70px;
@@ -47,16 +55,13 @@
         .navbar .nav-link {
             color: #dce8f6 !important;
             font-size: 14px;
-            font-weight: 500;
             border-radius: 8px;
             padding: 10px 13px !important;
-            transition: .2s;
         }
 
-        .navbar .nav-link:hover,
-        .navbar .nav-link:focus {
-            color: white !important;
+        .navbar .nav-link:hover {
             background: rgba(255,255,255,.1);
+            color: white !important;
         }
 
         .dropdown-menu {
@@ -77,7 +82,6 @@
             color: #1769c2;
         }
 
-        /* MAIN CONTENT */
         main {
             flex: 1;
         }
@@ -87,7 +91,6 @@
             color: #17385d;
         }
 
-        /* CARDS */
         .feature-card,
         .stat-card,
         .panel-card {
@@ -102,28 +105,13 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(24,53,86,.11);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(24,53,86,.10);
         }
 
-        .feature-icon,
-        .stat-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 13px;
-            font-size: 23px;
-            background: #e9f3ff;
-            color: #1769c2;
-        }
-
-        /* BUTTONS */
         .btn {
             border-radius: 9px;
             font-weight: 500;
-            transition: .2s;
         }
 
         .btn-primary {
@@ -136,117 +124,15 @@
             border-color: #10549e;
         }
 
-        /* ADMIN DASHBOARD */
-        .admin-layout {
-            display: flex;
-            align-items: stretch;
-            gap: 24px;
-        }
-
-        .admin-sidebar {
-            width: 245px;
-            flex-shrink: 0;
-            background: var(--sidebar);
-            color: white;
-            border-radius: 18px;
-            padding: 22px 14px;
-            align-self: flex-start;
-            position: sticky;
-            top: 20px;
-        }
-
-        .admin-sidebar .sidebar-heading {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #9db8d5;
-            padding: 10px 14px;
-        }
-
-        .admin-sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            border-radius: 10px;
-            color: #dce9f7;
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .admin-sidebar a:hover,
-        .admin-sidebar a.active {
-            background: #28547f;
-            color: white;
-        }
-
-        .admin-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 750;
-            line-height: 1.2;
-        }
-
-        /* TABLES */
-        .table th {
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .table td {
-            font-size: 14px;
-        }
-
-        /* FOOTER */
         footer {
             background: white;
             border-top: 1px solid #e5eaf0;
             font-size: 13px;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 991px) {
-            .admin-layout {
-                flex-direction: column;
-            }
-
-            .admin-sidebar {
-                width: 100%;
-                position: static;
-            }
-
-            .admin-sidebar nav {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 5px;
-            }
-
-            .admin-sidebar a {
-                margin: 0;
-            }
-
+        @media(max-width: 991px) {
             .navbar-collapse {
                 padding: 15px 0;
-            }
-        }
-
-        @media (max-width: 575px) {
-            .admin-sidebar nav {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-number {
-                font-size: 24px;
-            }
-
-            .navbar-brand {
-                font-size: 18px;
             }
         }
     </style>
@@ -258,6 +144,7 @@
 
 <!-- NAVIGATION -->
 <nav class="navbar navbar-expand-lg navbar-dark">
+
     <div class="container-fluid px-3 px-lg-5">
 
         <a class="navbar-brand" href="{% url 'home' %}">
@@ -265,22 +152,31 @@
             SkyAware PH
         </a>
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarMenu"
-                aria-controls="navbarMenu"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarMenu">
+        <div
+            class="collapse navbar-collapse"
+            id="navbarMenu"
+        >
+
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
 
                 <!-- HOME -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">
+                    <a
+                        class="nav-link"
+                        href="{% url 'home' %}"
+                    >
                         <i class="bi bi-house me-1"></i>
                         Home
                     </a>
@@ -290,7 +186,10 @@
 
                 <!-- DASHBOARD -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">
+                    <a
+                        class="nav-link"
+                        href="{% url 'dashboard' %}"
+                    >
                         <i class="bi bi-grid me-1"></i>
                         Dashboard
                     </a>
@@ -298,93 +197,80 @@
 
                 <!-- EXPLORE -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         <i class="bi bi-compass me-1"></i>
                         Explore
                     </a>
 
                     <ul class="dropdown-menu">
+
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'weather_forecast' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'weather_forecast' %}"
+                            >
                                 <i class="bi bi-cloud-sun me-2"></i>
                                 Weather Forecast
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'earthquake_updates' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'earthquake_updates' %}"
+                            >
                                 <i class="bi bi-activity me-2"></i>
                                 Earthquake Updates
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'air_quality' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'air_quality' %}"
+                            >
                                 <i class="bi bi-wind me-2"></i>
                                 Air Quality
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'ai_assistant' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'ai_assistant' %}"
+                            >
                                 <i class="bi bi-robot me-2"></i>
                                 AI Safety Assistant
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'saved_locations' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'saved_locations' %}"
+                            >
                                 <i class="bi bi-geo-alt me-2"></i>
                                 Saved Locations
                             </a>
                         </li>
-                    </ul>
-                </li>
 
-                <!-- DONATIONS -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
-                        <i class="bi bi-heart me-1"></i>
-                        Donations
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item"
-                               href="{% url 'donate' %}">
-                                <i class="bi bi-heart-fill me-2"></i>
-                                Donate
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item"
-                               href="{% url 'donation_history' %}">
-                                <i class="bi bi-clock-history me-2"></i>
-                                My Donation History
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
                 <!-- ADMIN -->
                 {% if user.is_staff %}
                 <li class="nav-item">
-                    <a class="nav-link"
-                       href="{% url 'admin_dashboard' %}">
+                    <a
+                        class="nav-link"
+                        href="{% url 'admin_dashboard' %}"
+                    >
                         <i class="bi bi-speedometer2 me-1"></i>
                         Admin
                     </a>
@@ -393,16 +279,19 @@
 
                 <!-- USER ACCOUNT -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         <i class="bi bi-person-circle me-1"></i>
                         {{ user.username }}
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-lg-end">
+
                         <li>
                             <span class="dropdown-item-text text-muted small">
                                 Signed in as {{ user.username }}
@@ -411,27 +300,37 @@
 
                         {% if user.is_staff %}
                         <li>
-                            <a class="dropdown-item"
-                               href="{% url 'admin:index' %}">
+                            <a
+                                class="dropdown-item"
+                                href="{% url 'admin:index' %}"
+                            >
                                 <i class="bi bi-gear me-2"></i>
-                                Django Admin Panel
+                                Django Admin
                             </a>
                         </li>
                         {% endif %}
 
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
                         <li class="px-3 py-1">
-                            <form method="POST"
-                                  action="{% url 'logout' %}">
+                            <form
+                                method="post"
+                                action="{% url 'logout' %}"
+                            >
                                 {% csrf_token %}
-                                <button class="btn btn-outline-danger btn-sm w-100"
-                                        type="submit">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm w-100"
+                                >
                                     <i class="bi bi-box-arrow-right me-2"></i>
                                     Logout
                                 </button>
                             </form>
                         </li>
+
                     </ul>
                 </li>
 
@@ -439,7 +338,10 @@
 
                 <!-- LOGIN -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">
+                    <a
+                        class="nav-link"
+                        href="{% url 'login' %}"
+                    >
                         <i class="bi bi-box-arrow-in-right me-1"></i>
                         Login
                     </a>
@@ -447,8 +349,10 @@
 
                 <!-- REGISTER -->
                 <li class="nav-item">
-                    <a class="btn btn-light btn-sm px-3"
-                       href="{% url 'register' %}">
+                    <a
+                        class="btn btn-light btn-sm px-3"
+                        href="{% url 'register' %}"
+                    >
                         Register
                     </a>
                 </li>
@@ -456,35 +360,49 @@
                 {% endif %}
 
             </ul>
+
         </div>
+
     </div>
 </nav>
 
-<!-- DJANGO MESSAGES -->
+<!-- MESSAGES -->
 <div class="container-fluid px-3 px-lg-5 mt-3">
+
     {% if messages %}
+
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
-             role="alert">
+
+        <div
+            class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+            role="alert"
+        >
             {{ message }}
 
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close">
-            </button>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+            ></button>
         </div>
+
         {% endfor %}
+
     {% endif %}
+
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- PAGE CONTENT -->
 <main class="container-fluid px-3 px-lg-5 py-4 py-lg-5">
+
     {% block content %}{% endblock %}
+
 </main>
 
 <!-- FOOTER -->
 <footer class="text-center text-muted py-4">
+
     <div class="container">
 
         <p class="mb-1">
@@ -496,12 +414,8 @@
             Stay Informed. Stay Prepared.
         </small>
 
-        <div class="mt-2">
-            Donation payments are simulated
-            for educational purposes only.
-        </div>
-
     </div>
+
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

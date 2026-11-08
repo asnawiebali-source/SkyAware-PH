@@ -1,351 +1,192 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Admin Overview | SkyAware PH{% endblock %}
+{% block title %}Admin Dashboard | SkyAware PH{% endblock %}
 
 {% block extra_css %}
 <style>
-    .navbar {
-        display: none !important;
-    }
-
-    main.container-fluid {
-        padding: 0 !important;
-        max-width: none;
-    }
-
     body {
         background: #f3f6fb;
     }
 
-    footer {
-        display: none;
+    .admin-dashboard {
+        --admin-navy: #102f54;
+        --admin-blue: #1769c2;
+        --admin-muted: #64748b;
     }
 
-    .sa-admin {
+    .admin-dashboard .admin-layout {
         display: flex;
-        min-height: 100vh;
-        color: #202e43;
+        gap: 24px;
+        align-items: flex-start;
     }
 
-    .sa-admin-sidebar {
-        width: 250px;
-        flex: 0 0 250px;
-        background: #101d32;
+    .admin-dashboard .admin-sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        background: #10243f;
+        border-radius: 16px;
+        padding: 20px 12px;
         color: white;
-        padding: 24px 14px;
     }
 
-    .sa-admin-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: white;
-        text-decoration: none;
-        font-size: 18px;
+    .admin-dashboard .sidebar-title {
+        font-size: 15px;
         font-weight: 800;
-        padding: 0 10px 28px;
+        padding: 10px 14px 22px;
     }
 
-    .sa-admin-brand i {
-        width: 32px;
-        height: 32px;
-        background: #1769c2;
-        border-radius: 9px;
-        display: grid;
-        place-items: center;
-        color: white;
-    }
-
-    .sa-admin-sidebar nav {
-        display: grid;
-        gap: 6px;
-    }
-
-    .sa-admin-sidebar .nav-item {
+    .admin-dashboard .sidebar-link {
         display: flex;
         align-items: center;
-        gap: 12px;
-        color: #c1ccdc;
-        padding: 11px 13px;
+        gap: 11px;
+        color: #cbd7e7;
+        text-decoration: none;
+        border-radius: 9px;
+        padding: 12px 14px;
+        margin-bottom: 5px;
         font-size: 14px;
-        font-weight: 600;
-        border-radius: 9px;
-        text-decoration: none;
     }
 
-    .sa-admin-sidebar .nav-item i {
-        font-size: 17px;
-        width: 20px;
-    }
-
-    .sa-admin-sidebar .nav-item:hover,
-    .sa-admin-sidebar .nav-item.active {
-        color: white;
+    .admin-dashboard .sidebar-link:hover,
+    .admin-dashboard .sidebar-link.active {
         background: #1d67bc;
+        color: white;
     }
 
-    .sa-admin-sidebar .nav-note {
-        margin: 24px 13px 12px;
-        color: #7f95b3;
-        text-transform: uppercase;
-        letter-spacing: 1.3px;
-        font-size: 11px;
-        font-weight: 800;
+    .admin-dashboard .sidebar-link i {
+        font-size: 17px;
     }
 
-    .sa-admin-sidebar .signout {
-        background: none;
-        border: 0;
-        text-align: left;
-        width: 100%;
-        cursor: pointer;
-    }
-
-    .sa-admin-content {
-        min-width: 0;
+    .admin-dashboard .admin-main {
         flex: 1;
-        padding: 32px;
-        max-width: 1600px;
+        min-width: 0;
     }
 
-    .sa-admin-top {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 23px;
-    }
-
-    .sa-admin-top h1 {
-        font-size: 26px;
+    .admin-dashboard .admin-heading h1 {
+        color: #17385d;
+        font-size: 28px;
         font-weight: 800;
-        letter-spacing: -.6px;
-        margin: 0 0 4px;
     }
 
-    .sa-admin-top p {
-        color: #7b8799;
-        font-size: 13px;
-        margin: 0;
+    .admin-dashboard .admin-heading p {
+        font-size: 14px;
+        color: #64748b;
     }
 
-    .sa-preview-label {
-        padding: 8px 13px;
-        border-radius: 30px;
-        background: #eaf5ee;
-        color: #27774f;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .sa-admin-card {
-        background: white;
-        border: 1px solid #e0e7ef;
-        border-radius: 15px;
-        padding: 22px;
+    .admin-dashboard .admin-card {
         height: 100%;
-        box-shadow: 0 2px 8px rgba(26,40,62,.025);
+        background: white;
+        border: 1px solid #e4ebf3;
+        border-radius: 16px;
+        padding: 23px;
+        box-shadow: 0 4px 18px rgba(16,47,84,.04);
     }
 
-    .sa-admin-card h2 {
+    .admin-dashboard .admin-card h2 {
+        color: #17385d;
         font-size: 19px;
         font-weight: 800;
-        letter-spacing: -.3px;
-        margin: 0;
     }
 
-    .sa-kpi-label {
-        color: #728096;
+    .admin-dashboard .stat-label {
+        color: #64748b;
         font-size: 13px;
-    }
-
-    .sa-kpi-value {
-        color: #17273c;
-        font-size: 34px;
-        font-weight: 800;
-        letter-spacing: -.8px;
-        line-height: 1.3;
-        margin-top: 7px;
-    }
-
-    .sa-kpi-icon {
-        font-size: 18px;
-        color: #1769c2;
-        float: right;
-    }
-
-    .sa-admin-table {
-        width: 100%;
-        margin: 14px 0 0;
-    }
-
-    .sa-admin-table th {
-        font-size: 12px;
-        color: #748196;
-        font-weight: 800;
-        border-bottom: 1px solid #e5ebf2;
-        padding: 12px 10px;
-        white-space: nowrap;
-    }
-
-    .sa-admin-table td {
-        padding: 12px 10px;
-        vertical-align: middle;
-        border-bottom: 1px solid #edf1f5;
-        font-size: 13px;
-    }
-
-    .sa-admin-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .sa-user-name {
-        font-size: 13px;
-        font-weight: 800;
-    }
-
-    .sa-user-email {
-        font-size: 11px;
-        color: #8793a4;
-        overflow-wrap: anywhere;
-    }
-
-    .sa-status {
-        display: inline-block;
-        border-radius: 30px;
-        padding: 5px 9px;
-        font-weight: 800;
-        font-size: 11px;
-        line-height: 1.2;
-        white-space: nowrap;
-    }
-
-    .sa-status.good {
-        color: #2f7952;
-        background: #e4f4eb;
-    }
-
-    .sa-status.warning {
-        color: #9c6524;
-        background: #fff0da;
-    }
-
-    .sa-status.bad {
-        color: #a63e43;
-        background: #fbe7e9;
-    }
-
-    .sa-admin-subtitle {
-        font-size: 12px;
-        color: #8090a3;
-    }
-
-    .sa-integration {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        border: 1px solid #e8edf2;
-        border-radius: 10px;
-        padding: 11px 12px;
-        margin-top: 9px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .sa-integration span:first-child {
-        min-width: 0;
-    }
-
-    .sa-admin-empty {
-        padding: 30px 15px;
-        text-align: center;
-        color: #7b8799;
-        font-size: 13px;
-        line-height: 1.7;
-    }
-
-    .sa-admin-empty i {
-        display: block;
-        font-size: 32px;
-        color: #97a6b8;
         margin-bottom: 8px;
     }
 
-    .sa-mini-btn {
-        padding: 7px 12px;
+    .admin-dashboard .stat-value {
+        font-size: 36px;
+        color: #102f54;
+        font-weight: 800;
+    }
+
+    .admin-dashboard .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: #e8f2ff;
+        color: #1769c2;
+        border-radius: 11px;
+        font-size: 20px;
+    }
+
+    .admin-dashboard .user-table {
+        width: 100%;
+    }
+
+    .admin-dashboard .user-table th {
         font-size: 12px;
-        border-radius: 8px;
+        color: #64748b;
+        font-weight: 700;
+        padding: 13px;
+        white-space: nowrap;
+    }
+
+    .admin-dashboard .user-table td {
+        padding: 13px;
+        font-size: 13px;
+        vertical-align: middle;
+        border-color: #edf1f5;
+    }
+
+    .admin-dashboard .user-name {
+        color: #17385d;
         font-weight: 700;
     }
 
-    .sa-api-note {
-        margin: 13px 0 0;
-        color: #7c8899;
+    .admin-dashboard .user-email {
+        color: #64748b;
         font-size: 12px;
-        line-height: 1.6;
+        overflow-wrap: anywhere;
     }
 
-    .sa-admin-notice {
-        background: #eaf3ff;
-        border: 1px solid #cfe3fc;
-        border-radius: 11px;
-        padding: 14px 17px;
-        color: #305a86;
-        font-size: 12px;
+    .admin-dashboard .api-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid #e8edf4;
+        border-radius: 10px;
+        padding: 13px;
+        margin-top: 10px;
     }
 
-    @media(max-width: 1050px) {
-        .sa-admin-sidebar {
-            width: 205px;
-            flex-basis: 205px;
-        }
-
-        .sa-admin-content {
-            padding: 24px;
-        }
+    .admin-dashboard .api-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #17385d;
     }
 
-    @media(max-width: 750px) {
-        .sa-admin {
-            display: block;
+    .admin-dashboard .api-purpose {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    @media(max-width: 991px) {
+        .admin-dashboard .admin-layout {
+            flex-direction: column;
         }
 
-        .sa-admin-sidebar {
+        .admin-dashboard .admin-sidebar {
             width: 100%;
-            padding: 14px;
         }
 
-        .sa-admin-brand {
-            padding-bottom: 13px;
-        }
-
-        .sa-admin-sidebar nav {
+        .admin-dashboard .admin-sidebar nav {
             display: flex;
             gap: 5px;
             flex-wrap: wrap;
         }
+    }
 
-        .sa-admin-sidebar .nav-item {
-            font-size: 12px;
-            padding: 8px 10px;
-        }
-
-        .sa-admin-sidebar .nav-note {
-            display: none;
-        }
-
-        .sa-admin-content {
+    @media(max-width: 575px) {
+        .admin-dashboard .admin-card {
             padding: 18px;
         }
 
-        .sa-admin-card {
-            padding: 17px;
-        }
-
-        .sa-kpi-value {
+        .admin-dashboard .stat-value {
             font-size: 29px;
         }
     }
@@ -355,411 +196,380 @@
 
 {% block content %}
 
-<div class="sa-admin">
+<div class="admin-dashboard">
 
-    <!-- SIDEBAR -->
-    <aside class="sa-admin-sidebar" aria-label="Admin menu">
+    <div class="admin-layout">
 
-        <a
-            href="{% url 'admin_dashboard' %}"
-            class="sa-admin-brand"
-        >
-            <i class="bi bi-cloud-sun-fill"></i>
-            SkyAware PH
-        </a>
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
 
-        <nav>
-
-            <a
-                class="nav-item active"
-                href="{% url 'admin_dashboard' %}"
-            >
-                <i class="bi bi-grid-1x2"></i>
-                Overview
-            </a>
-
-            <a class="nav-item" href="#users">
-                <i class="bi bi-people"></i>
-                Users
-            </a>
-
-            <a class="nav-item" href="#hazard-reports">
-                <i class="bi bi-exclamation-triangle"></i>
-                Hazard reports
-            </a>
-
-            <a class="nav-item" href="#api-status">
-                <i class="bi bi-hdd-network"></i>
-                API status
-            </a>
-
-            <a class="nav-item" href="#donations">
-                <i class="bi bi-heart"></i>
-                Test donations
-            </a>
-
-            <div class="nav-note">
-                Navigation
+            <div class="sidebar-title">
+                <i class="bi bi-shield-check me-2"></i>
+                Administration
             </div>
 
-            <a
-                class="nav-item"
-                href="{% url 'dashboard' %}"
-            >
-                <i class="bi bi-person"></i>
-                User dashboard
-            </a>
+            <nav>
 
-            <a
-                class="nav-item"
-                href="{% url 'admin:index' %}"
-            >
-                <i class="bi bi-gear"></i>
-                Django Admin
-            </a>
-
-            <a class="nav-item" href="{% url 'home' %}">
-                <i class="bi bi-house"></i>
-                Home
-            </a>
-
-            <form
-                action="{% url 'logout' %}"
-                method="post"
-            >
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="nav-item signout"
+                <a
+                    href="{% url 'admin_dashboard' %}"
+                    class="sidebar-link active"
                 >
-                    <i class="bi bi-box-arrow-right"></i>
-                    Logout
-                </button>
-            </form>
+                    <i class="bi bi-grid"></i>
+                    Overview
+                </a>
 
-        </nav>
-    </aside>
+                <a
+                    href="#users"
+                    class="sidebar-link"
+                >
+                    <i class="bi bi-people"></i>
+                    Users
+                </a>
 
-    <!-- MAIN ADMIN CONTENT -->
-    <div class="sa-admin-content">
+                <a
+                    href="#api-integrations"
+                    class="sidebar-link"
+                >
+                    <i class="bi bi-hdd-network"></i>
+                    API Integrations
+                </a>
 
-        <div class="sa-admin-top">
-            <div>
-                <h1>Admin overview</h1>
+                <a
+                    href="{% url 'admin:index' %}"
+                    class="sidebar-link"
+                >
+                    <i class="bi bi-gear"></i>
+                    Django Admin
+                </a>
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="sidebar-link"
+                >
+                    <i class="bi bi-person"></i>
+                    User Dashboard
+                </a>
+
+                <a
+                    href="{% url 'home' %}"
+                    class="sidebar-link"
+                >
+                    <i class="bi bi-house"></i>
+                    Homepage
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- ADMIN MAIN -->
+        <div class="admin-main">
+
+            <!-- HEADER -->
+            <div class="admin-heading mb-4">
+
+                <h1>Admin Overview</h1>
+
                 <p>
-                    Signed in as {{ user.username }}
-                    · Database statistics
+                    Welcome, {{ user.username }}.
+                    Here's your SkyAware PH system summary.
                 </p>
+
             </div>
 
-            <span class="sa-preview-label">
-                <i class="bi bi-database-check me-1"></i>
-                Live database totals
-            </span>
-        </div>
+            <!-- STATISTICS -->
+            <div class="row g-3 mb-4">
 
-        <!-- STATISTICS -->
-        <div class="row g-3 mb-3">
+                <!-- REGISTERED USERS -->
+                <div class="col-sm-6 col-xl-3">
 
-            <div class="col-sm-6 col-xl-3">
-                <div class="sa-admin-card">
-                    <i class="bi bi-people sa-kpi-icon"></i>
+                    <div class="admin-card">
 
-                    <div class="sa-kpi-label">
-                        Registered users
-                    </div>
+                        <div class="d-flex justify-content-between">
 
-                    <div class="sa-kpi-value">
-                        {{ total_users }}
-                    </div>
-
-                    <div class="sa-admin-subtitle">
-                        {{ active_users }} active
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="sa-admin-card">
-                    <i class="bi bi-geo-alt sa-kpi-icon"></i>
-
-                    <div class="sa-kpi-label">
-                        Saved places
-                    </div>
-
-                    <div class="sa-kpi-value">
-                        {{ total_saved_locations }}
-                    </div>
-
-                    <div class="sa-admin-subtitle">
-                        Across all users
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="sa-admin-card">
-                    <i class="bi bi-heart sa-kpi-icon"></i>
-
-                    <div class="sa-kpi-label">
-                        Test donations
-                    </div>
-
-                    <div class="sa-kpi-value">
-                        {{ total_donations }}
-                    </div>
-
-                    <div class="sa-admin-subtitle">
-                        {{ successful_donations }} marked paid
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="sa-admin-card">
-                    <i class="bi bi-clock-history sa-kpi-icon"></i>
-
-                    <div class="sa-kpi-label">
-                        Pending test payments
-                    </div>
-
-                    <div class="sa-kpi-value">
-                        {{ pending_donations }}
-                    </div>
-
-                    <div class="sa-admin-subtitle">
-                        PayMongo sandbox only
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- USERS AND API STATUS -->
-        <div class="row g-3 mb-3">
-
-            <div class="col-xl-8" id="users">
-                <section class="sa-admin-card">
-
-                    <div class="d-flex justify-content-between gap-3 align-items-center flex-wrap">
-                        <div>
-                            <h2>Recent users</h2>
-                            <div class="sa-admin-subtitle">
-                                Five most recently registered accounts
+                            <div class="stat-label">
+                                Registered Users
                             </div>
+
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+
                         </div>
 
-                        <a
-                            class="btn btn-primary sa-mini-btn"
-                            href="{% url 'admin:index' %}"
-                        >
-                            <i class="bi bi-people me-1"></i>
-                            Manage users
-                        </a>
+                        <div class="stat-value">
+                            {{ total_users }}
+                        </div>
+
+                        <small class="text-muted">
+                            Total accounts
+                        </small>
+
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="sa-admin-table">
+                </div>
 
-                            <thead>
-                                <tr>
-                                    <th>Account</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                <!-- ACTIVE USERS -->
+                <div class="col-sm-6 col-xl-3">
 
-                            <tbody>
-                                {% for account in recent_users %}
-                                <tr>
-                                    <td>
-                                        <div class="sa-user-name">
-                                            {{ account.get_full_name|default:account.username }}
-                                        </div>
+                    <div class="admin-card">
 
-                                        <div class="sa-user-email">
-                                            {{ account.email|default:'No email provided' }}
-                                        </div>
-                                    </td>
+                        <div class="d-flex justify-content-between">
 
-                                    <td>
-                                        {% if account.is_staff %}
-                                        Admin
-                                        {% else %}
-                                        Resident
-                                        {% endif %}
-                                    </td>
+                            <div class="stat-label">
+                                Active Users
+                            </div>
 
-                                    <td>
-                                        {% if account.is_active %}
-                                        <span class="sa-status good">
-                                            Active
-                                        </span>
-                                        {% else %}
-                                        <span class="sa-status bad">
-                                            Inactive
-                                        </span>
-                                        {% endif %}
-                                    </td>
+                            <div class="stat-icon">
+                                <i class="bi bi-person-check"></i>
+                            </div>
 
-                                    <td>
-                                        <a
-                                            class="btn btn-outline-secondary sa-mini-btn"
-                                            href="{% url 'admin:index' %}"
+                        </div>
+
+                        <div class="stat-value">
+                            {{ active_users }}
+                        </div>
+
+                        <small class="text-muted">
+                            Enabled accounts
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- SAVED LOCATIONS -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="admin-card">
+
+                        <div class="d-flex justify-content-between">
+
+                            <div class="stat-label">
+                                Saved Locations
+                            </div>
+
+                            <div class="stat-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+
+                        </div>
+
+                        <div class="stat-value">
+                            {{ total_saved_locations }}
+                        </div>
+
+                        <small class="text-muted">
+                            Across all users
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- ADMIN USERS -->
+                <div class="col-sm-6 col-xl-3">
+
+                    <div class="admin-card">
+
+                        <div class="d-flex justify-content-between">
+
+                            <div class="stat-label">
+                                Admin Accounts
+                            </div>
+
+                            <div class="stat-icon">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+
+                        </div>
+
+                        <div class="stat-value">
+                            {{ admin_users }}
+                        </div>
+
+                        <small class="text-muted">
+                            Staff accounts
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- USERS AND APIS -->
+            <div class="row g-4">
+
+                <!-- USER MANAGEMENT -->
+                <div class="col-xl-7" id="users">
+
+                    <section class="admin-card">
+
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+
+                            <h2 class="mb-0">
+                                Recent Users
+                            </h2>
+
+                            <a
+                                href="{% url 'admin:index' %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Manage Users
+                            </a>
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table class="table user-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for account in recent_users %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <div class="user-name">
+                                                {{ account.username }}
+                                            </div>
+
+                                            <div class="user-email">
+                                                {{ account.email|default:"No email" }}
+                                            </div>
+
+                                        </td>
+
+                                        <td>
+
+                                            {% if account.is_staff %}
+                                                Admin
+                                            {% else %}
+                                                Resident
+                                            {% endif %}
+
+                                        </td>
+
+                                        <td>
+
+                                            {% if account.is_active %}
+
+                                            <span class="badge bg-success">
+                                                Active
+                                            </span>
+
+                                            {% else %}
+
+                                            <span class="badge bg-danger">
+                                                Inactive
+                                            </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% empty %}
+
+                                    <tr>
+                                        <td
+                                            colspan="3"
+                                            class="text-center text-muted"
                                         >
-                                            Manage
-                                        </a>
-                                    </td>
-                                </tr>
+                                            No registered users.
+                                        </td>
+                                    </tr>
 
-                                {% empty %}
-                                <tr>
-                                    <td
-                                        colspan="4"
-                                        class="text-center text-muted py-4"
-                                    >
-                                        No users found.
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
+                                    {% endfor %}
 
-                        </table>
-                    </div>
-                </section>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <!-- API STATUS -->
+                <div class="col-xl-5" id="api-integrations">
+
+                    <section class="admin-card">
+
+                        <h2>API Integrations</h2>
+
+                        <p class="text-muted small">
+                            Your final five API providers.
+                            Statuses show integration progress,
+                            not live uptime.
+                        </p>
+
+                        {% for api in api_integrations %}
+
+                        <div class="api-item">
+
+                            <div>
+
+                                <div class="api-name">
+                                    {{ api.name }}
+                                </div>
+
+                                <div class="api-purpose">
+                                    {{ api.purpose }}
+                                </div>
+
+                            </div>
+
+                            {% if api.status == "Integrated" %}
+
+                            <span class="badge bg-success">
+                                Integrated
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-warning text-dark">
+                                Planned
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </section>
+
+                </div>
+
             </div>
 
-            <!-- API INTEGRATIONS -->
-            <div class="col-xl-4" id="api-status">
-                <section class="sa-admin-card">
+            <!-- REMINDER -->
+            <div class="alert alert-info mt-4">
 
-                    <h2>API integration status</h2>
+                <i class="bi bi-info-circle me-2"></i>
 
-                    <div class="sa-admin-subtitle">
-                        Code integration indicators, not live uptime checks
-                    </div>
+                NASA EONET and OpenStreetMap Nominatim
+                are planned integrations. Implement and
+                test both APIs before your final presentation.
 
-                    {% for api in api_integrations %}
-
-                    <div class="sa-integration">
-                        <span>{{ api.name }}</span>
-
-                        {% if api.status == 'Not Configured' %}
-                        <span class="sa-status warning">
-                            Not configured
-                        </span>
-
-                        {% elif api.status == 'Configured' %}
-                        <span class="sa-status good">
-                            Configured
-                        </span>
-
-                        {% else %}
-                        <span class="sa-status good">
-                            Integrated
-                        </span>
-                        {% endif %}
-                    </div>
-
-                    {% endfor %}
-
-                    <p class="sa-api-note">
-                        Five listed services are integrated in your code.
-                        PayMongo checkout requires a test key to be configured.
-                    </p>
-
-                </section>
             </div>
 
-        </div>
-
-        <!-- HAZARD REPORTS AND DONATIONS -->
-        <div class="row g-3 mb-3">
-
-            <div class="col-xl-8" id="hazard-reports">
-                <section class="sa-admin-card">
-
-                    <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                        <h2>Latest hazard reports</h2>
-
-                        <span class="sa-status warning">
-                            Not implemented yet
-                        </span>
-                    </div>
-
-                    <div class="sa-admin-empty">
-                        <i class="bi bi-cone-striped"></i>
-
-                        The hazard-report model, submission form,
-                        and verification workflow have not been added yet.
-
-                        This panel is reserved for actual
-                        community-submitted reports once that
-                        feature is built.
-                    </div>
-
-                </section>
-            </div>
-
-            <!-- TEST DONATIONS -->
-            <div class="col-xl-4" id="donations">
-                <section class="sa-admin-card">
-
-                    <h2>Test donation summary</h2>
-
-                    <div class="sa-admin-subtitle">
-                        Sandbox transactions only · no real fundraising
-                    </div>
-
-                    <div class="sa-integration">
-                        <span>Total marked paid</span>
-                        <strong>{{ successful_donations }}</strong>
-                    </div>
-
-                    <div class="sa-integration">
-                        <span>Pending</span>
-                        <strong>{{ pending_donations }}</strong>
-                    </div>
-
-                    <div class="sa-integration">
-                        <span>Failed</span>
-                        <strong>{{ failed_donations }}</strong>
-                    </div>
-
-                    <div class="sa-integration">
-                        <span>Cancelled</span>
-                        <strong>{{ cancelled_donations }}</strong>
-                    </div>
-
-                    <div class="sa-integration">
-                        <span>Amount marked paid</span>
-                        <strong>
-                            ₱{{ total_donation_amount|floatformat:2 }}
-                        </strong>
-                    </div>
-
-                    <div class="sa-api-note">
-                        Payment status is based on database records.
-                        It is not proof that funds were transferred.
-                    </div>
-
-                </section>
-            </div>
-
-        </div>
-
-        <!-- INFORMATION -->
-        <div class="sa-admin-notice">
-            <i class="bi bi-info-circle me-1"></i>
-
-            Hazard reports and AI assistant chat logs are not part
-            of the supplied database views.
-
-            No sample report counts or chat statistics have been invented.
-
-            Use the Django Admin link for actual user editing and deletion.
         </div>
 
     </div>

@@ -7,13 +7,14 @@ from dashboard.views import admin_dashboard_view
 
 
 urlpatterns = [
+
     # Django Admin Panel
     path(
         "admin/",
         admin.site.urls,
     ),
 
-    # Custom SkyAware PH Admin Dashboard
+    # SkyAware PH Admin Dashboard
     path(
         "admin-dashboard/",
         admin_dashboard_view,
@@ -32,12 +33,6 @@ urlpatterns = [
         include("dashboard.urls"),
     ),
 
-    # PayMongo Test Donations
-    path(
-        "",
-        include("donations.urls"),
-    ),
-
     # Homepage
     path(
         "",
@@ -45,9 +40,11 @@ urlpatterns = [
         name="home",
     ),
 
-    # Weather APIs and Saved Locations CRUD
+    # Weather, Earthquakes, Air Quality,
+    # AI Assistant and Saved Locations
     path(
         "",
         include("weather.urls"),
     ),
+
 ]
