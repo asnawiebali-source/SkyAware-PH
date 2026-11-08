@@ -1,10 +1,16 @@
 
-from datetime import datetime, timedelta, timezone as dt_timezone
-import hashlib
+from datetime import (
+    datetime,
+    timedelta,
+    timezone as dt_timezone
+)
 
 import requests
 
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.contrib.admin.views.decorators import (
+    staff_member_required
+)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -13,18 +19,28 @@ from django.utils import timezone
 
 from weather.models import SavedLocation
 
+# NEW: Nominatim geocoding
+from integrations.nominatim import find_ph_city
+
 
 # ==========================================
 # API REQUEST HELPER
 # ==========================================
 
-def get_api_json(url, params, cache_key, timeout=8):
+def get_api_json(
+    url,
+    params,
+    cache_key,
+    timeout=8
+):
+
     cached = cache.get(cache_key)
 
     if cached is not None:
         return cached
 
     try:
+
         response = requests.get(
             url,
             params=params,
@@ -37,62 +53,35 @@ def get_api_json(url, params, cache_key, timeout=8):
         response.raise_for_status()
         data = response.json()
 
-        if not isinstance(data, dict) or data.get("error"):
+        if (
+            not isinstance(data, dict)
+            or data.get("error")
+        ):
             return None
 
-        cache.set(cache_key, data, 600)
+        cache.set(
+            cache_key,
+            data,
+            600
+        )
+
         return data
 
-    except (requests.RequestException, ValueError):
+    except (
+        requests.RequestException,
+        ValueError
+    ):
+
         return None
-
-
-# ==========================================
-# CITY GEOCODING
-# Existing Open-Meteo geocoding.
-# Nominatim will replace this later.
-# ==========================================
-
-def find_city(city_name):
-    city_key = hashlib.sha256(
-        city_name.lower().encode("utf-8")
-    ).hexdigest()[:16]
-
-    data = get_api_json(
-        "https://geocoding-api.open-meteo.com/v1/search",
-        {
-            "name": city_name,
-            "count": 5,
-            "language": "en",
-            "countryCode": "PH",
-        },
-        f"skyaware:city:{city_key}"
-    )
-
-    if not data:
-        return None
-
-    for place in data.get("results", []):
-        if (
-            place.get("country_code") == "PH"
-            and place.get("latitude") is not None
-            and place.get("longitude") is not None
-        ):
-            return {
-                "name": place.get("name", city_name),
-                "region": place.get("admin1", "Philippines"),
-                "latitude": place["latitude"],
-                "longitude": place["longitude"],
-            }
-
-    return None
 
 
 # ==========================================
 # WEATHER API
+# OPEN-METEO
 # ==========================================
 
 def get_weather(city):
+
     if not city:
         return None
 
@@ -125,68 +114,109 @@ def get_weather(city):
     if not data:
         return None
 
-    current = data.get("current", {})
-    daily = data.get("daily", {})
+    current = data.get("current") or {}
+    daily = data.get("daily") or {}
 
-    code = current.get("weather_code")
+    weather_code = current.get(
+        "weather_code"
+    )
 
-    if code == 0:
+    # Weather condition and icon
+    if weather_code == 0:
+
         condition = "Clear Sky"
         icon = "bi-sun"
-    elif code in (1, 2):
+
+    elif weather_code in (1, 2):
+
         condition = "Partly Cloudy"
         icon = "bi-cloud-sun"
-    elif code == 3:
+
+    elif weather_code == 3:
+
         condition = "Cloudy"
         icon = "bi-clouds"
-    elif code in (45, 48):
+
+    elif weather_code in (45, 48):
+
         condition = "Foggy"
         icon = "bi-cloud-fog"
-    elif code in (
-        51, 53, 55, 61, 63, 65, 80, 81, 82
+
+    elif weather_code in (
+        51, 53, 55,
+        61, 63, 65,
+        80, 81, 82
     ):
+
         condition = "Rainy"
         icon = "bi-cloud-rain"
-    elif code in (95, 96, 99):
+
+    elif weather_code in (95, 96, 99):
+
         condition = "Thunderstorm"
         icon = "bi-cloud-lightning-rain"
+
     else:
+
         condition = "Weather Conditions"
         icon = "bi-cloud-sun"
 
+    # ======================================
+    # SEVEN DAY FORECAST
+    # ======================================
+
     forecast = []
 
-    for index, day in enumerate(daily.get("time", [])[:7]):
+    dates = daily.get("time") or []
+
+    for index, day in enumerate(dates[:7]):
 
         def daily_value(field):
-            values = daily.get(field, [])
-            return (
-                values[index]
-                if index < len(values)
-                else None
-            )
+
+            values = daily.get(field) or []
+
+            if index < len(values):
+                return values[index]
+
+            return None
 
         try:
+
             day_name = datetime.strptime(
-                day, "%Y-%m-%d"
+                day,
+                "%Y-%m-%d"
             ).strftime("%a")
-        except (TypeError, ValueError):
+
+        except (ValueError, TypeError):
+
             day_name = "Day"
 
         forecast.append({
             "day": day_name,
-            "high": daily_value("temperature_2m_max"),
-            "low": daily_value("temperature_2m_min"),
+            "high": daily_value(
+                "temperature_2m_max"
+            ),
+            "low": daily_value(
+                "temperature_2m_min"
+            ),
             "rain": daily_value(
                 "precipitation_probability_max"
             ),
         })
 
     return {
-        "temperature": current.get("temperature_2m"),
-        "feels_like": current.get("apparent_temperature"),
-        "humidity": current.get("relative_humidity_2m"),
-        "wind": current.get("wind_speed_10m"),
+        "temperature": current.get(
+            "temperature_2m"
+        ),
+        "feels_like": current.get(
+            "apparent_temperature"
+        ),
+        "humidity": current.get(
+            "relative_humidity_2m"
+        ),
+        "wind": current.get(
+            "wind_speed_10m"
+        ),
         "condition": condition,
         "icon": icon,
         "forecast": forecast,
@@ -195,9 +225,11 @@ def get_weather(city):
 
 # ==========================================
 # AIR QUALITY API
+# OPEN-METEO
 # ==========================================
 
 def get_air_quality(city):
+
     if not city:
         return None
 
@@ -218,29 +250,41 @@ def get_air_quality(city):
     if not data:
         return None
 
-    current = data.get("current", {})
-
+    current = data.get("current") or {}
     aqi = current.get("us_aqi")
 
     if aqi is None:
+
         category = "Unavailable"
         status_class = "secondary"
+
     elif aqi <= 50:
+
         category = "Good"
         status_class = "success"
+
     elif aqi <= 100:
+
         category = "Moderate"
         status_class = "warning"
+
     elif aqi <= 150:
+
         category = "Unhealthy for Sensitive Groups"
         status_class = "warning"
+
     elif aqi <= 200:
+
         category = "Unhealthy"
         status_class = "danger"
+
     elif aqi <= 300:
+
         category = "Very Unhealthy"
         status_class = "danger"
+
     else:
+
         category = "Hazardous"
         status_class = "danger"
 
@@ -254,10 +298,12 @@ def get_air_quality(city):
 
 
 # ==========================================
-# RECENT PHILIPPINE EARTHQUAKES
+# RECENT EARTHQUAKES
+# USGS EARTHQUAKE API
 # ==========================================
 
 def get_recent_earthquakes():
+
     start_date = (
         timezone.now() - timedelta(days=14)
     ).strftime("%Y-%m-%d")
@@ -275,7 +321,7 @@ def get_recent_earthquakes():
             "orderby": "time",
             "limit": 8,
         },
-        "skyaware:recent-earthquakes-v2"
+        f"skyaware:recent-earthquakes:{start_date}"
     )
 
     if data is None:
@@ -283,10 +329,21 @@ def get_recent_earthquakes():
 
     earthquakes = []
 
-    for event in data.get("features", [])[:8]:
-        properties = event.get("properties") or {}
-        geometry = event.get("geometry") or {}
-        coordinates = geometry.get("coordinates") or []
+    for event in (
+        data.get("features") or []
+    )[:8]:
+
+        properties = event.get(
+            "properties"
+        ) or {}
+
+        geometry = event.get(
+            "geometry"
+        ) or {}
+
+        coordinates = geometry.get(
+            "coordinates"
+        ) or []
 
         if (
             len(coordinates) < 3
@@ -295,10 +352,22 @@ def get_recent_earthquakes():
             continue
 
         try:
-            magnitude = float(properties["mag"])
-            longitude = float(coordinates[0])
-            latitude = float(coordinates[1])
-            depth = float(coordinates[2])
+
+            magnitude = float(
+                properties["mag"]
+            )
+
+            longitude = float(
+                coordinates[0]
+            )
+
+            latitude = float(
+                coordinates[1]
+            )
+
+            depth = float(
+                coordinates[2]
+            )
 
             event_time = datetime.fromtimestamp(
                 properties["time"] / 1000,
@@ -307,16 +376,22 @@ def get_recent_earthquakes():
 
             formatted_time = timezone.localtime(
                 event_time
-            ).strftime("%b %d, %I:%M %p")
+            ).strftime(
+                "%b %d, %I:%M %p"
+            )
 
-        except (TypeError, ValueError, OverflowError):
+        except (
+            TypeError,
+            ValueError,
+            KeyError,
+            OverflowError
+        ):
             continue
 
         earthquakes.append({
             "place": properties.get(
-                "place",
-                "Unknown Location"
-            ),
+                "place"
+            ) or "Unknown Location",
             "magnitude": magnitude,
             "depth": depth,
             "latitude": latitude,
@@ -328,16 +403,18 @@ def get_recent_earthquakes():
 
 
 # ==========================================
-# REGULAR USER DASHBOARD
+# USER DASHBOARD
 # ==========================================
 
 @login_required
 def dashboard_view(request):
 
+    # Saved Locations CRUD data
     user_locations = SavedLocation.objects.filter(
         user=request.user
     )
 
+    # Default city
     city_name = (
         request.GET.get("city") or "Iligan"
     ).strip()[:80]
@@ -345,10 +422,36 @@ def dashboard_view(request):
     if len(city_name) < 2:
         city_name = "Iligan"
 
-    city = find_city(city_name)
+    city = None
 
+    # ======================================
+    # NOMINATIM LOCATION SEARCH
+    # ======================================
+
+    try:
+
+        city = find_ph_city(
+            city_name
+        )
+
+    except (
+        requests.RequestException,
+        ValueError,
+        TypeError
+    ):
+
+        messages.warning(
+            request,
+            "Location search is temporarily unavailable. "
+            "Please try again later."
+        )
+
+    # Weather and air quality
     weather = get_weather(city)
+
     air_quality = get_air_quality(city)
+
+    # Earthquake monitoring
     earthquakes = get_recent_earthquakes()
 
     context = {
@@ -357,7 +460,9 @@ def dashboard_view(request):
         "weather": weather,
         "air_quality": air_quality,
         "earthquakes": earthquakes,
+
         "total_user_locations": user_locations.count(),
+
         "recent_locations": user_locations.order_by(
             "-pk"
         )[:5],
@@ -389,14 +494,16 @@ def admin_dashboard_view(request):
         is_staff=True
     ).count()
 
-    total_saved_locations = SavedLocation.objects.count()
+    total_saved_locations = (
+        SavedLocation.objects.count()
+    )
 
     recent_users = User.objects.order_by(
         "-date_joined"
     )[:5]
 
-    # Statuses reflect implementation progress,
-    # not live provider uptime checks.
+    # Status reflects code integration,
+    # not live API uptime.
     api_integrations = [
         {
             "name": "Open-Meteo",
@@ -416,12 +523,12 @@ def admin_dashboard_view(request):
         {
             "name": "NASA EONET",
             "purpose": "Natural Events",
-            "status": "Planned",
+            "status": "Integrated",
         },
         {
             "name": "OpenStreetMap Nominatim",
             "purpose": "City Geocoding",
-            "status": "Planned",
+            "status": "Integrated",
         },
     ]
 

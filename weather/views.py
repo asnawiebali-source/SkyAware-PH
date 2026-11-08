@@ -14,19 +14,23 @@ from django.views.decorators.http import require_http_methods
 from .models import SavedLocation
 from .forms import SavedLocationForm
 
-from integrations.open_meteo import (
-    search_city,
-    get_weather
-)
+# NEW: Nominatim City Search
+from integrations.nominatim import find_ph_city
 
+# EXISTING WEATHER API
+from integrations.open_meteo import get_weather
+
+# USGS EARTHQUAKE API
 from integrations.usgs_earthquake import (
     get_recent_earthquakes
 )
 
+# AIR QUALITY API
 from integrations.air_quality import (
     get_air_quality
 )
 
+# GROQ AI
 from integrations.groq_ai import (
     ask_groq,
     GroqConfigurationError,
@@ -39,18 +43,24 @@ from integrations.groq_ai import (
 # ==========================================
 
 def home(request):
-    return render(request, "home.html")
+
+    return render(
+        request,
+        "home.html"
+    )
 
 
 # ==========================================
 # WEATHER FORECAST
+# NOMINATIM + OPEN-METEO
 # ==========================================
 
 @login_required
 def weather_forecast(request):
 
     city_name = request.GET.get(
-        "city", "Iligan City"
+        "city",
+        "Iligan City"
     ).strip()
 
     city = None
@@ -58,33 +68,55 @@ def weather_forecast(request):
     error = None
 
     if not city_name:
+
         error = "Please enter a city name."
 
     elif len(city_name) > 100:
+
         error = "City name is too long."
 
     else:
+
         try:
-            city = search_city(city_name)
+
+            # STEP 1: Search city using Nominatim
+            city = find_ph_city(city_name)
 
             if city:
+
+                # STEP 2: Retrieve Open-Meteo weather
                 weather_data = get_weather(
                     city["latitude"],
                     city["longitude"]
                 )
+
+                if not weather_data:
+                    error = (
+                        "Weather data is currently "
+                        "unavailable for this location."
+                    )
+
             else:
+
                 error = (
                     "City not found in the Philippines. "
                     "Please try another city."
                 )
 
         except requests.RequestException:
+
             error = (
-                "Unable to connect to the weather "
-                "service. Please try again."
+                "Unable to connect to the location "
+                "or weather service. Please try again."
             )
 
-        except (ValueError, KeyError, IndexError):
+        except (
+            ValueError,
+            KeyError,
+            IndexError,
+            TypeError
+        ):
+
             error = (
                 "Weather information is temporarily "
                 "unavailable. Please try again."
@@ -104,6 +136,7 @@ def weather_forecast(request):
 
 # ==========================================
 # EARTHQUAKE UPDATES
+# USGS EARTHQUAKE API
 # ==========================================
 
 @login_required
@@ -113,18 +146,26 @@ def earthquake_updates(request):
     error = None
 
     try:
+
         earthquake_data = get_recent_earthquakes(
             days=7,
             min_magnitude=2.5
         )
 
     except requests.RequestException:
+
         error = (
             "Unable to connect to the USGS "
             "earthquake service. Please try later."
         )
 
-    except (ValueError, KeyError, TypeError, OverflowError):
+    except (
+        ValueError,
+        KeyError,
+        TypeError,
+        OverflowError
+    ):
+
         error = (
             "Earthquake data is temporarily "
             "unavailable. Please try again later."
@@ -142,13 +183,15 @@ def earthquake_updates(request):
 
 # ==========================================
 # AIR QUALITY
+# NOMINATIM + OPEN-METEO AIR QUALITY
 # ==========================================
 
 @login_required
 def air_quality_view(request):
 
     city_name = request.GET.get(
-        "city", "Iligan City"
+        "city",
+        "Iligan City"
     ).strip()
 
     city = None
@@ -156,33 +199,56 @@ def air_quality_view(request):
     error = None
 
     if not city_name:
+
         error = "Please enter a city name."
 
     elif len(city_name) > 100:
+
         error = "City name is too long."
 
     else:
+
         try:
-            city = search_city(city_name)
+
+            # STEP 1: Find city through Nominatim
+            city = find_ph_city(city_name)
 
             if city:
+
+                # STEP 2: Get air quality
                 air_quality_data = get_air_quality(
                     city["latitude"],
                     city["longitude"]
                 )
+
+                if not air_quality_data:
+                    error = (
+                        "Air quality data is currently "
+                        "unavailable for this location."
+                    )
+
             else:
+
                 error = (
                     "City not found in the Philippines. "
                     "Please try another city."
                 )
 
         except requests.RequestException:
+
             error = (
-                "Unable to connect to the Air Quality API. "
+                "Unable to connect to the location "
+                "or air quality service. "
                 "Please try again."
             )
 
-        except (ValueError, KeyError, IndexError, TypeError):
+        except (
+            ValueError,
+            KeyError,
+            IndexError,
+            TypeError
+        ):
+
             error = (
                 "Air quality information is temporarily "
                 "unavailable. Please try again later."
@@ -215,29 +281,36 @@ def ai_assistant(request):
     if request.method == "POST":
 
         question = request.POST.get(
-            "question", ""
+            "question",
+            ""
         ).strip()
 
         if not question:
+
             error = "Please enter your question."
 
         elif len(question) > 1000:
+
             error = (
                 "Your question is too long. "
                 "Please use 1000 characters or fewer."
             )
 
         else:
+
             try:
+
                 answer = ask_groq(question)
 
             except GroqConfigurationError:
+
                 error = (
                     "Groq API is not configured. "
                     "Please contact the administrator."
                 )
 
             except GroqServiceError as exc:
+
                 error = str(exc)
 
     return render(
@@ -280,11 +353,16 @@ def add_location(request):
 
     if request.method == "POST":
 
-        form = SavedLocationForm(request.POST)
+        form = SavedLocationForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            location = form.save(commit=False)
+            location = form.save(
+                commit=False
+            )
+
             location.user = request.user
             location.save()
 
@@ -293,9 +371,12 @@ def add_location(request):
                 "Location added successfully!"
             )
 
-            return redirect("saved_locations")
+            return redirect(
+                "saved_locations"
+            )
 
     else:
+
         form = SavedLocationForm()
 
     return render(
@@ -337,9 +418,12 @@ def edit_location(request, pk):
                 "Location updated successfully!"
             )
 
-            return redirect("saved_locations")
+            return redirect(
+                "saved_locations"
+            )
 
     else:
+
         form = SavedLocationForm(
             instance=location
         )
@@ -376,7 +460,9 @@ def delete_location(request, pk):
             "Location deleted successfully!"
         )
 
-        return redirect("saved_locations")
+        return redirect(
+            "saved_locations"
+        )
 
     return render(
         request,
