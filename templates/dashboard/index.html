@@ -6,12 +6,12 @@
 {% block extra_css %}
 <style>
     .sky-dashboard {
-        --blue: #1769c2;
         --navy: #17385d;
+        --blue: #1769c2;
         --muted: #64748b;
     }
 
-    .sky-dashboard .dashboard-heading {
+    .sky-dashboard .heading {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -20,14 +20,14 @@
         margin-bottom: 24px;
     }
 
-    .sky-dashboard .dashboard-heading h1 {
+    .sky-dashboard .heading h1 {
+        color: var(--navy);
         font-size: 27px;
         font-weight: 800;
-        color: var(--navy);
         margin: 0;
     }
 
-    .sky-dashboard .dashboard-heading p {
+    .sky-dashboard .heading p {
         color: var(--muted);
         font-size: 14px;
         margin: 5px 0 0;
@@ -43,15 +43,15 @@
     }
 
     .sky-dashboard .dashboard-card h2 {
+        color: var(--navy);
         font-size: 19px;
         font-weight: 800;
-        color: #17385d;
         margin-bottom: 5px;
     }
 
     .sky-dashboard .section-subtitle {
-        font-size: 12px;
         color: #778497;
+        font-size: 12px;
     }
 
     .sky-dashboard .city-search {
@@ -76,10 +76,10 @@
     }
 
     .sky-dashboard .temperature {
+        color: #102f54;
         font-size: 68px;
         font-weight: 800;
         letter-spacing: -3px;
-        color: #102f54;
         line-height: 1.1;
     }
 
@@ -112,8 +112,8 @@
     }
 
     .sky-dashboard .metric strong {
-        font-size: 18px;
         color: var(--navy);
+        font-size: 18px;
     }
 
     .sky-dashboard .forecast {
@@ -132,13 +132,7 @@
     }
 
     .sky-dashboard .forecast-day strong {
-        color: #17385d;
-    }
-
-    .sky-dashboard .forecast-day small {
-        display: block;
-        color: #64748b;
-        margin-top: 7px;
+        color: var(--navy);
     }
 
     .sky-dashboard .forecast-day i {
@@ -148,11 +142,16 @@
         margin: 8px 0;
     }
 
-    .sky-dashboard .air-value {
+    .sky-dashboard .forecast-day small {
+        display: block;
+        color: #64748b;
+        margin-top: 7px;
+    }
+
+    .sky-dashboard .aqi-number {
+        color: var(--navy);
         font-size: 44px;
         font-weight: 800;
-        color: #17385d;
-        line-height: 1.2;
     }
 
     .sky-dashboard .air-metrics {
@@ -163,9 +162,9 @@
     }
 
     .sky-dashboard .air-metric {
-        padding: 15px;
-        border-radius: 11px;
         background: #f3f6fb;
+        border-radius: 11px;
+        padding: 15px;
     }
 
     .sky-dashboard .air-metric small {
@@ -174,7 +173,7 @@
     }
 
     .sky-dashboard .air-metric strong {
-        color: #17385d;
+        color: var(--navy);
         font-size: 20px;
     }
 
@@ -205,9 +204,9 @@
 
     .sky-dashboard .quake-name,
     .sky-dashboard .place-name {
+        color: #233a56;
         font-size: 13px;
         font-weight: 700;
-        color: #233a56;
         overflow-wrap: anywhere;
     }
 
@@ -220,13 +219,12 @@
         background: #f3f6fb;
         padding: 18px;
         border-radius: 12px;
-        margin-top: 15px;
-        margin-bottom: 17px;
+        margin: 15px 0 17px;
     }
 
     .sky-dashboard .assistant-question {
         background: #1769c2;
-        color: white;
+        color: #fff;
         border-radius: 10px;
         padding: 12px;
         font-size: 13px;
@@ -234,7 +232,7 @@
     }
 
     .sky-dashboard .assistant-answer {
-        background: white;
+        background: #fff;
         border-radius: 10px;
         padding: 13px;
         color: #475569;
@@ -249,7 +247,19 @@
         padding: 25px 10px;
     }
 
-    @media(max-width: 575px) {
+    .sky-dashboard .nasa-icon {
+        width: 53px;
+        height: 53px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: #1769c2;
+        border-radius: 14px;
+        font-size: 25px;
+    }
+
+    @media (max-width: 575px) {
         .sky-dashboard .dashboard-card {
             padding: 18px;
         }
@@ -262,12 +272,12 @@
             min-height: 44px;
         }
 
-        .sky-dashboard .weather-metrics {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
         .sky-dashboard .temperature {
             font-size: 55px;
+        }
+
+        .sky-dashboard .weather-metrics {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 </style>
@@ -278,16 +288,18 @@
 
 <div class="sky-dashboard">
 
-    <!-- HEADER -->
-    <div class="dashboard-heading">
+    <!-- DASHBOARD HEADING -->
+    <div class="heading">
 
         <div>
+
             <h1>My Dashboard</h1>
 
             <p>
                 Weather and disaster information
                 for the Philippines.
             </p>
+
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -298,17 +310,20 @@
             </span>
 
             {% if user.is_staff %}
+
             <a
                 href="{% url 'admin_dashboard' %}"
                 class="btn btn-outline-primary btn-sm"
             >
                 Admin Dashboard
             </a>
+
             {% endif %}
 
         </div>
 
     </div>
+
 
     <!-- CITY SEARCH -->
     <section class="city-search mb-4">
@@ -329,24 +344,26 @@
                 required
             >
 
-            <button
-                type="submit"
-                class="btn btn-primary"
-            >
+            <button type="submit" class="btn btn-primary">
+
                 <i class="bi bi-search me-2"></i>
                 Search
+
             </button>
 
         </form>
 
     </section>
 
+
     {% if not city %}
+
     <div class="alert alert-warning">
-        The city could not be found, or the
-        location service is temporarily unavailable.
+        City not found, or the location service is unavailable.
     </div>
+
     {% endif %}
+
 
     <!-- WEATHER AND AIR QUALITY -->
     <div class="row g-4 mb-4">
@@ -359,12 +376,18 @@
                 <div class="mb-4">
 
                     <h2>
+
                         {% if city %}
-                            <i class="bi bi-geo-alt-fill text-primary"></i>
-                            {{ city.name }}, {{ city.region }}
+
+                        <i class="bi bi-geo-alt-fill text-primary"></i>
+                        {{ city.name }}, {{ city.region }}
+
                         {% else %}
-                            Weather Unavailable
+
+                        Weather Unavailable
+
                         {% endif %}
+
                     </h2>
 
                     <div class="section-subtitle">
@@ -373,58 +396,87 @@
 
                 </div>
 
+
                 {% if weather %}
 
                 <div class="d-flex align-items-center gap-3 mb-4">
 
                     <div class="temperature">
+
                         {% if weather.temperature != None %}
-                        {{ weather.temperature|floatformat:0 }}°
+                            {{ weather.temperature|floatformat:0 }}°
                         {% else %}
-                        —
+                            —
                         {% endif %}
+
                     </div>
 
                     <div class="weather-condition">
+
                         <i class="bi {{ weather.icon }}"></i>
+
                         {{ weather.condition }}
+
                     </div>
 
                 </div>
+
 
                 <!-- WEATHER METRICS -->
                 <div class="weather-metrics mb-4">
 
                     <div class="metric">
+
                         <small>Feels Like</small>
+
                         <strong>
+
                             {% if weather.feels_like != None %}
-                            {{ weather.feels_like|floatformat:0 }}°C
-                            {% else %}—{% endif %}
+                                {{ weather.feels_like|floatformat:0 }}°C
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
+
                     </div>
 
                     <div class="metric">
+
                         <small>Humidity</small>
+
                         <strong>
+
                             {% if weather.humidity != None %}
-                            {{ weather.humidity|floatformat:0 }}%
-                            {% else %}—{% endif %}
+                                {{ weather.humidity|floatformat:0 }}%
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
+
                     </div>
 
                     <div class="metric">
+
                         <small>Wind Speed</small>
+
                         <strong>
+
                             {% if weather.wind != None %}
-                            {{ weather.wind|floatformat:0 }} km/h
-                            {% else %}—{% endif %}
+                                {{ weather.wind|floatformat:0 }} km/h
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
+
                     </div>
 
                 </div>
 
-                <!-- FORECAST -->
+
+                <!-- 7-DAY FORECAST -->
                 <h6 class="fw-bold mb-3">
                     7-Day Weather Forecast
                 </h6>
@@ -435,43 +487,59 @@
 
                     <div class="forecast-day">
 
-                        <strong>{{ day.day }}</strong>
+                        <strong>
+                            {{ day.day }}
+                        </strong>
 
                         <i class="bi bi-cloud-sun"></i>
 
                         <strong class="d-block">
+
                             {% if day.high != None %}
-                            {{ day.high|floatformat:0 }}°
-                            {% else %}—{% endif %}
+                                {{ day.high|floatformat:0 }}°
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
 
                         <small>
+
                             {% if day.low != None %}
-                            {{ day.low|floatformat:0 }}°
-                            {% else %}—{% endif %}
+                                {{ day.low|floatformat:0 }}°
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </small>
 
                         <small>
+
                             {% if day.rain != None %}
-                            {{ day.rain|floatformat:0 }}% rain
-                            {% else %}—{% endif %}
+                                {{ day.rain|floatformat:0 }}% rain
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </small>
 
                     </div>
 
                     {% empty %}
+
                     <div class="empty-state">
                         Forecast unavailable.
                     </div>
+
                     {% endfor %}
 
                 </div>
 
+
                 {% else %}
 
                 <div class="empty-state">
-                    <i class="bi bi-cloud-slash fs-2 d-block mb-2"></i>
-                    Weather data is currently unavailable.
+                    Weather information is currently unavailable.
                 </div>
 
                 {% endif %}
@@ -479,6 +547,7 @@
             </section>
 
         </div>
+
 
         <!-- AIR QUALITY -->
         <div class="col-xl-4">
@@ -491,19 +560,24 @@
                     Open-Meteo Air Quality API
                 </div>
 
+
                 {% if air_quality %}
 
-                <div class="air-value">
+                <div class="aqi-number">
+
                     {% if air_quality.aqi != None %}
-                    {{ air_quality.aqi|floatformat:0 }}
+                        {{ air_quality.aqi|floatformat:0 }}
                     {% else %}
-                    —
+                        —
                     {% endif %}
+
                 </div>
+
 
                 <span class="badge bg-{{ air_quality.status_class }} mt-2 p-2">
                     {{ air_quality.category }}
                 </span>
+
 
                 <div class="air-metrics">
 
@@ -512,9 +586,13 @@
                         <small>PM2.5</small>
 
                         <strong>
+
                             {% if air_quality.pm25 != None %}
-                            {{ air_quality.pm25|floatformat:1 }}
-                            {% else %}—{% endif %}
+                                {{ air_quality.pm25|floatformat:1 }}
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
 
                         <small>µg/m³</small>
@@ -526,9 +604,13 @@
                         <small>PM10</small>
 
                         <strong>
+
                             {% if air_quality.pm10 != None %}
-                            {{ air_quality.pm10|floatformat:1 }}
-                            {% else %}—{% endif %}
+                                {{ air_quality.pm10|floatformat:1 }}
+                            {% else %}
+                                —
+                            {% endif %}
+
                         </strong>
 
                         <small>µg/m³</small>
@@ -543,6 +625,7 @@
                     pollution levels are elevated.
                 </p>
 
+
                 {% else %}
 
                 <div class="empty-state">
@@ -550,6 +633,7 @@
                 </div>
 
                 {% endif %}
+
 
                 <a
                     href="{% url 'air_quality' %}"
@@ -564,10 +648,11 @@
 
     </div>
 
+
     <!-- EARTHQUAKES AND SAVED LOCATIONS -->
     <div class="row g-4 mb-4">
 
-        <!-- EARTHQUAKES -->
+        <!-- RECENT EARTHQUAKES -->
         <div class="col-xl-7">
 
             <section class="dashboard-card">
@@ -575,10 +660,13 @@
                 <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
 
                     <div>
+
                         <h2>Recent Earthquakes</h2>
+
                         <div class="section-subtitle">
                             USGS Earthquake API
                         </div>
+
                     </div>
 
                     <a
@@ -589,6 +677,7 @@
                     </a>
 
                 </div>
+
 
                 {% for quake in earthquakes|slice:":5" %}
 
@@ -624,14 +713,17 @@
 
                 </div>
 
+
                 {% empty %}
 
                 <div class="empty-state">
+
                     {% if earthquakes == None %}
-                    Earthquake data is temporarily unavailable.
+                        Earthquake data is temporarily unavailable.
                     {% else %}
-                    No matching recent earthquakes.
+                        No matching recent earthquakes.
                     {% endif %}
+
                 </div>
 
                 {% endfor %}
@@ -639,6 +731,7 @@
             </section>
 
         </div>
+
 
         <!-- SAVED LOCATIONS -->
         <div class="col-xl-5">
@@ -648,12 +741,14 @@
                 <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
 
                     <div>
+
                         <h2>Saved Locations</h2>
 
                         <div class="section-subtitle">
                             {{ total_user_locations }}
                             location{{ total_user_locations|pluralize }}
                         </div>
+
                     </div>
 
                     <a
@@ -666,13 +761,17 @@
 
                 </div>
 
+
                 {% for location in recent_locations %}
 
                 <div class="place-item">
 
                     <span class="place-name">
+
                         <i class="bi bi-geo-alt text-primary me-2"></i>
+
                         {{ location }}
+
                     </span>
 
                     <a
@@ -684,10 +783,10 @@
 
                 </div>
 
+
                 {% empty %}
 
                 <div class="empty-state">
-                    <i class="bi bi-bookmark fs-2 d-block mb-2"></i>
                     No saved locations yet.
                 </div>
 
@@ -699,9 +798,11 @@
 
     </div>
 
-    <!-- AI SAFETY ASSISTANT -->
+
+    <!-- AI ASSISTANT AND NATURAL EVENTS -->
     <div class="row g-4 mb-4">
 
+        <!-- AI ASSISTANT -->
         <div class="col-lg-8">
 
             <section class="dashboard-card">
@@ -709,15 +810,19 @@
                 <div class="d-flex justify-content-between align-items-center gap-2">
 
                     <div>
+
                         <h2>AI Safety Assistant</h2>
+
                         <div class="section-subtitle">
                             Powered by Groq AI
                         </div>
+
                     </div>
 
                     <i class="bi bi-robot text-primary fs-3"></i>
 
                 </div>
+
 
                 <div class="assistant-preview">
 
@@ -726,10 +831,10 @@
                     </div>
 
                     <div class="assistant-answer">
-                        Drop, cover, and hold on during
-                        shaking. Stay away from windows.
-                        Follow official evacuation
-                        instructions when it is safe to move.
+                        Drop, cover, and hold on during shaking.
+                        Stay away from windows.
+                        Follow official evacuation instructions
+                        when it is safe to move.
                     </div>
 
                     <small class="section-subtitle d-block mt-2">
@@ -738,6 +843,7 @@
                     </small>
 
                 </div>
+
 
                 <a
                     href="{% url 'ai_assistant' %}"
@@ -751,9 +857,15 @@
 
         </div>
 
+
+        <!-- NASA NATURAL EVENTS -->
         <div class="col-lg-4">
 
             <section class="dashboard-card">
+
+                <div class="nasa-icon mb-3">
+                    <i class="bi bi-globe-americas"></i>
+                </div>
 
                 <h2>Natural Events</h2>
 
@@ -762,13 +874,23 @@
                 </div>
 
                 <p class="text-muted small">
-                    Natural event monitoring will be
-                    available after NASA EONET is integrated.
+                    Explore reported natural events,
+                    including severe storms, wildfires,
+                    volcanic activity, floods, and landslides.
                 </p>
 
-                <span class="badge bg-light text-secondary border">
-                    Coming Soon
-                </span>
+                <p class="text-muted small">
+                    Filter events by location, category,
+                    reporting period, and event status.
+                </p>
+
+                <a
+                    href="{% url 'natural_events' %}"
+                    class="btn btn-outline-primary mt-3"
+                >
+                    <i class="bi bi-globe-americas me-2"></i>
+                    View Natural Events
+                </a>
 
             </section>
 
@@ -776,7 +898,8 @@
 
     </div>
 
-    <!-- SAFETY DISCLAIMER -->
+
+    <!-- DISCLAIMER -->
     <div class="alert alert-info">
 
         <i class="bi bi-info-circle me-2"></i>

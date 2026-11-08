@@ -1,0 +1,731 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Natural Events | SkyAware PH
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .natural-page {
+        --navy: #17385d;
+        --blue: #1769c2;
+        --muted: #64748b;
+    }
+
+    .natural-page .page-heading {
+        color: var(--navy);
+        font-weight: 800;
+        font-size: 28px;
+    }
+
+    .natural-page .page-subtitle {
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .natural-page .panel {
+        background: #fff;
+        border: 1px solid #e5ebf3;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 5px 20px rgba(16,47,84,.04);
+    }
+
+    .natural-page .filter-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #33465e;
+        margin-bottom: 8px;
+    }
+
+    .natural-page .form-select {
+        min-height: 45px;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .natural-page .stat-number {
+        font-weight: 800;
+        color: var(--navy);
+        font-size: 31px;
+    }
+
+    .natural-page .stat-label {
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .natural-page .event-card {
+        background: white;
+        border: 1px solid #e5ebf3;
+        border-radius: 16px;
+        padding: 24px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 5px 20px rgba(16,47,84,.04);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .natural-page .event-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(16,47,84,.09);
+    }
+
+    .natural-page .event-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: var(--blue);
+        font-size: 25px;
+    }
+
+    .natural-page .event-name {
+        color: var(--navy);
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.5;
+        margin: 18px 0 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .natural-page .event-description {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+    }
+
+    .natural-page .event-detail {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+        color: #52657a;
+        font-size: 13px;
+    }
+
+    .natural-page .event-detail i {
+        color: var(--blue);
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .natural-page .event-actions {
+        display: grid;
+        gap: 9px;
+        margin-top: auto;
+        padding-top: 18px;
+    }
+
+    .natural-page .event-actions .btn {
+        padding: 10px 14px;
+        font-size: 13px;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+    .natural-page .empty-state {
+        text-align: center;
+        background: white;
+        border: 1px solid #e5ebf3;
+        border-radius: 16px;
+        padding: 50px 25px;
+    }
+
+    .natural-page .empty-state i {
+        font-size: 45px;
+        color: #9aacc0;
+    }
+
+    .natural-page .empty-state h3 {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--navy);
+        margin-top: 15px;
+    }
+
+    .natural-page .empty-state p {
+        font-size: 14px;
+        color: var(--muted);
+        max-width: 500px;
+        margin: 10px auto 20px;
+    }
+
+    @media (max-width: 575px) {
+        .natural-page .panel,
+        .natural-page .event-card {
+            padding: 18px;
+        }
+
+        .natural-page .page-heading {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="natural-page">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+
+        <div>
+
+            <h1 class="page-heading mb-2">
+                <i class="bi bi-globe-americas text-primary me-2"></i>
+                Natural Events
+            </h1>
+
+            <p class="page-subtitle">
+                Monitor reported natural events worldwide
+                and around the Philippines using NASA EONET.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="btn btn-outline-primary"
+        >
+            <i class="bi bi-arrow-left me-2"></i>
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- IMPORTANT NOTICE -->
+    <div class="alert alert-info mb-4">
+
+        <i class="bi bi-info-circle me-2"></i>
+
+        <strong>Important Notice:</strong>
+
+        NASA EONET provides curated natural-event
+        records, not disaster predictions or
+        official emergency warnings.
+
+        For Philippine emergencies, follow
+        PAGASA, PHIVOLCS, and local authorities.
+
+    </div>
+
+
+    <!-- FILTER PANEL -->
+    <section class="panel mb-4">
+
+        <h4 class="fw-bold mb-4" style="color:#17385d;">
+            <i class="bi bi-funnel text-primary me-2"></i>
+            Filter Natural Events
+        </h4>
+
+        <form method="get">
+
+            <div class="row g-3">
+
+                <!-- LOCATION -->
+                <div class="col-md-6 col-xl-3">
+
+                    <label for="scope" class="form-label filter-label">
+                        Location
+                    </label>
+
+                    <select
+                        id="scope"
+                        name="scope"
+                        class="form-select"
+                    >
+
+                        <option
+                            value="world"
+                            {% if scope == "world" %}selected{% endif %}
+                        >
+                            Worldwide
+                        </option>
+
+                        <option
+                            value="ph"
+                            {% if scope == "ph" %}selected{% endif %}
+                        >
+                            Philippines & Nearby Waters
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CATEGORY -->
+                <div class="col-md-6 col-xl-3">
+
+                    <label for="category" class="form-label filter-label">
+                        Event Category
+                    </label>
+
+                    <select
+                        id="category"
+                        name="category"
+                        class="form-select"
+                    >
+
+                        {% for key, label in categories.items %}
+
+                        <option
+                            value="{{ key }}"
+                            {% if category == key %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="col-md-6 col-xl-3">
+
+                    <label for="status" class="form-label filter-label">
+                        Event Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        class="form-select"
+                    >
+
+                        <option
+                            value="all"
+                            {% if status == "all" %}selected{% endif %}
+                        >
+                            All Events
+                        </option>
+
+                        <option
+                            value="open"
+                            {% if status == "open" %}selected{% endif %}
+                        >
+                            Open Events
+                        </option>
+
+                        <option
+                            value="closed"
+                            {% if status == "closed" %}selected{% endif %}
+                        >
+                            Closed Events
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- REPORTING PERIOD -->
+                <div class="col-md-6 col-xl-3">
+
+                    <label for="days" class="form-label filter-label">
+                        Reporting Period
+                    </label>
+
+                    <select
+                        id="days"
+                        name="days"
+                        class="form-select"
+                    >
+
+                        <option
+                            value="30"
+                            {% if days == 30 %}selected{% endif %}
+                        >
+                            Last 30 Days
+                        </option>
+
+                        <option
+                            value="90"
+                            {% if days == 90 %}selected{% endif %}
+                        >
+                            Last 90 Days
+                        </option>
+
+                        <option
+                            value="180"
+                            {% if days == 180 %}selected{% endif %}
+                        >
+                            Last 180 Days
+                        </option>
+
+                        <option
+                            value="365"
+                            {% if days == 365 %}selected{% endif %}
+                        >
+                            Last 365 Days
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTER BUTTONS -->
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-search me-2"></i>
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{% url 'natural_events' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Reset Filters
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- SUMMARY -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="panel h-100">
+
+                <div class="stat-label">
+                    Events Displayed
+                </div>
+
+                <div class="stat-number">
+                    {{ event_count }}
+                </div>
+
+                <small class="text-muted">
+                    Up to 200 matching records
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="panel h-100">
+
+                <div class="stat-label">
+                    Selected Location
+                </div>
+
+                <div class="stat-number fs-5 mt-3">
+
+                    {% if scope == "ph" %}
+                        Philippines
+                    {% else %}
+                        Worldwide
+                    {% endif %}
+
+                </div>
+
+                <small class="text-muted">
+                    Geographic search area
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="panel h-100">
+
+                <div class="stat-label">
+                    Search Period
+                </div>
+
+                <div class="stat-number">
+                    {{ days }}
+                </div>
+
+                <small class="text-muted">
+                    Days
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if retrieved_at %}
+
+    <p class="text-muted small mb-4">
+
+        <i class="bi bi-clock-history me-1"></i>
+
+        <strong>Last Retrieved:</strong>
+
+        {{ retrieved_at|date:"M d, Y h:i A" }} PHT
+
+    </p>
+
+    {% endif %}
+
+
+    <!-- RESULTS -->
+    <div class="d-flex justify-content-between align-items-center gap-2 mb-4">
+
+        <h4 class="fw-bold mb-0" style="color:#17385d;">
+            Recent Natural Events
+        </h4>
+
+        <span class="badge bg-primary px-3 py-2">
+            {{ event_count }} Event{{ event_count|pluralize }}
+        </span>
+
+    </div>
+
+
+    {% if error %}
+
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    {% if events %}
+
+    <div class="row g-4">
+
+        {% for event in events %}
+
+        <div class="col-md-6 col-xl-4">
+
+            <article class="event-card">
+
+                <!-- EVENT ICON AND STATUS -->
+                <div class="d-flex justify-content-between align-items-center gap-2">
+
+                    <div class="event-icon">
+                        <i class="bi {{ event.icon }}"></i>
+                    </div>
+
+                    {% if event.status == "Open" %}
+
+                    <span class="badge bg-success px-3 py-2">
+                        Open
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge bg-secondary px-3 py-2">
+                        Closed
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- EVENT NAME -->
+                <h3 class="event-name">
+                    {{ event.title }}
+                </h3>
+
+
+                <!-- DESCRIPTION -->
+                {% if event.description %}
+
+                <p class="event-description">
+                    {{ event.description|truncatechars:180 }}
+                </p>
+
+                {% endif %}
+
+
+                <!-- CATEGORY -->
+                <div class="event-detail">
+
+                    <i class="bi bi-tag"></i>
+
+                    <span>
+                        <strong>Category:</strong>
+                        {{ event.category }}
+                    </span>
+
+                </div>
+
+
+                <!-- DATE -->
+                <div class="event-detail">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                    <span>
+                        <strong>Latest Reported Date:</strong>
+                        {{ event.date }}
+                    </span>
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <div class="event-detail">
+
+                    <i class="bi bi-geo-alt"></i>
+
+                    <span>
+
+                        <strong>Reported Location:</strong>
+
+                        {% if event.latitude != None and event.longitude != None %}
+
+                            {{ event.latitude|floatformat:4 }},
+                            {{ event.longitude|floatformat:4 }}
+
+                        {% else %}
+
+                            No single point available
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="event-actions">
+
+                    {% if event.latitude != None and event.longitude != None %}
+
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&amp;query={{ event.latitude }},{{ event.longitude }}"
+                        class="btn btn-primary"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="bi bi-geo-alt me-2"></i>
+                        View Event Location
+                    </a>
+
+                    {% endif %}
+
+
+                    {% if event.source_url %}
+
+                    <a
+                        href="{{ event.source_url }}"
+                        class="btn btn-outline-primary"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="bi bi-box-arrow-up-right me-2"></i>
+                        View Event Source
+                    </a>
+
+                    {% elif event.event_url %}
+
+                    <a
+                        href="{{ event.event_url }}"
+                        class="btn btn-outline-primary"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="bi bi-info-circle me-2"></i>
+                        View NASA Event Details
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% elif not error %}
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state">
+
+        <i class="bi bi-globe-americas"></i>
+
+        <h3>No Matching Natural Events</h3>
+
+        <p>
+            NASA EONET has no records matching the
+            selected location, category, status,
+            and reporting period.
+
+            This does not mean an area is free from hazards.
+        </p>
+
+        <a
+            href="{% url 'natural_events' %}"
+            class="btn btn-primary"
+        >
+            <i class="bi bi-globe me-2"></i>
+            View Worldwide Events
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- DATA SOURCE -->
+    <div class="panel mt-4">
+
+        <strong>
+            <i class="bi bi-database text-primary me-2"></i>
+            Data Source
+        </strong>
+
+        <p class="mt-2 mb-2">
+
+            <a
+                href="https://eonet.gsfc.nasa.gov/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                NASA Earth Observatory Natural Event Tracker
+            </a>
+
+        </p>
+
+        <p class="small text-muted mb-0">
+            Events may be revised or updated by NASA EONET.
+            Use official government sources for emergency alerts.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -3,18 +3,19 @@ from django.contrib import admin
 from django.urls import path, include
 
 from weather.views import home
+from weather.natural_events import natural_events_view
 from dashboard.views import admin_dashboard_view
 
 
 urlpatterns = [
 
-    # Django Admin Panel
+    # Django Admin
     path(
         "admin/",
         admin.site.urls,
     ),
 
-    # SkyAware PH Admin Dashboard
+    # SkyAware Admin Dashboard
     path(
         "admin-dashboard/",
         admin_dashboard_view,
@@ -33,6 +34,13 @@ urlpatterns = [
         include("dashboard.urls"),
     ),
 
+    # NASA Natural Events
+    path(
+        "natural-events/",
+        natural_events_view,
+        name="natural_events",
+    ),
+
     # Homepage
     path(
         "",
@@ -40,8 +48,8 @@ urlpatterns = [
         name="home",
     ),
 
-    # Weather, Earthquakes, Air Quality,
-    # AI Assistant and Saved Locations
+    # Weather, Air Quality, Earthquakes,
+    # Groq AI and Saved Locations
     path(
         "",
         include("weather.urls"),
