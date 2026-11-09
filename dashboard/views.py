@@ -1,77 +1,143 @@
 
-from datetime import (
-    datetime,
-    timedelta,
-    timezone as dt_timezone
-)
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 import requests
 
 from django.contrib import messages
-from django.contrib.admin.views.decorators import (
-    staff_member_required
-)
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.shortcuts import render
-from django.utils import timezone
 
 from weather.models import SavedLocation
 
-# NEW: Nominatim geocoding
 from integrations.nominatim import find_ph_city
+from integrations.usgs_earthquake import (
+    get_recent_earthquakes as fetch_usgs_earthquakes
+)
 
 
 # ==========================================
-# API REQUEST HELPER
+# SETTINGS
+# ==========================================
+
+WEATHER_CACHE_SECONDS = 600
+AIR_QUALITY_CACHE_SECONDS = 600
+
+# Avoid repeatedly calling an unavailable
+# API on every page refresh.
+FAILURE_CACHE_SECONDS = 30
+
+# Separate connection and read timeouts.
+API_TIMEOUT = (3, 5)
+
+
+# ==========================================
+# REUSABLE API REQUEST HELPER
 # ==========================================
 
 def get_api_json(
     url,
     params,
     cache_key,
-    timeout=8
+    timeout=API_TIMEOUT,
+    cache_seconds=600,
 ):
+    """
+    Fetch JSON with caching and error handling.
+
+    A successful result is cached to avoid
+    unnecessary repeated external requests.
+
+    If an API fails, requests for the same
+    resource are briefly paused.
+    """
 
     cached = cache.get(cache_key)
 
     if cached is not None:
         return cached
 
-    try:
+    failure_key = f"{cache_key}:failed"
 
+    if cache.get(failure_key):
+        return None
+
+    try:
         response = requests.get(
             url,
             params=params,
             timeout=timeout,
             headers={
-                "User-Agent": "SkyAwarePH-SchoolProject/1.0"
-            }
+                "User-Agent": (
+                    "SkyAwarePH/1.0 "
+                    "educational-weather-portal"
+                ),
+                "Accept": "application/json",
+            },
         )
 
         response.raise_for_status()
+
         data = response.json()
 
         if (
             not isinstance(data, dict)
             or data.get("error")
         ):
+            cache.set(
+                failure_key,
+                True,
+                FAILURE_CACHE_SECONDS
+            )
             return None
 
         cache.set(
             cache_key,
             data,
-            600
+            cache_seconds
         )
 
         return data
 
     except (
         requests.RequestException,
-        ValueError
+        ValueError,
     ):
+        cache.set(
+            failure_key,
+            True,
+            FAILURE_CACHE_SECONDS
+        )
 
+        return None
+
+
+# ==========================================
+# CITY COORDINATES CACHE KEY
+# ==========================================
+
+def city_cache_suffix(city):
+    """
+    Consistent cache key for a location.
+    """
+
+    try:
+        latitude = float(city["latitude"])
+        longitude = float(city["longitude"])
+
+        return (
+            f"{latitude:.5f}:"
+            f"{longitude:.5f}"
+        )
+
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+    ):
         return None
 
 
@@ -85,9 +151,16 @@ def get_weather(city):
     if not city:
         return None
 
+    location_key = city_cache_suffix(city)
+
+    if location_key is None:
+        return None
+
     data = get_api_json(
-        "https://api.open-meteo.com/v1/forecast",
-        {
+        url=(
+            "https://api.open-meteo.com/v1/forecast"
+        ),
+        params={
             "latitude": city["latitude"],
             "longitude": city["longitude"],
             "current": (
@@ -105,10 +178,11 @@ def get_weather(city):
             "forecast_days": 7,
             "timezone": "Asia/Manila",
         },
-        (
-            f"skyaware:weather:"
-            f"{city['latitude']}:{city['longitude']}"
-        )
+        cache_key=(
+            "skyaware:dashboard:"
+            f"weather:v2:{location_key}"
+        ),
+        cache_seconds=WEATHER_CACHE_SECONDS,
     )
 
     if not data:
@@ -121,24 +195,23 @@ def get_weather(city):
         "weather_code"
     )
 
-    # Weather condition and icon
-    if weather_code == 0:
+    # ======================================
+    # WEATHER DESCRIPTION
+    # ======================================
 
+    if weather_code == 0:
         condition = "Clear Sky"
         icon = "bi-sun"
 
     elif weather_code in (1, 2):
-
         condition = "Partly Cloudy"
         icon = "bi-cloud-sun"
 
     elif weather_code == 3:
-
         condition = "Cloudy"
         icon = "bi-clouds"
 
     elif weather_code in (45, 48):
-
         condition = "Foggy"
         icon = "bi-cloud-fog"
 
@@ -147,17 +220,14 @@ def get_weather(city):
         61, 63, 65,
         80, 81, 82
     ):
-
         condition = "Rainy"
         icon = "bi-cloud-rain"
 
     elif weather_code in (95, 96, 99):
-
         condition = "Thunderstorm"
         icon = "bi-cloud-lightning-rain"
 
     else:
-
         condition = "Weather Conditions"
         icon = "bi-cloud-sun"
 
@@ -169,38 +239,39 @@ def get_weather(city):
 
     dates = daily.get("time") or []
 
+    def get_daily_value(field, index):
+
+        values = daily.get(field) or []
+
+        if index < len(values):
+            return values[index]
+
+        return None
+
     for index, day in enumerate(dates[:7]):
 
-        def daily_value(field):
-
-            values = daily.get(field) or []
-
-            if index < len(values):
-                return values[index]
-
-            return None
-
         try:
-
             day_name = datetime.strptime(
                 day,
                 "%Y-%m-%d"
             ).strftime("%a")
 
         except (ValueError, TypeError):
-
             day_name = "Day"
 
         forecast.append({
             "day": day_name,
-            "high": daily_value(
-                "temperature_2m_max"
+            "high": get_daily_value(
+                "temperature_2m_max",
+                index
             ),
-            "low": daily_value(
-                "temperature_2m_min"
+            "low": get_daily_value(
+                "temperature_2m_min",
+                index
             ),
-            "rain": daily_value(
-                "precipitation_probability_max"
+            "rain": get_daily_value(
+                "precipitation_probability_max",
+                index
             ),
         })
 
@@ -233,58 +304,65 @@ def get_air_quality(city):
     if not city:
         return None
 
+    location_key = city_cache_suffix(city)
+
+    if location_key is None:
+        return None
+
     data = get_api_json(
-        "https://air-quality-api.open-meteo.com/v1/air-quality",
-        {
+        url=(
+            "https://air-quality-api.open-meteo.com/"
+            "v1/air-quality"
+        ),
+        params={
             "latitude": city["latitude"],
             "longitude": city["longitude"],
             "current": "us_aqi,pm2_5,pm10",
             "timezone": "Asia/Manila",
         },
-        (
-            f"skyaware:air:"
-            f"{city['latitude']}:{city['longitude']}"
-        )
+        cache_key=(
+            "skyaware:dashboard:"
+            f"air:v2:{location_key}"
+        ),
+        cache_seconds=AIR_QUALITY_CACHE_SECONDS,
     )
 
     if not data:
         return None
 
     current = data.get("current") or {}
+
     aqi = current.get("us_aqi")
 
-    if aqi is None:
+    # ======================================
+    # AIR QUALITY STATUS
+    # ======================================
 
+    if aqi is None:
         category = "Unavailable"
         status_class = "secondary"
 
     elif aqi <= 50:
-
         category = "Good"
         status_class = "success"
 
     elif aqi <= 100:
-
         category = "Moderate"
         status_class = "warning"
 
     elif aqi <= 150:
-
         category = "Unhealthy for Sensitive Groups"
         status_class = "warning"
 
     elif aqi <= 200:
-
         category = "Unhealthy"
         status_class = "danger"
 
     elif aqi <= 300:
-
         category = "Very Unhealthy"
         status_class = "danger"
 
     else:
-
         category = "Hazardous"
         status_class = "danger"
 
@@ -298,108 +376,147 @@ def get_air_quality(city):
 
 
 # ==========================================
-# RECENT EARTHQUAKES
 # USGS EARTHQUAKE API
+# SHARED WITH EARTHQUAKE UPDATES PAGE
 # ==========================================
 
 def get_recent_earthquakes():
+    """
+    Dashboard preview:
+    - Last 7 days
+    - Magnitude 2.5+
+    - Maximum 5 displayed earthquakes
+    """
 
-    start_date = (
-        timezone.now() - timedelta(days=14)
-    ).strftime("%Y-%m-%d")
+    try:
+        data = fetch_usgs_earthquakes(
+            days=7,
+            min_magnitude=2.5
+        )
 
-    data = get_api_json(
-        "https://earthquake.usgs.gov/fdsnws/event/1/query",
-        {
-            "format": "geojson",
-            "minlatitude": 4,
-            "maxlatitude": 22,
-            "minlongitude": 116,
-            "maxlongitude": 127,
-            "minmagnitude": 3,
-            "starttime": start_date,
-            "orderby": "time",
-            "limit": 8,
-        },
-        f"skyaware:recent-earthquakes:{start_date}"
-    )
-
-    if data is None:
+    except (
+        requests.RequestException,
+        ValueError,
+        TypeError,
+        KeyError,
+        IndexError,
+        OverflowError,
+    ):
         return None
 
-    earthquakes = []
+    if not data:
+        return None
 
-    for event in (
-        data.get("features") or []
-    )[:8]:
+    recent = []
 
-        properties = event.get(
-            "properties"
-        ) or {}
+    for quake in (
+        data.get("earthquakes") or []
+    )[:5]:
 
-        geometry = event.get(
-            "geometry"
-        ) or {}
-
-        coordinates = geometry.get(
-            "coordinates"
-        ) or []
-
-        if (
-            len(coordinates) < 3
-            or properties.get("mag") is None
-        ):
-            continue
-
+        # Convert date and time for the
+        # smaller dashboard card.
         try:
-
-            magnitude = float(
-                properties["mag"]
+            event_datetime = datetime.strptime(
+                (
+                    f"{quake['date']} "
+                    f"{quake['time']}"
+                ),
+                "%B %d, %Y %I:%M %p"
             )
 
-            longitude = float(
-                coordinates[0]
-            )
-
-            latitude = float(
-                coordinates[1]
-            )
-
-            depth = float(
-                coordinates[2]
-            )
-
-            event_time = datetime.fromtimestamp(
-                properties["time"] / 1000,
-                tz=dt_timezone.utc
-            )
-
-            formatted_time = timezone.localtime(
-                event_time
-            ).strftime(
-                "%b %d, %I:%M %p"
+            display_time = (
+                event_datetime.strftime(
+                    "%b %d, %I:%M %p"
+                )
             )
 
         except (
-            TypeError,
             ValueError,
+            TypeError,
             KeyError,
-            OverflowError
         ):
-            continue
+            display_time = (
+                f"{quake.get('date', '')}, "
+                f"{quake.get('time', '')}"
+            )
 
-        earthquakes.append({
-            "place": properties.get(
-                "place"
-            ) or "Unknown Location",
-            "magnitude": magnitude,
-            "depth": depth,
-            "latitude": latitude,
-            "longitude": longitude,
-            "time": formatted_time,
+        recent.append({
+            "id": quake.get("id"),
+            "place": quake.get(
+                "place",
+                "Unknown location"
+            ),
+            "magnitude": quake.get(
+                "magnitude"
+            ),
+            "depth": quake.get("depth"),
+            "latitude": quake.get(
+                "latitude"
+            ),
+            "longitude": quake.get(
+                "longitude"
+            ),
+            "time": display_time,
         })
 
-    return earthquakes
+    return recent
+
+
+# ==========================================
+# CONCURRENT DASHBOARD API REQUESTS
+# ==========================================
+
+def fetch_dashboard_data(city):
+    """
+    Fetch independent API data concurrently.
+
+    Previously:
+        Weather -> Air Quality -> Earthquakes
+
+    Now:
+        Weather + Air Quality + Earthquakes
+
+    This reduces waiting when several
+    requests need fresh data at once.
+    """
+
+    with ThreadPoolExecutor(
+        max_workers=3
+    ) as executor:
+
+        weather_future = executor.submit(
+            get_weather,
+            city
+        )
+
+        air_future = executor.submit(
+            get_air_quality,
+            city
+        )
+
+        earthquake_future = executor.submit(
+            get_recent_earthquakes
+        )
+
+        try:
+            weather = weather_future.result()
+
+        except Exception:
+            weather = None
+
+        try:
+            air_quality = air_future.result()
+
+        except Exception:
+            air_quality = None
+
+        try:
+            earthquakes = earthquake_future.result()
+
+        except Exception:
+            earthquakes = None
+
+    return weather, air_quality, earthquakes
 
 
 # ==========================================
@@ -409,12 +526,10 @@ def get_recent_earthquakes():
 @login_required
 def dashboard_view(request):
 
-    # Saved Locations CRUD data
     user_locations = SavedLocation.objects.filter(
         user=request.user
     )
 
-    # Default city
     city_name = (
         request.GET.get("city") or "Iligan"
     ).strip()[:80]
@@ -425,34 +540,36 @@ def dashboard_view(request):
     city = None
 
     # ======================================
-    # NOMINATIM LOCATION SEARCH
+    # CITY GEOCODING
     # ======================================
 
     try:
-
-        city = find_ph_city(
-            city_name
-        )
+        city = find_ph_city(city_name)
 
     except (
         requests.RequestException,
         ValueError,
-        TypeError
+        TypeError,
     ):
-
         messages.warning(
             request,
-            "Location search is temporarily unavailable. "
-            "Please try again later."
+            "Location search is temporarily "
+            "unavailable. Please try again later."
         )
 
-    # Weather and air quality
-    weather = get_weather(city)
+    # ======================================
+    # CONCURRENT API DATA
+    # ======================================
 
-    air_quality = get_air_quality(city)
+    (
+        weather,
+        air_quality,
+        earthquakes
+    ) = fetch_dashboard_data(city)
 
-    # Earthquake monitoring
-    earthquakes = get_recent_earthquakes()
+    # ======================================
+    # DASHBOARD DATA
+    # ======================================
 
     context = {
         "searched_city": city_name,
@@ -461,11 +578,13 @@ def dashboard_view(request):
         "air_quality": air_quality,
         "earthquakes": earthquakes,
 
-        "total_user_locations": user_locations.count(),
+        "total_user_locations": (
+            user_locations.count()
+        ),
 
-        "recent_locations": user_locations.order_by(
-            "-pk"
-        )[:5],
+        "recent_locations": (
+            user_locations.order_by("-pk")[:5]
+        ),
     }
 
     return render(
@@ -502,8 +621,8 @@ def admin_dashboard_view(request):
         "-date_joined"
     )[:5]
 
-    # Status reflects code integration,
-    # not live API uptime.
+    # Status describes code integration,
+    # not real-time API availability.
     api_integrations = [
         {
             "name": "Open-Meteo",
