@@ -31,10 +31,15 @@
     .sky-dashboard .heading p {
         color: var(--muted);
         font-size: 14px;
-        margin: 5px 0 0;
+        margin: 7px 0 0;
     }
 
-    /* COMMON DASHBOARD CARDS */
+    .sky-dashboard .welcome-icon {
+        color: #e4a83c;
+        margin-left: 5px;
+    }
+
+    /* COMMON CARDS */
     .sky-dashboard .dashboard-card {
         background: #fff;
         border: 1px solid #e3eaf2;
@@ -102,7 +107,7 @@
         margin: 10px 0 0;
     }
 
-    /* AUTOCOMPLETE DROPDOWN */
+    /* AUTOCOMPLETE */
     .sky-dashboard .city-suggestions {
         position: absolute;
         top: calc(100% + 7px);
@@ -240,7 +245,7 @@
         font-size: 18px;
     }
 
-    /* WEATHER FORECAST */
+    /* FORECAST */
     .sky-dashboard .forecast {
         display: grid;
         grid-template-columns: repeat(7, minmax(75px, 1fr));
@@ -388,7 +393,7 @@
         font-size: 25px;
     }
 
-    /* RESPONSIVE DESIGN */
+    /* RESPONSIVE */
     @media (max-width: 575px) {
         .sky-dashboard .dashboard-card {
             padding: 18px;
@@ -426,45 +431,54 @@
 
 <div class="sky-dashboard">
 
-    <!-- ============================== -->
-    <!-- DASHBOARD HEADING -->
-    <!-- ============================== -->
+    <!-- ================================= -->
+    <!-- PERSONALIZED DASHBOARD HEADER -->
+    <!-- ================================= -->
 
     <div class="heading">
 
         <div>
-            <h1>My Dashboard</h1>
+
+            <h1>
+
+                Welcome back,
+
+                {% if user.first_name %}
+                    {{ user.first_name }}!
+                {% else %}
+                    {{ user.username }}!
+                {% endif %}
+
+                <i class="bi bi-cloud-sun welcome-icon"></i>
+
+            </h1>
 
             <p>
-                Weather and disaster information
-                for the Philippines.
+                Here's your latest weather and disaster
+                information for the Philippines.
             </p>
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-
-            <span class="badge bg-primary px-3 py-2">
-                <i class="bi bi-person me-1"></i>
-                {{ user.username }}
-            </span>
-
-            {% if user.is_staff %}
-            <a
-                href="{% url 'admin_dashboard' %}"
-                class="btn btn-outline-primary btn-sm"
-            >
-                Admin Dashboard
-            </a>
-            {% endif %}
 
         </div>
+
+        <!-- ADMIN ACCESS ONLY -->
+        {% if user.is_staff %}
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="btn btn-outline-primary btn-sm"
+        >
+            <i class="bi bi-speedometer2 me-1"></i>
+            Admin Dashboard
+        </a>
+
+        {% endif %}
 
     </div>
 
 
-    <!-- ============================== -->
+    <!-- ================================= -->
     <!-- CITY SEARCH WITH AUTOCOMPLETE -->
-    <!-- ============================== -->
+    <!-- ================================= -->
 
     <section class="city-search mb-4">
 
@@ -493,7 +507,6 @@
                     required
                 >
 
-                <!-- SUGGESTIONS -->
                 <div
                     id="dashboardCitySuggestions"
                     class="city-suggestions"
@@ -531,9 +544,9 @@
     {% endif %}
 
 
-    <!-- ============================== -->
+    <!-- ================================= -->
     <!-- WEATHER AND AIR QUALITY -->
-    <!-- ============================== -->
+    <!-- ================================= -->
 
     <div class="row g-4 mb-4">
 
@@ -549,6 +562,7 @@
                         {% if city %}
 
                         <i class="bi bi-geo-alt-fill text-primary"></i>
+
                         {{ city.name }}, {{ city.region }}
 
                         {% else %}
@@ -581,8 +595,11 @@
                     </div>
 
                     <div class="weather-condition">
+
                         <i class="bi {{ weather.icon }}"></i>
+
                         {{ weather.condition }}
+
                     </div>
 
                 </div>
@@ -716,14 +733,17 @@
                     Air Quality
                 </h2>
 
-                <!-- SHOW SELECTED CITY -->
                 <div class="section-subtitle mb-1">
 
                     {% if city %}
+
                         <i class="bi bi-geo-alt me-1"></i>
                         {{ city.name }}, {{ city.region }}
+
                     {% else %}
+
                         Location unavailable
+
                     {% endif %}
 
                 </div>
@@ -825,9 +845,9 @@
     </div>
 
 
-    <!-- ============================== -->
+    <!-- ================================= -->
     <!-- EARTHQUAKES AND SAVED LOCATIONS -->
-    <!-- ============================== -->
+    <!-- ================================= -->
 
     <div class="row g-4 mb-4">
 
@@ -946,8 +966,11 @@
                     <div class="flex-grow-1">
 
                         <div class="place-name">
+
                             <i class="bi bi-geo-alt text-primary me-2"></i>
+
                             {{ location.city }}
+
                         </div>
 
                         <div class="quake-meta ms-4">
@@ -981,9 +1004,9 @@
     </div>
 
 
-    <!-- ============================== -->
+    <!-- ================================= -->
     <!-- AI ASSISTANT AND NATURAL EVENTS -->
-    <!-- ============================== -->
+    <!-- ================================= -->
 
     <div class="row g-4 mb-4">
 
@@ -1084,9 +1107,9 @@
     </div>
 
 
-    <!-- ============================== -->
-    <!-- DISCLAIMER -->
-    <!-- ============================== -->
+    <!-- ================================= -->
+    <!-- SAFETY DISCLAIMER -->
+    <!-- ================================= -->
 
     <div class="alert alert-info">
 
@@ -1263,17 +1286,18 @@
         ["Calapan City", "Oriental Mindoro"]
 
     ].map(function (row) {
+
         return {
             name: row[0],
             province: row[1],
             saved: false
         };
+
     });
 
 
     // ========================================
     // USER'S SAVED LOCATIONS
-    // Prioritize recently saved cities.
     // ========================================
 
     const savedCities = [
@@ -1307,7 +1331,9 @@
 
     });
 
-    const cities = Array.from(cityMap.values());
+    const cities = Array.from(
+        cityMap.values()
+    );
 
 
     const popularCities = [
@@ -1347,12 +1373,13 @@
 
 
     // ========================================
-    // CITY MATCHING SCORE
+    // CITY MATCH SCORE
     // ========================================
 
     function getScore(city, query) {
 
         const name = city.name.toLowerCase();
+
         const province = city.province.toLowerCase();
 
         if (!query) {
@@ -1365,7 +1392,9 @@
                 city.name
             );
 
-            return index >= 0 ? index + 1 : 99;
+            return index >= 0
+                ? index + 1
+                : 99;
 
         }
 
@@ -1387,7 +1416,7 @@
 
 
     // ========================================
-    // SELECT CITY AND SUBMIT
+    // SELECT CITY
     // ========================================
 
     function selectCity(city) {
@@ -1406,7 +1435,7 @@
 
 
     // ========================================
-    // UPDATE KEYBOARD HIGHLIGHT
+    // KEYBOARD HIGHLIGHT
     // ========================================
 
     function highlightOption() {
@@ -1456,7 +1485,7 @@
 
 
     // ========================================
-    // DISPLAY SUGGESTIONS
+    // SHOW SUGGESTIONS
     // ========================================
 
     function showSuggestions() {
@@ -1470,7 +1499,9 @@
         visibleCities = cities
 
             .filter(function (city) {
+
                 return getScore(city, query) < 99;
+
             })
 
             .sort(function (a, b) {
@@ -1497,11 +1528,10 @@
             .slice(0, 6);
 
 
-        // Clear existing results safely.
         dropdown.replaceChildren();
 
 
-        // Dropdown heading.
+        // Dropdown heading
         const heading = document.createElement(
             "div"
         );
@@ -1515,7 +1545,7 @@
         dropdown.appendChild(heading);
 
 
-        // Generate suggestion buttons.
+        // City buttons
         visibleCities.forEach(function (city, index) {
 
             const button = document.createElement(
@@ -1523,6 +1553,7 @@
             );
 
             button.type = "button";
+
             button.className = "suggestion-item";
 
             button.id = "city-suggestion-" + index;
@@ -1538,12 +1569,12 @@
             );
 
 
-            // Location icon.
             const icon = document.createElement(
                 "span"
             );
 
             icon.className = "suggestion-icon";
+
 
             const iconElement = document.createElement(
                 "i"
@@ -1556,7 +1587,6 @@
             icon.appendChild(iconElement);
 
 
-            // City text.
             const details = document.createElement(
                 "span"
             );
@@ -1569,6 +1599,7 @@
             );
 
             name.className = "suggestion-city";
+
             name.textContent = city.name;
 
 
@@ -1586,12 +1617,10 @@
             details.appendChild(name);
             details.appendChild(province);
 
-
             button.appendChild(icon);
             button.appendChild(details);
 
 
-            // Saved location indicator.
             if (city.saved) {
 
                 const savedBadge = document.createElement(
@@ -1599,6 +1628,7 @@
                 );
 
                 savedBadge.className = "suggestion-saved";
+
                 savedBadge.textContent = "SAVED";
 
                 button.appendChild(savedBadge);
@@ -1606,18 +1636,22 @@
             }
 
 
-            // Select suggestion.
             button.addEventListener(
                 "mousedown",
                 function (event) {
+
                     event.preventDefault();
+
                 }
             );
+
 
             button.addEventListener(
                 "click",
                 function () {
+
                     selectCity(city);
+
                 }
             );
 
@@ -1627,7 +1661,7 @@
         });
 
 
-        // No matching suggestions.
+        // No suggestions
         if (visibleCities.length === 0) {
 
             const empty = document.createElement(
@@ -1746,7 +1780,7 @@
 
 
     // ========================================
-    // CLOSE WHEN CLICKING OUTSIDE
+    // CLICK OUTSIDE TO CLOSE
     // ========================================
 
     document.addEventListener(
