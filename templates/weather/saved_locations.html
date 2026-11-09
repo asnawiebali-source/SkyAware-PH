@@ -1,62 +1,605 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Saved Locations | SkyAware PH{% endblock %}
+{% block title %}
+My Saved Locations | SkyAware PH
+{% endblock %}
+
+
+{% block extra_css %}
+<style>
+    .saved-page {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* PAGE HEADER */
+    .saved-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .saved-header h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: #102f54;
+        margin-bottom: 7px;
+    }
+
+    .saved-header p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
+    .add-location-btn {
+        background: #1769c2;
+        color: white;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .add-location-btn:hover {
+        background: #10549e;
+        color: white;
+    }
+
+    /* SUMMARY */
+    .location-summary {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        background: #fff;
+        border: 1px solid #e3eaf3;
+        border-radius: 15px;
+        padding: 18px 21px;
+        margin-bottom: 22px;
+    }
+
+    .summary-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 13px;
+        background: #e9f3ff;
+        color: #1769c2;
+        font-size: 23px;
+    }
+
+    .summary-number {
+        color: #102f54;
+        font-size: 23px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .summary-label {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    /* TABLE CARD */
+    .locations-card {
+        background: white;
+        border: 1px solid #e3eaf3;
+        border-radius: 17px;
+        overflow: hidden;
+        box-shadow: 0 5px 24px rgba(16,47,84,.04);
+    }
+
+    .locations-card-header {
+        padding: 22px 24px;
+        border-bottom: 1px solid #e8eef5;
+    }
+
+    .locations-card-header h2 {
+        color: #102f54;
+        font-size: 19px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .locations-card-header p {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+
+    .locations-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .locations-table thead {
+        background: #f8fafd;
+    }
+
+    .locations-table thead th {
+        color: #53657c;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        padding: 16px 22px;
+        border-bottom: 1px solid #e5ebf3;
+        white-space: nowrap;
+    }
+
+    .locations-table tbody td {
+        padding: 20px 22px;
+        vertical-align: middle;
+        border-bottom: 1px solid #edf1f6;
+        font-size: 14px;
+        color: #43546a;
+    }
+
+    .locations-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .locations-table tbody tr:hover {
+        background: #fafcff;
+    }
+
+    /* CITY INFORMATION */
+    .city-info {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-width: 180px;
+    }
+
+    .city-icon {
+        width: 43px;
+        height: 43px;
+        min-width: 43px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #e9f3ff;
+        color: #1769c2;
+        border-radius: 12px;
+        font-size: 20px;
+    }
+
+    .city-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #102f54;
+        margin-bottom: 3px;
+    }
+
+    .city-subtitle {
+        font-size: 11px;
+        color: #94a3b8;
+    }
+
+    .country-badge {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1769c2;
+        border-radius: 20px;
+        padding: 6px 11px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* ACTION BUTTONS */
+    .location-actions {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .location-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-decoration: none;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+        transition: .2s;
+    }
+
+    .action-weather {
+        background: #e8f2ff;
+        color: #1769c2;
+    }
+
+    .action-weather:hover {
+        background: #1769c2;
+        color: white;
+    }
+
+    .action-air {
+        background: #e6f7ee;
+        color: #198754;
+    }
+
+    .action-air:hover {
+        background: #198754;
+        color: white;
+    }
+
+    .action-edit {
+        background: #fff3d6;
+        color: #a66a00;
+    }
+
+    .action-edit:hover {
+        background: #f0ad24;
+        color: #fff;
+    }
+
+    .action-delete {
+        background: #ffe9eb;
+        color: #cf3547;
+    }
+
+    .action-delete:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    /* FOOTER TIP */
+    .locations-tip {
+        display: flex;
+        gap: 12px;
+        padding: 19px 23px;
+        background: #f8fbff;
+        border-top: 1px solid #e8eef5;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .locations-tip i {
+        font-size: 18px;
+        color: #1769c2;
+    }
+
+    /* EMPTY STATE */
+    .empty-locations {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        border-radius: 22px;
+        background: #e9f3ff;
+        color: #1769c2;
+        font-size: 35px;
+    }
+
+    .empty-locations h3 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #102f54;
+    }
+
+    .empty-locations p {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+        max-width: 400px;
+        margin: 12px auto 24px;
+    }
+
+    @media (max-width: 767px) {
+        .saved-header h1 {
+            font-size: 24px;
+        }
+
+        .saved-header {
+            align-items: flex-start;
+        }
+
+        .locations-card-header {
+            padding: 20px;
+        }
+
+        .locations-table thead th,
+        .locations-table tbody td {
+            padding: 15px;
+        }
+
+        .location-actions a {
+            padding: 9px 11px;
+        }
+    }
+</style>
+{% endblock %}
+
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">📍 Saved Locations</h2>
+<div class="saved-page">
 
-    <a href="{% url 'add_location' %}" class="btn btn-primary">
-        + Add Location
-    </a>
-</div>
+    <!-- ============================== -->
+    <!-- PAGE HEADER -->
+    <!-- ============================== -->
 
-<div class="card shadow-sm border-0">
-    <div class="card-body">
+    <div class="saved-header">
+
+        <div>
+
+            <h1>
+                <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                My Saved Locations
+            </h1>
+
+            <p>
+                Save your favorite Philippine cities and
+                quickly check their weather and air quality.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'add_location' %}"
+            class="add-location-btn"
+        >
+            <i class="bi bi-plus-lg me-1"></i>
+            Add Location
+        </a>
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- SAVED LOCATION COUNT -->
+    <!-- ============================== -->
+
+    <div class="location-summary">
+
+        <div class="summary-icon">
+            <i class="bi bi-geo-alt"></i>
+        </div>
+
+        <div>
+
+            <div class="summary-number">
+                {{ locations|length }}
+            </div>
+
+            <div class="summary-label">
+                Saved Locations
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================== -->
+    <!-- LOCATIONS TABLE -->
+    <!-- ============================== -->
+
+    <div class="locations-card">
+
+        <div class="locations-card-header">
+
+            <h2>
+                <i class="bi bi-bookmark-check me-2 text-primary"></i>
+                Your Favorite Cities
+            </h2>
+
+            <p>
+                View weather forecasts, monitor air quality,
+                or manage your saved locations.
+            </p>
+
+        </div>
+
 
         {% if locations %}
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>City</th>
-                            <th>Province</th>
-                            <th>Country</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
-                        {% for location in locations %}
-                        <tr>
-                            <td>{{ location.city }}</td>
-                            <td>{{ location.province|default:"—" }}</td>
-                            <td>{{ location.country }}</td>
-                            <td>
-                                <a href="{% url 'edit_location' location.pk %}"
-                                   class="btn btn-sm btn-warning">
+        <div class="table-responsive">
+
+            <table class="table locations-table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>City</th>
+                        <th>Province</th>
+                        <th>Country</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for location in locations %}
+
+                    <tr>
+
+                        <!-- CITY -->
+                        <td>
+
+                            <div class="city-info">
+
+                                <div class="city-icon">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+
+                                <div>
+
+                                    <div class="city-name">
+                                        {{ location.city }}
+                                    </div>
+
+                                    <div class="city-subtitle">
+                                        Saved Location
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- PROVINCE -->
+                        <td>
+                            {{ location.province|default:"—" }}
+                        </td>
+
+
+                        <!-- COUNTRY -->
+                        <td>
+
+                            <span class="country-badge">
+                                {{ location.country }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACTION BUTTONS -->
+                        <td>
+
+                            <div class="location-actions">
+
+                                <!-- VIEW WEATHER -->
+                                <a
+                                    href="{% url 'weather_forecast' %}?city={{ location.city|urlencode }}"
+                                    class="action-weather"
+                                    title="View weather for {{ location.city }}"
+                                >
+                                    <i class="bi bi-cloud-sun"></i>
+                                    Weather
+                                </a>
+
+
+                                <!-- VIEW AIR QUALITY -->
+                                <a
+                                    href="{% url 'air_quality' %}?city={{ location.city|urlencode }}"
+                                    class="action-air"
+                                    title="View air quality for {{ location.city }}"
+                                >
+                                    <i class="bi bi-wind"></i>
+                                    Air Quality
+                                </a>
+
+
+                                <!-- EDIT LOCATION -->
+                                <a
+                                    href="{% url 'edit_location' location.pk %}"
+                                    class="action-edit"
+                                    title="Edit {{ location.city }}"
+                                >
+                                    <i class="bi bi-pencil-square"></i>
                                     Edit
                                 </a>
 
-                                <a href="{% url 'delete_location' location.pk %}"
-                                   class="btn btn-sm btn-danger">
+
+                                <!-- DELETE LOCATION -->
+                                <a
+                                    href="{% url 'delete_location' location.pk %}"
+                                    class="action-delete"
+                                    title="Delete {{ location.city }}"
+                                >
+                                    <i class="bi bi-trash3"></i>
                                     Delete
                                 </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- HELPFUL TIP -->
+        <div class="locations-tip">
+
+            <i class="bi bi-info-circle"></i>
+
+            <div>
+
+                <strong>Quick Access:</strong>
+
+                Click <strong>Weather</strong> to see
+                the forecast for a saved city,
+                or <strong>Air Quality</strong> to
+                check its air pollution information.
+
+                You can also edit or remove
+                your saved locations anytime.
+
             </div>
+
+        </div>
+
+
         {% else %}
-            <p class="text-muted text-center my-4">
-                No saved locations yet. Add your first city!
+
+        <!-- ============================== -->
+        <!-- EMPTY STATE -->
+        <!-- ============================== -->
+
+        <div class="empty-locations">
+
+            <div class="empty-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+
+            <h3>No Saved Locations Yet</h3>
+
+            <p>
+                You haven't saved any cities yet.
+                Add your first Philippine city to
+                quickly access its weather forecast
+                and air quality information.
             </p>
+
+            <a
+                href="{% url 'add_location' %}"
+                class="btn btn-primary px-4 py-2"
+            >
+                <i class="bi bi-plus-lg me-2"></i>
+                Add Your First Location
+            </a>
+
+        </div>
+
         {% endif %}
 
     </div>
+
 </div>
 
 {% endblock %}
