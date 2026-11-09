@@ -1,0 +1,854 @@
+
+{% extends 'base.html' %}
+
+{% block title %}About Us | SkyAware PH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-page {
+        --about-navy: #102f54;
+        --about-blue: #1769c2;
+        --about-muted: #64748b;
+    }
+
+    /* HERO */
+    .about-page .about-hero {
+        background: linear-gradient(
+            115deg,
+            #102f54 0%,
+            #164c84 52%,
+            #1976d2 100%
+        );
+        border-radius: 23px;
+        padding: 65px 50px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 28px;
+    }
+
+    .about-page .about-hero::before {
+        content: "";
+        position: absolute;
+        width: 310px;
+        height: 310px;
+        right: -80px;
+        top: -120px;
+        background: rgba(255,255,255,.05);
+        border-radius: 50%;
+    }
+
+    .about-page .about-hero::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        right: 17%;
+        bottom: -125px;
+        background: rgba(255,255,255,.04);
+        border-radius: 50%;
+    }
+
+    .about-page .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .about-page .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 30px;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.22);
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .about-page .hero-heading {
+        font-size: clamp(30px, 4vw, 47px);
+        font-weight: 800;
+        letter-spacing: -.8px;
+        margin-bottom: 17px;
+    }
+
+    .about-page .hero-description {
+        max-width: 700px;
+        color: #dfecfb;
+        font-size: 15px;
+        line-height: 1.85;
+        margin-bottom: 0;
+    }
+
+    .about-page .hero-symbol {
+        text-align: center;
+        font-size: 130px;
+        color: #e7f3ff;
+        opacity: .9;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* COMMON SECTIONS */
+    .about-page .section-heading {
+        color: var(--about-navy);
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .about-page .section-description {
+        color: var(--about-muted);
+        font-size: 14px;
+        line-height: 1.75;
+        margin-bottom: 25px;
+    }
+
+    .about-page .section-space {
+        margin-top: 43px;
+    }
+
+    .about-page .about-card {
+        background: #fff;
+        border: 1px solid #e4eaf2;
+        border-radius: 17px;
+        padding: 28px;
+        height: 100%;
+        box-shadow: 0 5px 20px rgba(16,47,84,.035);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .about-page .about-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(16,47,84,.08);
+    }
+
+    .about-page .card-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 15px;
+        background: #e9f3ff;
+        color: #1769c2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        margin-bottom: 19px;
+    }
+
+    .about-page .card-icon.green {
+        background: #e6f7ee;
+        color: #239b61;
+    }
+
+    .about-page .card-icon.orange {
+        background: #fff2df;
+        color: #d58a25;
+    }
+
+    .about-page .card-icon.purple {
+        background: #efeaff;
+        color: #7957d2;
+    }
+
+    .about-page .card-icon.red {
+        background: #ffeced;
+        color: #d6535f;
+    }
+
+    .about-page .about-card h3 {
+        font-size: 18px;
+        color: #17385d;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .about-page .about-card p {
+        font-size: 14px;
+        line-height: 1.8;
+        color: var(--about-muted);
+        margin-bottom: 0;
+    }
+
+    /* FEATURE CARDS */
+    .about-page .feature-card-about {
+        background: #fff;
+        border: 1px solid #e4eaf2;
+        border-radius: 15px;
+        padding: 23px;
+        height: 100%;
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .about-page .feature-card-about:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(16,47,84,.07);
+    }
+
+    .about-page .feature-card-about h3 {
+        color: #17385d;
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .about-page .feature-card-about p {
+        color: var(--about-muted);
+        font-size: 13px;
+        line-height: 1.75;
+        margin-bottom: 0;
+    }
+
+    /* API INTEGRATION CARDS */
+    .about-page .api-card {
+        background: white;
+        border: 1px solid #e4eaf2;
+        border-radius: 15px;
+        padding: 23px 19px;
+        height: 100%;
+    }
+
+    .about-page .api-number {
+        color: #1769c2;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .about-page .api-icon {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: #1769c2;
+        border-radius: 12px;
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    .about-page .api-card h3 {
+        color: #17385d;
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 9px;
+    }
+
+    .about-page .api-card p {
+        color: var(--about-muted);
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    /* PURPOSE SECTION */
+    .about-page .purpose-panel {
+        background: white;
+        border: 1px solid #e4eaf2;
+        border-radius: 18px;
+        padding: 32px;
+    }
+
+    .about-page .purpose-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 19px;
+    }
+
+    .about-page .purpose-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .about-page .purpose-item i {
+        color: #1769c2;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .about-page .purpose-item strong {
+        display: block;
+        font-size: 14px;
+        color: #17385d;
+        margin-bottom: 4px;
+    }
+
+    .about-page .purpose-item span {
+        display: block;
+        color: var(--about-muted);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* SAFETY */
+    .about-page .safety-note {
+        margin-top: 32px;
+        padding: 21px;
+        border: 1px solid #cde3f9;
+        background: #e8f3ff;
+        border-radius: 14px;
+        color: #315b85;
+        font-size: 13px;
+        line-height: 1.85;
+    }
+
+    /* CALL TO ACTION */
+    .about-page .about-cta {
+        background: white;
+        border: 1px solid #e4eaf2;
+        border-radius: 18px;
+        padding: 35px;
+        text-align: center;
+        margin-top: 32px;
+    }
+
+    .about-page .about-cta h2 {
+        color: var(--about-navy);
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+    .about-page .about-cta p {
+        color: var(--about-muted);
+        font-size: 14px;
+        line-height: 1.75;
+        margin: 12px auto 22px;
+        max-width: 600px;
+    }
+
+    @media (max-width: 991px) {
+        .about-page .about-hero {
+            padding: 45px 34px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .about-page .about-hero {
+            padding: 35px 23px;
+        }
+
+        .about-page .about-card,
+        .about-page .purpose-panel {
+            padding: 23px;
+        }
+
+        .about-page .section-heading {
+            font-size: 23px;
+        }
+
+        .about-page .about-cta {
+            padding: 27px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="about-page">
+
+    <!-- ABOUT HERO -->
+    <section class="about-hero">
+
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-9">
+
+                <div class="hero-content">
+
+                    <span class="hero-badge">
+                        <i class="bi bi-shield-check"></i>
+                        Weather &amp; Disaster Information Portal
+                    </span>
+
+                    <h1 class="hero-heading">
+                        About SkyAware PH
+                    </h1>
+
+                    <p class="hero-description">
+                        Empowering communities across the Philippines
+                        with accessible weather information, natural
+                        event updates, and disaster preparedness
+                        resources — all in one platform.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 d-none d-lg-block">
+
+                <div class="hero-symbol">
+                    <i class="bi bi-globe-asia-australia"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MISSION AND VISION -->
+    <section class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="about-card">
+
+                <div class="card-icon">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+
+                <h3>Our Mission</h3>
+
+                <p>
+                    To provide accessible and understandable
+                    environmental information that helps Filipinos
+                    make informed decisions and prepare for
+                    potential natural hazards.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="about-card">
+
+                <div class="card-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+
+                <h3>Our Vision</h3>
+
+                <p>
+                    A more informed and disaster-ready Philippines,
+                    where communities can easily access useful
+                    weather information, hazard updates, and
+                    general safety resources.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- WHAT SKY AWARE OFFERS -->
+    <section class="section-space">
+
+        <h2 class="section-heading">
+            What SkyAware PH Offers
+        </h2>
+
+        <p class="section-description">
+            SkyAware PH brings different information sources
+            together so users can access environmental data
+            and preparedness tools in one place.
+        </p>
+
+        <div class="row g-4">
+
+            <!-- WEATHER -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon">
+                        <i class="bi bi-cloud-sun"></i>
+                    </div>
+
+                    <h3>Weather Forecasts</h3>
+
+                    <p>
+                        View current temperature, humidity,
+                        wind speed, weather conditions,
+                        and seven-day forecasts for
+                        Philippine cities.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- AIR QUALITY -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon green">
+                        <i class="bi bi-wind"></i>
+                    </div>
+
+                    <h3>Air Quality Monitoring</h3>
+
+                    <p>
+                        Check air quality information such
+                        as the US Air Quality Index,
+                        PM2.5, and PM10 measurements.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- EARTHQUAKES -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon orange">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <h3>Earthquake Updates</h3>
+
+                    <p>
+                        Explore recently reported earthquakes,
+                        including magnitude, location, depth,
+                        and event time.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- NATURAL EVENTS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon orange">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+
+                    <h3>Natural Events</h3>
+
+                    <p>
+                        Browse available NASA EONET records
+                        about significant storms, wildfires,
+                        volcanic activity, and other
+                        natural events.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- AI -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon purple">
+                        <i class="bi bi-robot"></i>
+                    </div>
+
+                    <h3>AI Safety Assistant</h3>
+
+                    <p>
+                        Ask questions and receive general
+                        disaster preparedness guidance
+                        using an AI-powered assistant.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- SAVED LOCATIONS -->
+            <div class="col-md-6 col-xl-4">
+                <div class="feature-card-about">
+
+                    <div class="card-icon red">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <h3>Saved Locations</h3>
+
+                    <p>
+                        Save preferred cities for convenient
+                        access and manage them using
+                        add, view, edit, and delete features.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FIVE API INTEGRATIONS -->
+    <section class="section-space">
+
+        <h2 class="section-heading">
+            Our Five API Integrations
+        </h2>
+
+        <p class="section-description">
+            SkyAware PH combines five external service
+            providers to support its weather,
+            disaster-information, and location features.
+        </p>
+
+        <div class="row g-3">
+
+            <!-- OPEN-METEO -->
+            <div class="col-sm-6 col-lg-4 col-xl">
+
+                <div class="api-card">
+
+                    <div class="api-number">01</div>
+
+                    <div class="api-icon">
+                        <i class="bi bi-cloud-sun"></i>
+                    </div>
+
+                    <h3>Open-Meteo</h3>
+
+                    <p>
+                        Weather forecasts and
+                        air quality information.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- USGS -->
+            <div class="col-sm-6 col-lg-4 col-xl">
+
+                <div class="api-card">
+
+                    <div class="api-number">02</div>
+
+                    <div class="api-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+
+                    <h3>USGS</h3>
+
+                    <p>
+                        Recent earthquake reports
+                        and seismic event data.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- GROQ AI -->
+            <div class="col-sm-6 col-lg-4 col-xl">
+
+                <div class="api-card">
+
+                    <div class="api-number">03</div>
+
+                    <div class="api-icon">
+                        <i class="bi bi-robot"></i>
+                    </div>
+
+                    <h3>Groq AI</h3>
+
+                    <p>
+                        AI-powered answers to
+                        disaster safety questions.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- NASA -->
+            <div class="col-sm-6 col-lg-4 col-xl">
+
+                <div class="api-card">
+
+                    <div class="api-number">04</div>
+
+                    <div class="api-icon">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+
+                    <h3>NASA EONET</h3>
+
+                    <p>
+                        Curated natural-event
+                        information from NASA.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- NOMINATIM -->
+            <div class="col-sm-6 col-lg-4 col-xl">
+
+                <div class="api-card">
+
+                    <div class="api-number">05</div>
+
+                    <div class="api-icon">
+                        <i class="bi bi-pin-map"></i>
+                    </div>
+
+                    <h3>Nominatim</h3>
+
+                    <p>
+                        Philippine place search
+                        and geographic coordinates.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- OUR OBJECTIVES -->
+    <section class="section-space">
+
+        <div class="purpose-panel">
+
+            <h2 class="section-heading mb-3">
+                Our Objectives
+            </h2>
+
+            <p class="section-description">
+                SkyAware PH aims to make useful
+                environmental information easier
+                to find and understand.
+            </p>
+
+            <div class="purpose-item">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <div>
+                    <strong>
+                        Improve access to information
+                    </strong>
+
+                    <span>
+                        Organize weather, earthquake,
+                        air quality, and natural-event
+                        information in one platform.
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="purpose-item">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <div>
+                    <strong>
+                        Support disaster preparedness
+                    </strong>
+
+                    <span>
+                        Provide general safety resources
+                        that encourage awareness and
+                        informed decision-making.
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="purpose-item">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <div>
+                    <strong>
+                        Provide a user-friendly experience
+                    </strong>
+
+                    <span>
+                        Present environmental information
+                        through clear dashboards,
+                        location searches, and
+                        responsive pages.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- IMPORTANT DISCLAIMER -->
+    <div class="safety-note">
+
+        <strong>
+            <i class="bi bi-info-circle me-2"></i>
+            Important Safety Reminder
+        </strong>
+
+        <p class="mb-0 mt-2">
+            SkyAware PH is an informational platform
+            and does not replace official government
+            warnings, emergency services, or professional
+            safety advice. Information from external APIs
+            may be delayed, incomplete, or unavailable.
+            During emergencies, always follow PAGASA,
+            PHIVOLCS, and your local authorities.
+        </p>
+
+    </div>
+
+
+    <!-- CALL TO ACTION -->
+    <section class="about-cta">
+
+        <h2>Stay Informed. Stay Prepared.</h2>
+
+        <p>
+            Explore SkyAware PH and access weather
+            information, natural-event updates,
+            and disaster preparedness tools.
+        </p>
+
+        {% if user.is_authenticated %}
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="btn btn-primary px-4 py-2"
+        >
+            <i class="bi bi-grid me-2"></i>
+            Go to Dashboard
+        </a>
+
+        {% else %}
+
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+
+            <a
+                href="{% url 'register' %}"
+                class="btn btn-primary px-4 py-2"
+            >
+                <i class="bi bi-person-plus me-2"></i>
+                Get Started
+            </a>
+
+            <a
+                href="{% url 'login' %}"
+                class="btn btn-outline-primary px-4 py-2"
+            >
+                Sign In
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}
