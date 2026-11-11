@@ -2,374 +2,348 @@
 /*
  * SkyAware PH - Philippine City Autocomplete
  *
- * Autocomplete uses a local list only.
- * No API requests are made while typing.
+ * Used for standard city search forms, including:
+ * - Weather Forecast
+ * - Air Quality
+ * - Homepage city search
  *
- * Nominatim is still used by the Django backend
- * when the user submits the search form.
+ * IMPORTANT:
+ * The Dashboard has its own autocomplete that
+ * combines saved locations and local cities.
+ * This script deliberately skips that input.
+ *
+ * Suggestions use local data only.
+ * Nominatim is called by Django after submission.
  */
 
 (function () {
     "use strict";
 
-    // ==========================================
-    // LOCAL PHILIPPINE CITY AND TOWN LIST
-    // ==========================================
+    // =========================================
+    // LOCAL PHILIPPINE CITIES AND TOWNS
+    // =========================================
 
-    const PHILIPPINE_PLACES = [
-
-        // Metro Manila
-        "Caloocan City",
-        "Las Piñas City",
-        "Makati City",
-        "Malabon City",
-        "Mandaluyong City",
-        "Manila",
-        "Marikina City",
-        "Muntinlupa City",
-        "Navotas City",
-        "Parañaque City",
-        "Pasay City",
-        "Pasig City",
-        "Quezon City",
-        "San Juan City, Metro Manila",
-        "Taguig City",
-        "Valenzuela City",
-
-        // Cordillera
-        "Baguio City",
-        "Tabuk City",
-
-        // Ilocos Region
-        "Alaminos City",
-        "Batac City",
-        "Candon City",
-        "Dagupan City",
-        "Laoag City",
-        "San Carlos City, Pangasinan",
-        "San Fernando City, La Union",
-        "Urdaneta City",
-        "Vigan City",
-
-        // Cagayan Valley
-        "Cauayan City",
-        "Ilagan City",
-        "Santiago City, Isabela",
-        "Tuguegarao City",
-
-        // Central Luzon
-        "Angeles City",
-        "Balanga City",
-        "Baliwag City",
-        "Cabanatuan City",
-        "Gapan City",
-        "Mabalacat City",
-        "Malolos City",
-        "Meycauayan City",
-        "Muñoz City, Nueva Ecija",
-        "Olongapo City",
-        "Palayan City",
-        "San Fernando City, Pampanga",
-        "San Jose City, Nueva Ecija",
-        "San Jose del Monte City",
-        "Tarlac City",
-
-        // CALABARZON
-        "Antipolo City",
-        "Bacoor City",
-        "Batangas City",
-        "Biñan City",
-        "Cabuyao City",
-        "Calaca City",
-        "Calamba City",
-        "Carmona City",
-        "Cavite City",
-        "Dasmariñas City",
-        "General Trias City",
-        "Imus City",
-        "Lipa City",
-        "Lucena City",
-        "San Pablo City",
-        "San Pedro City, Laguna",
-        "Santa Rosa City, Laguna",
-        "Santo Tomas City, Batangas",
-        "Tagaytay City",
-        "Tanauan City",
-        "Tayabas City",
-        "Trece Martires City",
-
-        // MIMAROPA
-        "Calapan City",
-        "Puerto Princesa City",
-
-        // Bicol Region
-        "Iriga City",
-        "Legazpi City",
-        "Ligao City",
-        "Masbate City",
-        "Naga City, Camarines Sur",
-        "Sorsogon City",
-        "Tabaco City",
-
-        // Western Visayas
-        "Bacolod City",
-        "Bago City",
-        "Cadiz City",
-        "Escalante City",
-        "Himamaylan City",
-        "Iloilo City",
-        "Kabankalan City",
-        "La Carlota City",
-        "Passi City",
-        "Roxas City",
-        "Sagay City",
-        "San Carlos City, Negros Occidental",
-        "Silay City",
-        "Sipalay City",
-        "Talisay City, Negros Occidental",
-        "Victorias City",
-
-        // Negros Island Region
-        "Bais City",
-        "Bayawan City",
-        "Canlaon City",
-        "Dumaguete City",
-        "Guihulngan City",
-        "Tanjay City",
-
-        // Central Visayas
-        "Bogo City",
-        "Carcar City",
-        "Cebu City",
-        "Danao City",
-        "Lapu-Lapu City",
-        "Mandaue City",
-        "Naga City, Cebu",
-        "Tagbilaran City",
-        "Talisay City, Cebu",
-        "Toledo City",
-
-        // Eastern Visayas
-        "Baybay City",
-        "Borongan City",
-        "Calbayog City",
-        "Catbalogan City",
-        "Maasin City",
-        "Ormoc City",
-        "Tacloban City",
-
-        // Zamboanga Peninsula and Basilan
-        "Dapitan City",
-        "Dipolog City",
-        "Isabela City, Basilan",
-        "Pagadian City",
-        "Zamboanga City",
+    const LOCAL_CITIES = [
 
         // Northern Mindanao
-        "Cagayan de Oro City",
-        "El Salvador City",
-        "Gingoog City",
-        "Iligan City",
-        "Malaybalay City",
-        "Oroquieta City",
-        "Ozamiz City",
-        "Tangub City",
-        "Valencia City, Bukidnon",
-
-        // Davao Region
-        "Davao City",
-        "Digos City",
-        "Mati City",
-        "Panabo City",
-        "Samal City, Davao del Norte",
-        "Tagum City",
-
-        // SOCCSKSARGEN
-        "General Santos City",
-        "Kidapawan City",
-        "Koronadal City",
-        "Tacurong City",
+        ["Iligan City", "Lanao del Norte"],
+        ["Cagayan de Oro", "Misamis Oriental"],
+        ["Marawi City", "Lanao del Sur"],
+        ["Ozamiz City", "Misamis Occidental"],
+        ["Oroquieta City", "Misamis Occidental"],
+        ["Tangub City", "Misamis Occidental"],
+        ["Malaybalay City", "Bukidnon"],
+        ["Valencia City", "Bukidnon"],
+        ["Gingoog City", "Misamis Oriental"],
+        ["El Salvador City", "Misamis Oriental"],
+        ["Lugait", "Misamis Oriental"],
+        ["Manticao", "Misamis Oriental"],
+        ["Naawan", "Misamis Oriental"],
+        ["Initao", "Misamis Oriental"],
+        ["Opol", "Misamis Oriental"],
+        ["Jasaan", "Misamis Oriental"],
+        ["Linamon", "Lanao del Norte"],
+        ["Kauswagan", "Lanao del Norte"],
+        ["Kolambugan", "Lanao del Norte"],
+        ["Tubod", "Lanao del Norte"],
 
         // Caraga
-        "Bayugan City",
-        "Bislig City",
-        "Butuan City",
-        "Cabadbaran City",
-        "Surigao City",
-        "Tandag City",
+        ["Butuan City", "Agusan del Norte"],
+        ["Surigao City", "Surigao del Norte"],
+        ["Tandag City", "Surigao del Sur"],
+        ["Bislig City", "Surigao del Sur"],
+        ["Bayugan City", "Agusan del Sur"],
+        ["Cabadbaran City", "Agusan del Norte"],
+
+        // Davao Region
+        ["Davao City", "Davao del Sur"],
+        ["Tagum City", "Davao del Norte"],
+        ["Panabo City", "Davao del Norte"],
+        ["Digos City", "Davao del Sur"],
+        ["Mati City", "Davao Oriental"],
+        ["Samal City", "Davao del Norte"],
+
+        // SOCCSKSARGEN
+        ["General Santos City", "South Cotabato"],
+        ["Koronadal City", "South Cotabato"],
+        ["Kidapawan City", "Cotabato"],
+        ["Tacurong City", "Sultan Kudarat"],
+
+        // Zamboanga Peninsula
+        ["Zamboanga City", "Zamboanga del Sur"],
+        ["Pagadian City", "Zamboanga del Sur"],
+        ["Dipolog City", "Zamboanga del Norte"],
+        ["Dapitan City", "Zamboanga del Norte"],
+        ["Isabela City", "Basilan"],
 
         // BARMM
-        "Cotabato City",
-        "Lamitan City",
-        "Marawi City",
+        ["Cotabato City", "Maguindanao del Norte"],
+        ["Lamitan City", "Basilan"],
 
-        // Additional municipalities and towns
-        "Alubijid, Misamis Oriental",
-        "Balingasag, Misamis Oriental",
-        "Balingoan, Misamis Oriental",
-        "Baroy, Lanao del Norte",
-        "Clarin, Misamis Occidental",
-        "Coron, Palawan",
-        "El Nido, Palawan",
-        "General Luna, Surigao del Norte",
-        "Initao, Misamis Oriental",
-        "Jasaan, Misamis Oriental",
-        "Jimenez, Misamis Occidental",
-        "Kauswagan, Lanao del Norte",
-        "Kapatagan, Lanao del Norte",
-        "Kolambugan, Lanao del Norte",
-        "Linamon, Lanao del Norte",
-        "Lugait, Misamis Oriental",
-        "Manticao, Misamis Oriental",
-        "Maramag, Bukidnon",
-        "Medina, Misamis Oriental",
-        "Naawan, Misamis Oriental",
-        "Opol, Misamis Oriental",
-        "Panglao, Bohol",
-        "Plaridel, Misamis Occidental",
-        "Siargao, Surigao del Norte",
-        "Tubod, Lanao del Norte",
-        "Villanueva, Misamis Oriental",
+        // Central Visayas
+        ["Cebu City", "Cebu"],
+        ["Mandaue City", "Cebu"],
+        ["Lapu-Lapu City", "Cebu"],
+        ["Talisay City", "Cebu"],
+        ["Carcar City", "Cebu"],
+        ["Toledo City", "Cebu"],
+        ["Danao City", "Cebu"],
+        ["Bogo City", "Cebu"],
+        ["Naga City", "Cebu"],
+        ["Tagbilaran City", "Bohol"],
+        ["Dumaguete City", "Negros Oriental"],
 
-    ];
+        // Western Visayas
+        ["Bacolod City", "Negros Occidental"],
+        ["Silay City", "Negros Occidental"],
+        ["Iloilo City", "Iloilo"],
+        ["Passi City", "Iloilo"],
+        ["Roxas City", "Capiz"],
+        ["Kabankalan City", "Negros Occidental"],
+        ["Bago City", "Negros Occidental"],
+        ["Cadiz City", "Negros Occidental"],
+        ["Sagay City", "Negros Occidental"],
+        ["Victorias City", "Negros Occidental"],
+
+        // Eastern Visayas
+        ["Tacloban City", "Leyte"],
+        ["Ormoc City", "Leyte"],
+        ["Calbayog City", "Samar"],
+        ["Catbalogan City", "Samar"],
+        ["Borongan City", "Eastern Samar"],
+        ["Maasin City", "Southern Leyte"],
+        ["Baybay City", "Leyte"],
+
+        // Metro Manila
+        ["Manila", "Metro Manila"],
+        ["Quezon City", "Metro Manila"],
+        ["Makati City", "Metro Manila"],
+        ["Pasig City", "Metro Manila"],
+        ["Taguig City", "Metro Manila"],
+        ["Pasay City", "Metro Manila"],
+        ["Caloocan City", "Metro Manila"],
+        ["Mandaluyong City", "Metro Manila"],
+        ["Marikina City", "Metro Manila"],
+        ["Muntinlupa City", "Metro Manila"],
+        ["Parañaque City", "Metro Manila"],
+        ["Las Piñas City", "Metro Manila"],
+        ["Valenzuela City", "Metro Manila"],
+        ["San Juan City", "Metro Manila"],
+        ["Malabon City", "Metro Manila"],
+        ["Navotas City", "Metro Manila"],
+
+        // Northern Luzon
+        ["Baguio City", "Benguet"],
+        ["Laoag City", "Ilocos Norte"],
+        ["Vigan City", "Ilocos Sur"],
+        ["Dagupan City", "Pangasinan"],
+        ["Tuguegarao City", "Cagayan"],
+        ["Santiago City", "Isabela"],
+        ["Ilagan City", "Isabela"],
+        ["Urdaneta City", "Pangasinan"],
+
+        // Central Luzon
+        ["Olongapo City", "Zambales"],
+        ["Angeles City", "Pampanga"],
+        ["San Fernando City", "Pampanga"],
+        ["Tarlac City", "Tarlac"],
+        ["Cabanatuan City", "Nueva Ecija"],
+        ["Malolos City", "Bulacan"],
+        ["San Jose del Monte City", "Bulacan"],
+        ["Balanga City", "Bataan"],
+        ["Mabalacat City", "Pampanga"],
+        ["Gapan City", "Nueva Ecija"],
+        ["Meycauayan City", "Bulacan"],
+
+        // CALABARZON
+        ["Antipolo City", "Rizal"],
+        ["Calamba City", "Laguna"],
+        ["Santa Rosa City", "Laguna"],
+        ["San Pablo City", "Laguna"],
+        ["Batangas City", "Batangas"],
+        ["Lipa City", "Batangas"],
+        ["Lucena City", "Quezon"],
+        ["Bacoor City", "Cavite"],
+        ["Imus City", "Cavite"],
+        ["Dasmariñas City", "Cavite"],
+        ["General Trias City", "Cavite"],
+        ["Tagaytay City", "Cavite"],
+        ["Biñan City", "Laguna"],
+        ["Cabuyao City", "Laguna"],
+        ["San Pedro City", "Laguna"],
+        ["Tanauan City", "Batangas"],
+
+        // Bicol Region
+        ["Legazpi City", "Albay"],
+        ["Naga City", "Camarines Sur"],
+        ["Iriga City", "Camarines Sur"],
+        ["Sorsogon City", "Sorsogon"],
+        ["Tabaco City", "Albay"],
+        ["Ligao City", "Albay"],
+        ["Masbate City", "Masbate"],
+
+        // MIMAROPA
+        ["Puerto Princesa City", "Palawan"],
+        ["Calapan City", "Oriental Mindoro"],
+        ["Coron", "Palawan"],
+        ["El Nido", "Palawan"],
+
+    ].map(function (row) {
+        return {
+            name: row[0],
+            province: row[1]
+        };
+    });
 
 
-    // ==========================================
-    // SEARCH CONFIGURATION
-    // ==========================================
+    // =========================================
+    // POPULAR LOCATIONS
+    // =========================================
 
-    const MAX_SUGGESTIONS = 8;
-
-    const POPULAR_PLACES = [
+    const POPULAR_CITIES = [
         "Iligan City",
-        "Cagayan de Oro City",
-        "Cebu City",
+        "Cagayan de Oro",
         "Davao City",
+        "Cebu City",
         "Manila",
         "Pagadian City",
-        "Zamboanga City",
-        "General Santos City"
+        "Zamboanga City"
     ];
 
+    const MAX_RESULTS = 7;
 
-    // ==========================================
-    // NORMALIZE SEARCH TEXT
-    // ==========================================
 
-    function normalizeText(value) {
+    // =========================================
+    // NORMALIZE SEARCH QUERY
+    // =========================================
+
+    function normalize(value) {
         return String(value || "")
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase()
             .trim()
+            .toLowerCase()
             .replace(/\s+/g, " ");
     }
 
 
-    // ==========================================
-    // PREPARE LOCAL DATA
-    // ==========================================
+    // =========================================
+    // MATCH AND RANK CITY SUGGESTIONS
+    // =========================================
 
-    const PLACES = [...new Set(PHILIPPINE_PLACES)]
-        .map(function (name) {
-            return {
-                name: name,
-                search: normalizeText(name)
-            };
-        });
+    function findSuggestions(query) {
 
+        const search = normalize(query);
 
-    // ==========================================
-    // MATCH CITY NAMES
-    // ==========================================
-
-    function getSuggestions(query) {
-
-        const search = normalizeText(query);
-
-        // Show popular cities when the input is empty
-        if (!search) {
-            return POPULAR_PLACES.slice(
-                0,
-                MAX_SUGGESTIONS
-            );
-        }
-
-        const matches = PLACES.filter(function (place) {
-            return place.search.includes(search);
-        });
-
-        // Prioritize names starting with the query
-        matches.sort(function (a, b) {
-
-            const aStarts = a.search.startsWith(search);
-            const bStarts = b.search.startsWith(search);
-
-            if (aStarts && !bStarts) {
-                return -1;
+        const matches = LOCAL_CITIES.filter(function (city) {
+            if (!search) {
+                return POPULAR_CITIES.includes(city.name);
             }
 
-            if (!aStarts && bStarts) {
-                return 1;
+            const name = normalize(city.name);
+            const province = normalize(city.province);
+
+            return (
+                name.includes(search) ||
+                province.includes(search)
+            );
+        });
+
+        matches.sort(function (a, b) {
+
+            if (!search) {
+                return (
+                    POPULAR_CITIES.indexOf(a.name) -
+                    POPULAR_CITIES.indexOf(b.name)
+                );
+            }
+
+            function score(city) {
+                const name = normalize(city.name);
+                const province = normalize(city.province);
+
+                if (name.startsWith(search)) {
+                    return 0;
+                }
+
+                if (name.includes(search)) {
+                    return 1;
+                }
+
+                if (province.includes(search)) {
+                    return 2;
+                }
+
+                return 3;
+            }
+
+            const difference = score(a) - score(b);
+
+            if (difference !== 0) {
+                return difference;
             }
 
             return a.name.localeCompare(b.name);
-
         });
 
-        return matches
-            .slice(0, MAX_SUGGESTIONS)
-            .map(function (place) {
-                return place.name;
-            });
+        return matches.slice(0, MAX_RESULTS);
     }
 
 
-    // ==========================================
-    // ATTACH AUTOCOMPLETE TO CITY INPUT
-    // ==========================================
+    // =========================================
+    // INITIALIZE AUTOCOMPLETE
+    // =========================================
 
     function initializeAutocomplete(input, index) {
 
-        if (input.dataset.phAutocomplete === "ready") {
+        /*
+         * VERY IMPORTANT:
+         *
+         * Never attach a second autocomplete
+         * to the Dashboard's custom city search.
+         *
+         * The Dashboard already includes:
+         * - Saved Locations
+         * - SAVED indicators
+         * - Provincial descriptions
+         * - Automatic search on selection
+         */
+
+        if (
+            input.id === "dashboardCityInput" ||
+            input.closest("#dashboardCityForm") ||
+            input.dataset.phCityReady === "true"
+        ) {
             return;
         }
 
-        input.dataset.phAutocomplete = "ready";
+        input.dataset.phCityReady = "true";
 
-        // Disable the browser's saved-value dropdown
         input.setAttribute("autocomplete", "off");
-        input.setAttribute("aria-autocomplete", "list");
         input.setAttribute("role", "combobox");
+        input.setAttribute("aria-autocomplete", "list");
         input.setAttribute("aria-expanded", "false");
 
-        const listId = "ph-city-suggestions-" + index;
-
-        input.setAttribute("aria-controls", listId);
-
-        // Append dropdown to body, avoiding
-        // conflicts with Bootstrap input groups
         const dropdown = document.createElement("div");
+
+        const listId = "ph-city-dropdown-" + index;
 
         dropdown.id = listId;
         dropdown.className = "ph-city-dropdown";
         dropdown.setAttribute("role", "listbox");
-        dropdown.setAttribute(
-            "aria-label",
-            "Philippine city suggestions"
-        );
-
         dropdown.hidden = true;
+
+        input.setAttribute("aria-controls", listId);
 
         document.body.appendChild(dropdown);
 
-        let currentSuggestions = [];
-        let selectedIndex = -1;
+        let visibleCities = [];
+        let activeIndex = -1;
 
 
-        // ======================================
-        // POSITION THE DROPDOWN
-        // ======================================
+        // =====================================
+        // POSITION DROPDOWN
+        // =====================================
 
         function positionDropdown() {
 
@@ -379,17 +353,19 @@
 
             const rect = input.getBoundingClientRect();
 
-            dropdown.style.left = rect.left + "px";
-            dropdown.style.width = rect.width + "px";
+            const left = Math.max(8, rect.left);
 
-            const roomBelow = (
-                window.innerHeight - rect.bottom
+            const width = Math.min(
+                rect.width,
+                window.innerWidth - left - 8
             );
 
-            if (
-                roomBelow < 230
-                && rect.top > roomBelow
-            ) {
+            dropdown.style.left = left + "px";
+            dropdown.style.width = width + "px";
+
+            const roomBelow = window.innerHeight - rect.bottom;
+
+            if (roomBelow < 230 && rect.top > roomBelow) {
 
                 dropdown.style.top = "auto";
 
@@ -404,22 +380,21 @@
                 dropdown.style.top = (
                     rect.bottom + 5
                 ) + "px";
-
             }
         }
 
 
-        // ======================================
-        // CLOSE SUGGESTIONS
-        // ======================================
+        // =====================================
+        // CLOSE DROPDOWN
+        // =====================================
 
         function closeDropdown() {
 
             dropdown.hidden = true;
             dropdown.replaceChildren();
 
-            selectedIndex = -1;
-            currentSuggestions = [];
+            visibleCities = [];
+            activeIndex = -1;
 
             input.setAttribute(
                 "aria-expanded",
@@ -432,55 +407,56 @@
         }
 
 
-        // ======================================
-        // SELECT A SUGGESTION
-        // ======================================
+        // =====================================
+        // SELECT CITY
+        // =====================================
 
-        function selectSuggestion(name) {
+        function selectCity(city) {
 
-            input.value = name;
+            input.value = city.name;
 
             closeDropdown();
 
-            input.focus();
+            // Submit the existing search form.
+            // Django then calls Nominatim.
+            if (input.form) {
 
-            // Trigger input listeners without
-            // submitting the search form.
-            input.dispatchEvent(
-                new Event("change", {
-                    bubbles: true
-                })
-            );
+                if (input.form.requestSubmit) {
+                    input.form.requestSubmit();
+                } else {
+                    input.form.submit();
+                }
+            }
         }
 
 
-        // ======================================
-        // KEYBOARD HIGHLIGHT
-        // ======================================
+        // =====================================
+        // HIGHLIGHT KEYBOARD SELECTION
+        // =====================================
 
-        function updateHighlight() {
+        function highlightSelection() {
 
             const options = dropdown.querySelectorAll(
-                '[role="option"]'
+                ".ph-city-option"
             );
 
             options.forEach(function (option, optionIndex) {
 
-                const isSelected = (
-                    optionIndex === selectedIndex
+                const active = (
+                    optionIndex === activeIndex
                 );
 
                 option.classList.toggle(
                     "active",
-                    isSelected
+                    active
                 );
 
                 option.setAttribute(
                     "aria-selected",
-                    isSelected ? "true" : "false"
+                    active ? "true" : "false"
                 );
 
-                if (isSelected) {
+                if (active) {
 
                     input.setAttribute(
                         "aria-activedescendant",
@@ -493,7 +469,7 @@
                 }
             });
 
-            if (selectedIndex < 0) {
+            if (activeIndex < 0) {
                 input.removeAttribute(
                     "aria-activedescendant"
                 );
@@ -501,24 +477,21 @@
         }
 
 
-        // ======================================
-        // RENDER MATCHING SUGGESTIONS
-        // ======================================
+        // =====================================
+        // SHOW CITY SUGGESTIONS
+        // =====================================
 
         function showSuggestions() {
 
-            currentSuggestions = getSuggestions(
+            visibleCities = findSuggestions(
                 input.value
             );
 
-            selectedIndex = -1;
+            activeIndex = -1;
 
             dropdown.replaceChildren();
 
-            if (
-                currentSuggestions.length === 0
-            ) {
-
+            if (!visibleCities.length) {
                 closeDropdown();
                 return;
             }
@@ -526,82 +499,103 @@
             const heading = document.createElement("div");
 
             heading.className = "ph-city-dropdown-heading";
-            heading.textContent = "Suggested Philippine Locations";
+
+            heading.textContent = input.value.trim()
+                ? "Suggested Philippine Locations"
+                : "Popular Philippine Locations";
 
             dropdown.appendChild(heading);
 
-            currentSuggestions.forEach(
-                function (name, suggestionIndex) {
 
-                    const option = document.createElement(
-                        "button"
-                    );
+            visibleCities.forEach(function (city, itemIndex) {
 
-                    option.type = "button";
-                    option.className = "ph-city-option";
+                const option = document.createElement(
+                    "button"
+                );
 
-                    option.id = (
-                        listId + "-option-" + suggestionIndex
-                    );
+                option.type = "button";
+                option.className = "ph-city-option";
 
-                    option.setAttribute(
-                        "role",
-                        "option"
-                    );
+                option.id = (
+                    listId + "-option-" + itemIndex
+                );
 
-                    option.setAttribute(
-                        "aria-selected",
-                        "false"
-                    );
+                option.setAttribute(
+                    "role",
+                    "option"
+                );
 
-                    const icon = document.createElement("span");
+                option.setAttribute(
+                    "aria-selected",
+                    "false"
+                );
 
-                    icon.className = "ph-city-option-icon";
-                    icon.textContent = "📍";
-                    icon.setAttribute(
-                        "aria-hidden",
-                        "true"
-                    );
 
-                    const label = document.createElement("span");
+                // Location icon
+                const icon = document.createElement("span");
 
-                    label.className = "ph-city-option-name";
-                    label.textContent = name;
+                icon.className = "ph-city-option-icon";
 
-                    option.appendChild(icon);
-                    option.appendChild(label);
+                const iconElement = document.createElement("i");
 
-                    option.addEventListener(
-                        "pointerdown",
-                        function (event) {
+                iconElement.className = "bi bi-geo-alt";
 
-                            event.preventDefault();
+                icon.appendChild(iconElement);
 
-                            selectSuggestion(name);
 
-                        }
-                    );
+                // City and province
+                const details = document.createElement("span");
 
-                    option.addEventListener(
-                        "click",
-                        function () {
+                details.className = "ph-city-option-details";
 
-                            selectSuggestion(name);
+                const name = document.createElement("span");
 
-                        }
-                    );
+                name.className = "ph-city-option-name";
+                name.textContent = city.name;
 
-                    dropdown.appendChild(option);
-                }
-            );
+                const province = document.createElement("span");
+
+                province.className = "ph-city-option-province";
+
+                province.textContent = (
+                    city.province + ", Philippines"
+                );
+
+                details.appendChild(name);
+                details.appendChild(province);
+
+                option.appendChild(icon);
+                option.appendChild(details);
+
+
+                // Mouse and touch selection
+                option.addEventListener(
+                    "pointerdown",
+                    function (event) {
+                        event.preventDefault();
+                        selectCity(city);
+                    }
+                );
+
+                // Keyboard or accessibility click
+                option.addEventListener(
+                    "click",
+                    function () {
+                        selectCity(city);
+                    }
+                );
+
+                dropdown.appendChild(option);
+            });
+
 
             const note = document.createElement("div");
 
             note.className = "ph-city-dropdown-note";
 
             note.textContent = (
-                "Select a location, then press Search. " +
-                "Other Philippine towns can also be typed."
+                "Select a city to search automatically. " +
+                "You can also type other Philippine locations."
             );
 
             dropdown.appendChild(note);
@@ -617,9 +611,9 @@
         }
 
 
-        // ======================================
+        // =====================================
         // INPUT EVENTS
-        // ======================================
+        // =====================================
 
         input.addEventListener(
             "input",
@@ -632,24 +626,24 @@
         );
 
 
-        // ======================================
+        // =====================================
         // KEYBOARD NAVIGATION
-        // ======================================
+        // =====================================
 
         input.addEventListener(
             "keydown",
             function (event) {
 
                 if (
-                    event.key === "ArrowDown"
-                    || event.key === "ArrowUp"
+                    event.key === "ArrowDown" ||
+                    event.key === "ArrowUp"
                 ) {
 
                     if (dropdown.hidden) {
                         showSuggestions();
                     }
 
-                    if (!currentSuggestions.length) {
+                    if (!visibleCities.length) {
                         return;
                     }
 
@@ -657,79 +651,71 @@
 
                     if (event.key === "ArrowDown") {
 
-                        selectedIndex = (
-                            selectedIndex + 1
-                        ) % currentSuggestions.length;
+                        activeIndex = (
+                            activeIndex + 1
+                        ) % visibleCities.length;
 
                     } else {
 
-                        selectedIndex = (
-                            selectedIndex <= 0
-                                ? currentSuggestions.length - 1
-                                : selectedIndex - 1
-                        );
-
+                        activeIndex = activeIndex <= 0
+                            ? visibleCities.length - 1
+                            : activeIndex - 1;
                     }
 
-                    updateHighlight();
+                    highlightSelection();
                 }
 
                 else if (event.key === "Enter") {
 
-                    // If the user highlighted a city,
-                    // select it instead of submitting.
                     if (
-                        !dropdown.hidden
-                        && selectedIndex >= 0
+                        !dropdown.hidden &&
+                        activeIndex >= 0
                     ) {
 
                         event.preventDefault();
 
-                        selectSuggestion(
-                            currentSuggestions[selectedIndex]
+                        selectCity(
+                            visibleCities[activeIndex]
                         );
                     }
 
-                    // Otherwise let the form submit.
-
+                    // Otherwise, normal Enter
+                    // submits the typed city.
                 }
 
                 else if (
-                    event.key === "Escape"
-                    || event.key === "Tab"
+                    event.key === "Escape" ||
+                    event.key === "Tab"
                 ) {
 
                     closeDropdown();
-
                 }
-
             }
         );
 
 
-        // ======================================
-        // CLICKING OUTSIDE
-        // ======================================
+        // =====================================
+        // CLICK OUTSIDE
+        // =====================================
 
         document.addEventListener(
             "pointerdown",
             function (event) {
 
                 if (
-                    event.target !== input
-                    && !dropdown.contains(event.target)
+                    event.target !== input &&
+                    !dropdown.contains(event.target)
                 ) {
 
                     closeDropdown();
-
                 }
             }
         );
 
 
-        // ======================================
-        // SCREEN RESIZE AND SCROLL
-        // ======================================
+        // =====================================
+        // REPOSITION ON RESIZE OR SCROLL
+        // =====================================
 
         window.addEventListener(
             "resize",
@@ -743,9 +729,9 @@
         );
 
 
-        // ======================================
+        // =====================================
         // FORM SUBMISSION
-        // ======================================
+        // =====================================
 
         if (input.form) {
 
@@ -753,52 +739,57 @@
                 "submit",
                 closeDropdown
             );
-
         }
     }
 
 
-    // ==========================================
-    // INITIALIZE ALL CITY SEARCH INPUTS
-    // ==========================================
+    // =========================================
+    // FIND REGULAR CITY SEARCH INPUTS
+    // =========================================
 
-    function initializeAllCityInputs() {
+    function initializeCitySearches() {
 
         const inputs = document.querySelectorAll(
             'input[name="city"]'
         );
 
-        inputs.forEach(
-            function (input, index) {
+        inputs.forEach(function (input, index) {
 
-                if (
-                    input.type === "text"
-                    || input.type === "search"
-                ) {
-
-                    initializeAutocomplete(
-                        input,
-                        index
-                    );
-
-                }
+            if (
+                input.type !== "text" &&
+                input.type !== "search"
+            ) {
+                return;
             }
-        );
 
+            // Preserve the Dashboard's
+            // existing Saved Locations autocomplete.
+            if (
+                input.id === "dashboardCityInput" ||
+                input.closest("#dashboardCityForm")
+            ) {
+                return;
+            }
+
+            initializeAutocomplete(input, index);
+        });
     }
 
+
+    // =========================================
+    // INITIALIZE AFTER PAGE LOAD
+    // =========================================
 
     if (document.readyState === "loading") {
 
         document.addEventListener(
             "DOMContentLoaded",
-            initializeAllCityInputs
+            initializeCitySearches
         );
 
     } else {
 
-        initializeAllCityInputs();
-
+        initializeCitySearches();
     }
 
 })();
