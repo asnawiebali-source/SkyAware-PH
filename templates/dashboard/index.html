@@ -11,7 +11,6 @@
         --muted: #64748b;
     }
 
-    /* DASHBOARD HEADER */
     .sky-dashboard .heading {
         display: flex;
         justify-content: space-between;
@@ -39,7 +38,6 @@
         margin-left: 5px;
     }
 
-    /* COMMON CARDS */
     .sky-dashboard .dashboard-card {
         background: #fff;
         border: 1px solid #e3eaf2;
@@ -61,9 +59,10 @@
         font-size: 12px;
     }
 
-    /* CITY SEARCH */
+    /* SEARCH */
+
     .sky-dashboard .city-search {
-        background: white;
+        background: #fff;
         border: 1px solid #e3eaf2;
         border-radius: 15px;
         padding: 18px;
@@ -71,7 +70,6 @@
 
     .sky-dashboard .city-search form {
         display: flex;
-        align-items: stretch;
         gap: 10px;
     }
 
@@ -91,7 +89,7 @@
     }
 
     .sky-dashboard .city-search input:focus {
-        border-color: #1769c2;
+        border-color: var(--blue);
         box-shadow: 0 0 0 4px rgba(23,105,194,.10);
     }
 
@@ -107,14 +105,15 @@
         margin: 10px 0 0;
     }
 
-    /* AUTOCOMPLETE */
+    /* CITY AUTOCOMPLETE */
+
     .sky-dashboard .city-suggestions {
         position: absolute;
         top: calc(100% + 7px);
         left: 0;
         right: 0;
         z-index: 1050;
-        background: #fff;
+        background: white;
         border: 1px solid #dce5f1;
         border-radius: 13px;
         box-shadow: 0 16px 40px rgba(16,47,84,.17);
@@ -142,11 +141,11 @@
         gap: 12px;
         width: 100%;
         padding: 11px 15px;
-        background: #fff;
+        background: white;
         border: 0;
         text-align: left;
         cursor: pointer;
-        color: #17385d;
+        color: var(--navy);
     }
 
     .sky-dashboard .suggestion-item:hover,
@@ -163,7 +162,7 @@
         justify-content: center;
         border-radius: 10px;
         background: #e9f3ff;
-        color: #1769c2;
+        color: var(--blue);
         font-size: 17px;
     }
 
@@ -175,35 +174,35 @@
 
     .sky-dashboard .suggestion-city {
         display: block;
-        color: #17385d;
         font-size: 13px;
         font-weight: 700;
     }
 
     .sky-dashboard .suggestion-province {
         display: block;
-        margin-top: 3px;
-        color: #8492a6;
         font-size: 11px;
+        color: #8492a6;
+        margin-top: 3px;
     }
 
     .sky-dashboard .suggestion-saved {
         font-size: 10px;
         font-weight: 800;
-        color: #1769c2;
+        color: var(--blue);
         background: #e8f2ff;
         padding: 5px 8px;
         border-radius: 6px;
     }
 
     .sky-dashboard .suggestions-empty {
-        color: #64748b;
         font-size: 12px;
+        color: var(--muted);
         line-height: 1.7;
         padding: 15px;
     }
 
     /* WEATHER */
+
     .sky-dashboard .temperature {
         color: #102f54;
         font-size: 68px;
@@ -246,6 +245,7 @@
     }
 
     /* FORECAST */
+
     .sky-dashboard .forecast {
         display: grid;
         grid-template-columns: repeat(7, minmax(75px, 1fr));
@@ -274,11 +274,12 @@
 
     .sky-dashboard .forecast-day small {
         display: block;
-        color: #64748b;
+        color: var(--muted);
         margin-top: 7px;
     }
 
     /* AIR QUALITY */
+
     .sky-dashboard .aqi-number {
         color: var(--navy);
         font-size: 44px;
@@ -288,7 +289,7 @@
 
     .sky-dashboard .air-metrics {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
         margin-top: 18px;
     }
@@ -301,7 +302,7 @@
 
     .sky-dashboard .air-metric small {
         display: block;
-        color: #64748b;
+        color: var(--muted);
     }
 
     .sky-dashboard .air-metric strong {
@@ -309,7 +310,8 @@
         font-size: 20px;
     }
 
-    /* EARTHQUAKES AND SAVED LOCATIONS */
+    /* EARTHQUAKES AND LOCATIONS */
+
     .sky-dashboard .quake-item,
     .sky-dashboard .place-item {
         display: flex;
@@ -327,7 +329,7 @@
 
     .sky-dashboard .quake-mag {
         background: #e8f2ff;
-        color: #1769c2;
+        color: var(--blue);
         font-weight: 800;
         border-radius: 9px;
         padding: 10px;
@@ -348,7 +350,8 @@
         font-size: 11px;
     }
 
-    /* AI ASSISTANT */
+    /* ASSISTANT */
+
     .sky-dashboard .assistant-preview {
         background: #f3f6fb;
         padding: 18px;
@@ -357,8 +360,8 @@
     }
 
     .sky-dashboard .assistant-question {
-        background: #1769c2;
-        color: #fff;
+        background: var(--blue);
+        color: white;
         border-radius: 10px;
         padding: 12px;
         font-size: 13px;
@@ -366,7 +369,7 @@
     }
 
     .sky-dashboard .assistant-answer {
-        background: #fff;
+        background: white;
         border-radius: 10px;
         padding: 13px;
         color: #475569;
@@ -388,12 +391,13 @@
         align-items: center;
         justify-content: center;
         background: #e9f3ff;
-        color: #1769c2;
+        color: var(--blue);
         border-radius: 14px;
         font-size: 25px;
     }
 
-    /* RESPONSIVE */
+    /* MOBILE */
+
     @media (max-width: 575px) {
         .sky-dashboard .dashboard-card {
             padding: 18px;
@@ -418,10 +422,6 @@
         .sky-dashboard .weather-metrics {
             grid-template-columns: repeat(2, 1fr);
         }
-
-        .sky-dashboard .city-suggestions {
-            max-height: 280px;
-        }
     }
 </style>
 {% endblock %}
@@ -431,38 +431,27 @@
 
 <div class="sky-dashboard">
 
-    <!-- ================================= -->
-    <!-- PERSONALIZED DASHBOARD HEADER -->
-    <!-- ================================= -->
+    <!-- HEADER -->
 
     <div class="heading">
-
         <div>
-
             <h1>
-
                 Welcome back,
-
                 {% if user.first_name %}
                     {{ user.first_name }}!
                 {% else %}
                     {{ user.username }}!
                 {% endif %}
-
                 <i class="bi bi-cloud-sun welcome-icon"></i>
-
             </h1>
 
             <p>
                 Here's your latest weather and disaster
                 information for the Philippines.
             </p>
-
         </div>
 
-        <!-- ADMIN ACCESS ONLY -->
         {% if user.is_staff %}
-
         <a
             href="{% url 'admin_dashboard' %}"
             class="btn btn-outline-primary btn-sm"
@@ -470,15 +459,11 @@
             <i class="bi bi-speedometer2 me-1"></i>
             Admin Dashboard
         </a>
-
         {% endif %}
-
     </div>
 
 
-    <!-- ================================= -->
-    <!-- CITY SEARCH WITH AUTOCOMPLETE -->
-    <!-- ================================= -->
+    <!-- CITY SEARCH -->
 
     <section class="city-search mb-4">
 
@@ -514,6 +499,16 @@
                     hidden
                 ></div>
 
+                <!-- DATA FOR AUTOCOMPLETE -->
+                <div id="dashboardSavedLocationsData" hidden>
+                    {% for location in recent_locations %}
+                    <span
+                        data-city="{{ location.city }}"
+                        data-province="{{ location.province|default:'' }}"
+                    ></span>
+                    {% endfor %}
+                </div>
+
             </div>
 
             <button
@@ -535,81 +530,65 @@
 
 
     {% if not city %}
-
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle me-2"></i>
         City not found, or the location service is unavailable.
     </div>
-
     {% endif %}
 
 
-    <!-- ================================= -->
-    <!-- WEATHER AND AIR QUALITY -->
-    <!-- ================================= -->
+    <!-- WEATHER + AIR QUALITY -->
 
     <div class="row g-4 mb-4">
 
         <!-- WEATHER CARD -->
-        <div class="col-xl-8">
 
+        <div class="col-xl-8">
             <section class="dashboard-card">
 
                 <div class="mb-4">
 
                     <h2>
-
                         {% if city %}
-
-                        <i class="bi bi-geo-alt-fill text-primary"></i>
-
-                        {{ city.name }}, {{ city.region }}
-
+                            <i class="bi bi-geo-alt-fill text-primary"></i>
+                            {{ city.name }}, {{ city.region }}
                         {% else %}
-
-                        Weather Unavailable
-
+                            Weather Unavailable
                         {% endif %}
-
                     </h2>
 
                     <div class="section-subtitle">
-                        Current Weather · Open-Meteo API
+                        Current Weather ·
+                        {{ weather.source|default:"Weather Provider" }}
                     </div>
 
                 </div>
-
 
                 {% if weather %}
 
                 <div class="d-flex align-items-center gap-3 mb-4">
 
                     <div class="temperature">
-
                         {% if weather.temperature != None %}
                             {{ weather.temperature|floatformat:0 }}°
                         {% else %}
                             —
                         {% endif %}
-
                     </div>
 
                     <div class="weather-condition">
-
                         <i class="bi {{ weather.icon }}"></i>
-
                         {{ weather.condition }}
-
                     </div>
 
                 </div>
 
 
                 <!-- WEATHER METRICS -->
+
                 <div class="weather-metrics mb-4">
 
                     <div class="metric">
-
                         <small>Feels Like</small>
 
                         <strong>
@@ -619,11 +598,9 @@
                                 —
                             {% endif %}
                         </strong>
-
                     </div>
 
                     <div class="metric">
-
                         <small>Humidity</small>
 
                         <strong>
@@ -633,11 +610,9 @@
                                 —
                             {% endif %}
                         </strong>
-
                     </div>
 
                     <div class="metric">
-
                         <small>Wind Speed</small>
 
                         <strong>
@@ -647,13 +622,13 @@
                                 —
                             {% endif %}
                         </strong>
-
                     </div>
 
                 </div>
 
 
                 <!-- SEVEN DAY FORECAST -->
+
                 <h6 class="fw-bold mb-3">
                     7-Day Weather Forecast
                 </h6>
@@ -669,33 +644,27 @@
                         <i class="bi bi-cloud-sun"></i>
 
                         <strong class="d-block">
-
                             {% if day.high != None %}
                                 {{ day.high|floatformat:0 }}°
                             {% else %}
                                 —
                             {% endif %}
-
                         </strong>
 
                         <small>
-
                             {% if day.low != None %}
                                 {{ day.low|floatformat:0 }}°
                             {% else %}
                                 —
                             {% endif %}
-
                         </small>
 
                         <small>
-
                             {% if day.rain != None %}
                                 {{ day.rain|floatformat:0 }}% rain
                             {% else %}
                                 —
                             {% endif %}
-
                         </small>
 
                     </div>
@@ -719,13 +688,12 @@
                 {% endif %}
 
             </section>
-
         </div>
 
 
         <!-- AIR QUALITY CARD -->
-        <div class="col-xl-4">
 
+        <div class="col-xl-4">
             <section class="dashboard-card">
 
                 <h2>
@@ -736,14 +704,10 @@
                 <div class="section-subtitle mb-1">
 
                     {% if city %}
-
                         <i class="bi bi-geo-alt me-1"></i>
                         {{ city.name }}, {{ city.region }}
-
                     {% else %}
-
                         Location unavailable
-
                     {% endif %}
 
                 </div>
@@ -751,7 +715,6 @@
                 <div class="section-subtitle mb-4">
                     Open-Meteo Air Quality API
                 </div>
-
 
                 {% if air_quality %}
 
@@ -765,55 +728,41 @@
 
                 </div>
 
-
                 <span class="badge bg-{{ air_quality.status_class }} mt-2 p-2">
                     {{ air_quality.category }}
                 </span>
 
-
                 <div class="air-metrics">
 
-                    <!-- PM2.5 -->
                     <div class="air-metric">
-
                         <small>PM2.5</small>
 
                         <strong>
-
                             {% if air_quality.pm25 != None %}
                                 {{ air_quality.pm25|floatformat:1 }}
                             {% else %}
                                 —
                             {% endif %}
-
                         </strong>
 
                         <small>µg/m³</small>
-
                     </div>
 
-
-                    <!-- PM10 -->
                     <div class="air-metric">
-
                         <small>PM10</small>
 
                         <strong>
-
                             {% if air_quality.pm10 != None %}
                                 {{ air_quality.pm10|floatformat:1 }}
                             {% else %}
                                 —
                             {% endif %}
-
                         </strong>
 
                         <small>µg/m³</small>
-
                     </div>
 
                 </div>
-
 
                 <p class="section-subtitle mt-4 mb-0">
                     Air quality is based on the US AQI scale.
@@ -829,7 +778,6 @@
 
                 {% endif %}
 
-
                 <a
                     href="{% url 'air_quality' %}?city={{ searched_city|urlencode }}"
                     class="btn btn-outline-primary btn-sm mt-4"
@@ -839,33 +787,28 @@
                 </a>
 
             </section>
-
         </div>
 
     </div>
 
 
-    <!-- ================================= -->
-    <!-- EARTHQUAKES AND SAVED LOCATIONS -->
-    <!-- ================================= -->
+    <!-- EARTHQUAKES + SAVED LOCATIONS -->
 
     <div class="row g-4 mb-4">
 
-        <!-- RECENT EARTHQUAKES -->
-        <div class="col-xl-7">
+        <!-- EARTHQUAKE CARD -->
 
+        <div class="col-xl-7">
             <section class="dashboard-card">
 
                 <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
 
                     <div>
-
                         <h2>Recent Earthquakes</h2>
 
                         <div class="section-subtitle">
                             USGS Earthquake API
                         </div>
-
                     </div>
 
                     <a
@@ -876,7 +819,6 @@
                     </a>
 
                 </div>
-
 
                 {% for quake in earthquakes|slice:":5" %}
 
@@ -926,26 +868,23 @@
                 {% endfor %}
 
             </section>
-
         </div>
 
 
-        <!-- SAVED LOCATIONS -->
-        <div class="col-xl-5">
+        <!-- SAVED LOCATIONS CARD -->
 
+        <div class="col-xl-5">
             <section class="dashboard-card">
 
                 <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
 
                     <div>
-
                         <h2>Saved Locations</h2>
 
                         <div class="section-subtitle">
                             {{ total_user_locations }}
                             location{{ total_user_locations|pluralize }}
                         </div>
-
                     </div>
 
                     <a
@@ -958,7 +897,6 @@
 
                 </div>
 
-
                 {% for location in recent_locations %}
 
                 <div class="place-item">
@@ -966,11 +904,8 @@
                     <div class="flex-grow-1">
 
                         <div class="place-name">
-
                             <i class="bi bi-geo-alt text-primary me-2"></i>
-
                             {{ location.city }}
-
                         </div>
 
                         <div class="quake-meta ms-4">
@@ -998,39 +933,31 @@
                 {% endfor %}
 
             </section>
-
         </div>
 
     </div>
 
 
-    <!-- ================================= -->
-    <!-- AI ASSISTANT AND NATURAL EVENTS -->
-    <!-- ================================= -->
+    <!-- AI ASSISTANT + NASA EVENTS -->
 
     <div class="row g-4 mb-4">
 
-        <!-- AI SAFETY ASSISTANT -->
         <div class="col-lg-8">
-
             <section class="dashboard-card">
 
                 <div class="d-flex justify-content-between align-items-center gap-2">
 
                     <div>
-
                         <h2>AI Safety Assistant</h2>
 
                         <div class="section-subtitle">
                             Powered by Groq AI
                         </div>
-
                     </div>
 
                     <i class="bi bi-robot text-primary fs-3"></i>
 
                 </div>
-
 
                 <div class="assistant-preview">
 
@@ -1052,23 +979,21 @@
 
                 </div>
 
-
                 <a
                     href="{% url 'ai_assistant' %}"
                     class="btn btn-primary"
                 >
-                    <i class="bi bi-chat-dots me-2"></i>
+                    <i class="bi bi-chat-dots me-1"></i>
                     Open AI Safety Assistant
                 </a>
 
             </section>
-
         </div>
 
 
-        <!-- NASA NATURAL EVENTS -->
-        <div class="col-lg-4">
+        <!-- NATURAL EVENTS -->
 
+        <div class="col-lg-4">
             <section class="dashboard-card">
 
                 <div class="nasa-icon mb-3">
@@ -1096,20 +1021,17 @@
                     href="{% url 'natural_events' %}"
                     class="btn btn-outline-primary mt-3"
                 >
-                    <i class="bi bi-globe-americas me-2"></i>
+                    <i class="bi bi-globe-americas me-1"></i>
                     View Natural Events
                 </a>
 
             </section>
-
         </div>
 
     </div>
 
 
-    <!-- ================================= -->
-    <!-- SAFETY DISCLAIMER -->
-    <!-- ================================= -->
+    <!-- DISCLAIMER -->
 
     <div class="alert alert-info">
 
@@ -1132,10 +1054,6 @@
 (function () {
     "use strict";
 
-    // ========================================
-    // SEARCH ELEMENTS
-    // ========================================
-
     const form = document.getElementById(
         "dashboardCityForm"
     );
@@ -1152,15 +1070,12 @@
         return;
     }
 
-
     // ========================================
-    // LOCAL PHILIPPINE CITY LIST
-    // No external API calls while typing.
+    // PHILIPPINE CITY LIST
     // ========================================
 
     const localCities = [
 
-        // NORTHERN MINDANAO
         ["Iligan City", "Lanao del Norte"],
         ["Cagayan de Oro", "Misamis Oriental"],
         ["Marawi City", "Lanao del Sur"],
@@ -1172,7 +1087,6 @@
         ["Gingoog City", "Misamis Oriental"],
         ["El Salvador City", "Misamis Oriental"],
 
-        // CARAGA
         ["Butuan City", "Agusan del Norte"],
         ["Surigao City", "Surigao del Norte"],
         ["Tandag City", "Surigao del Sur"],
@@ -1180,7 +1094,6 @@
         ["Bayugan City", "Agusan del Sur"],
         ["Cabadbaran City", "Agusan del Norte"],
 
-        // DAVAO REGION
         ["Davao City", "Davao del Sur"],
         ["Tagum City", "Davao del Norte"],
         ["Panabo City", "Davao del Norte"],
@@ -1188,24 +1101,20 @@
         ["Mati City", "Davao Oriental"],
         ["Samal City", "Davao del Norte"],
 
-        // SOCCSKSARGEN
         ["General Santos City", "South Cotabato"],
         ["Koronadal City", "South Cotabato"],
         ["Kidapawan City", "Cotabato"],
         ["Tacurong City", "Sultan Kudarat"],
 
-        // ZAMBOANGA PENINSULA
         ["Zamboanga City", "Zamboanga del Sur"],
         ["Pagadian City", "Zamboanga del Sur"],
         ["Dipolog City", "Zamboanga del Norte"],
         ["Dapitan City", "Zamboanga del Norte"],
         ["Isabela City", "Basilan"],
 
-        // BARMM
         ["Cotabato City", "Maguindanao del Norte"],
         ["Lamitan City", "Basilan"],
 
-        // CENTRAL VISAYAS
         ["Cebu City", "Cebu"],
         ["Mandaue City", "Cebu"],
         ["Lapu-Lapu City", "Cebu"],
@@ -1216,7 +1125,6 @@
         ["Tagbilaran City", "Bohol"],
         ["Dumaguete City", "Negros Oriental"],
 
-        // WESTERN VISAYAS
         ["Bacolod City", "Negros Occidental"],
         ["Silay City", "Negros Occidental"],
         ["Iloilo City", "Iloilo"],
@@ -1224,7 +1132,6 @@
         ["Roxas City", "Capiz"],
         ["Kabankalan City", "Negros Occidental"],
 
-        // EASTERN VISAYAS
         ["Tacloban City", "Leyte"],
         ["Ormoc City", "Leyte"],
         ["Calbayog City", "Samar"],
@@ -1232,7 +1139,6 @@
         ["Borongan City", "Eastern Samar"],
         ["Maasin City", "Southern Leyte"],
 
-        // METRO MANILA
         ["Manila", "Metro Manila"],
         ["Quezon City", "Metro Manila"],
         ["Makati City", "Metro Manila"],
@@ -1248,7 +1154,6 @@
         ["Valenzuela City", "Metro Manila"],
         ["San Juan City", "Metro Manila"],
 
-        // NORTHERN LUZON
         ["Baguio City", "Benguet"],
         ["Laoag City", "Ilocos Norte"],
         ["Vigan City", "Ilocos Sur"],
@@ -1257,7 +1162,6 @@
         ["Santiago City", "Isabela"],
         ["Ilagan City", "Isabela"],
 
-        // CENTRAL LUZON
         ["Olongapo City", "Zambales"],
         ["Angeles City", "Pampanga"],
         ["San Fernando City", "Pampanga"],
@@ -1266,7 +1170,6 @@
         ["Malolos City", "Bulacan"],
         ["San Jose del Monte City", "Bulacan"],
 
-        // CALABARZON
         ["Antipolo City", "Rizal"],
         ["Calamba City", "Laguna"],
         ["Santa Rosa City", "Laguna"],
@@ -1275,44 +1178,38 @@
         ["Lipa City", "Batangas"],
         ["Lucena City", "Quezon"],
 
-        // BICOL
         ["Legazpi City", "Albay"],
         ["Naga City", "Camarines Sur"],
         ["Iriga City", "Camarines Sur"],
         ["Sorsogon City", "Sorsogon"],
 
-        // MIMAROPA
         ["Puerto Princesa City", "Palawan"],
         ["Calapan City", "Oriental Mindoro"]
 
     ].map(function (row) {
-
         return {
             name: row[0],
             province: row[1],
             saved: false
         };
-
     });
 
 
     // ========================================
-    // USER'S SAVED LOCATIONS
+    // SAVED LOCATIONS FROM HTML
     // ========================================
 
-    const savedCities = [
-
-        {% for location in recent_locations %}
-
-        {
-            name: "{{ location.city|escapejs }}",
-            province: "{{ location.province|default:''|escapejs }}",
+    const savedCities = Array.from(
+        document.querySelectorAll(
+            "#dashboardSavedLocationsData [data-city]"
+        )
+    ).map(function (element) {
+        return {
+            name: element.dataset.city || "",
+            province: element.dataset.province || "",
             saved: true
-        },
-
-        {% endfor %}
-
-    ];
+        };
+    });
 
 
     // ========================================
@@ -1322,19 +1219,14 @@
     const cityMap = new Map();
 
     savedCities.concat(localCities).forEach(function (city) {
-
         const key = city.name.trim().toLowerCase();
 
         if (key && !cityMap.has(key)) {
             cityMap.set(key, city);
         }
-
     });
 
-    const cities = Array.from(
-        cityMap.values()
-    );
-
+    const cities = Array.from(cityMap.values());
 
     const popularCities = [
         "Iligan City",
@@ -1345,7 +1237,6 @@
         "Quezon City"
     ];
 
-
     let visibleCities = [];
     let activeIndex = -1;
 
@@ -1355,9 +1246,7 @@
     // ========================================
 
     function closeSuggestions() {
-
         dropdown.hidden = true;
-
         activeIndex = -1;
 
         input.setAttribute(
@@ -1368,22 +1257,18 @@
         input.removeAttribute(
             "aria-activedescendant"
         );
-
     }
 
 
     // ========================================
-    // CITY MATCH SCORE
+    // SCORE CITY MATCHES
     // ========================================
 
     function getScore(city, query) {
-
         const name = city.name.toLowerCase();
-
         const province = city.province.toLowerCase();
 
         if (!query) {
-
             if (city.saved) {
                 return 0;
             }
@@ -1392,10 +1277,7 @@
                 city.name
             );
 
-            return index >= 0
-                ? index + 1
-                : 99;
-
+            return index >= 0 ? index + 1 : 99;
         }
 
         if (name.startsWith(query)) {
@@ -1411,7 +1293,6 @@
         }
 
         return 99;
-
     }
 
 
@@ -1420,9 +1301,7 @@
     // ========================================
 
     function selectCity(city) {
-
         input.value = city.name;
-
         closeSuggestions();
 
         if (form.requestSubmit) {
@@ -1430,22 +1309,19 @@
         } else {
             form.submit();
         }
-
     }
 
 
     // ========================================
-    // KEYBOARD HIGHLIGHT
+    // HIGHLIGHT KEYBOARD SELECTION
     // ========================================
 
     function highlightOption() {
-
         const options = dropdown.querySelectorAll(
             ".suggestion-item"
         );
 
         options.forEach(function (option, index) {
-
             const isActive = index === activeIndex;
 
             option.classList.toggle(
@@ -1459,7 +1335,6 @@
             );
 
             if (isActive) {
-
                 input.setAttribute(
                     "aria-activedescendant",
                     option.id
@@ -1468,44 +1343,31 @@
                 option.scrollIntoView({
                     block: "nearest"
                 });
-
             }
-
         });
 
         if (activeIndex < 0) {
-
             input.removeAttribute(
                 "aria-activedescendant"
             );
-
         }
-
     }
 
 
     // ========================================
-    // SHOW SUGGESTIONS
+    // SHOW CITY SUGGESTIONS
     // ========================================
 
     function showSuggestions() {
-
-        const query = input.value
-            .trim()
-            .toLowerCase();
+        const query = input.value.trim().toLowerCase();
 
         activeIndex = -1;
 
         visibleCities = cities
-
             .filter(function (city) {
-
                 return getScore(city, query) < 99;
-
             })
-
             .sort(function (a, b) {
-
                 const difference = (
                     getScore(a, query) -
                     getScore(b, query)
@@ -1519,23 +1381,13 @@
                     return a.saved ? -1 : 1;
                 }
 
-                return a.name.localeCompare(
-                    b.name
-                );
-
+                return a.name.localeCompare(b.name);
             })
-
             .slice(0, 6);
-
 
         dropdown.replaceChildren();
 
-
-        // Dropdown heading
-        const heading = document.createElement(
-            "div"
-        );
-
+        const heading = document.createElement("div");
         heading.className = "suggestions-title";
 
         heading.textContent = query
@@ -1544,41 +1396,23 @@
 
         dropdown.appendChild(heading);
 
-
-        // City buttons
         visibleCities.forEach(function (city, index) {
-
-            const button = document.createElement(
-                "button"
-            );
+            const button = document.createElement("button");
 
             button.type = "button";
-
             button.className = "suggestion-item";
-
             button.id = "city-suggestion-" + index;
 
-            button.setAttribute(
-                "role",
-                "option"
-            );
-
+            button.setAttribute("role", "option");
             button.setAttribute(
                 "aria-selected",
                 "false"
             );
 
-
-            const icon = document.createElement(
-                "span"
-            );
-
+            const icon = document.createElement("span");
             icon.className = "suggestion-icon";
 
-
-            const iconElement = document.createElement(
-                "i"
-            );
+            const iconElement = document.createElement("i");
 
             iconElement.className = city.saved
                 ? "bi bi-bookmark-fill"
@@ -1586,33 +1420,19 @@
 
             icon.appendChild(iconElement);
 
-
-            const details = document.createElement(
-                "span"
-            );
-
+            const details = document.createElement("span");
             details.className = "suggestion-details";
 
-
-            const name = document.createElement(
-                "span"
-            );
-
+            const name = document.createElement("span");
             name.className = "suggestion-city";
-
             name.textContent = city.name;
 
-
-            const province = document.createElement(
-                "span"
-            );
-
+            const province = document.createElement("span");
             province.className = "suggestion-province";
 
             province.textContent = city.province
                 ? city.province + ", Philippines"
                 : "Philippines";
-
 
             details.appendChild(name);
             details.appendChild(province);
@@ -1620,54 +1440,36 @@
             button.appendChild(icon);
             button.appendChild(details);
 
-
             if (city.saved) {
-
                 const savedBadge = document.createElement(
                     "span"
                 );
 
                 savedBadge.className = "suggestion-saved";
-
                 savedBadge.textContent = "SAVED";
 
                 button.appendChild(savedBadge);
-
             }
-
 
             button.addEventListener(
                 "mousedown",
                 function (event) {
-
                     event.preventDefault();
-
                 }
             );
-
 
             button.addEventListener(
                 "click",
                 function () {
-
                     selectCity(city);
-
                 }
             );
 
-
             dropdown.appendChild(button);
-
         });
 
-
-        // No suggestions
         if (visibleCities.length === 0) {
-
-            const empty = document.createElement(
-                "div"
-            );
-
+            const empty = document.createElement("div");
             empty.className = "suggestions-empty";
 
             empty.textContent =
@@ -1676,9 +1478,7 @@
                 "the city you entered.";
 
             dropdown.appendChild(empty);
-
         }
-
 
         dropdown.hidden = false;
 
@@ -1690,7 +1490,6 @@
         input.removeAttribute(
             "aria-activedescendant"
         );
-
     }
 
 
@@ -1698,38 +1497,21 @@
     // INPUT EVENTS
     // ========================================
 
-    input.addEventListener(
-        "focus",
-        showSuggestions
-    );
-
-    input.addEventListener(
-        "input",
-        showSuggestions
-    );
-
-
-    // ========================================
-    // KEYBOARD NAVIGATION
-    // ========================================
+    input.addEventListener("focus", showSuggestions);
+    input.addEventListener("input", showSuggestions);
 
     input.addEventListener(
         "keydown",
         function (event) {
-
             if (event.key === "Escape") {
-
                 closeSuggestions();
                 return;
-
             }
-
 
             if (
                 event.key === "ArrowDown" ||
                 event.key === "ArrowUp"
             ) {
-
                 event.preventDefault();
 
                 if (dropdown.hidden) {
@@ -1740,62 +1522,41 @@
                     return;
                 }
 
-
                 if (event.key === "ArrowDown") {
-
                     activeIndex = (
                         activeIndex + 1
                     ) % visibleCities.length;
-
                 } else {
-
                     activeIndex = activeIndex <= 0
                         ? visibleCities.length - 1
                         : activeIndex - 1;
-
                 }
 
-
                 highlightOption();
-
             }
-
 
             if (
                 event.key === "Enter" &&
                 !dropdown.hidden &&
                 activeIndex >= 0
             ) {
-
                 event.preventDefault();
 
-                selectCity(
-                    visibleCities[activeIndex]
-                );
-
+                selectCity(visibleCities[activeIndex]);
             }
-
         }
     );
 
 
-    // ========================================
-    // CLICK OUTSIDE TO CLOSE
-    // ========================================
-
     document.addEventListener(
         "click",
         function (event) {
-
             if (
                 !input.contains(event.target) &&
                 !dropdown.contains(event.target)
             ) {
-
                 closeSuggestions();
-
             }
-
         }
     );
 

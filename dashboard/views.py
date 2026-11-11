@@ -1,4 +1,6 @@
 
+import logging
+
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
@@ -14,6 +16,14 @@ from django.shortcuts import render
 from weather.models import SavedLocation
 
 from integrations.nominatim import find_ph_city
+
+# SHARED WEATHER API
+# Primary: Open-Meteo
+# Backup: Visual Crossing
+from integrations.open_meteo import (
+    get_weather as fetch_shared_weather
+)
+
 from integrations.usgs_earthquake import (
     get_recent_earthquakes as fetch_usgs_earthquakes
 )
@@ -23,7 +33,8 @@ from integrations.usgs_earthquake import (
 # SETTINGS
 # ==========================================
 
-WEATHER_CACHE_SECONDS = 600
+logger = logging.getLogger(__name__)
+
 AIR_QUALITY_CACHE_SECONDS = 600
 
 # Avoid repeatedly calling an unavailable
@@ -46,13 +57,12 @@ def get_api_json(
     cache_seconds=600,
 ):
     """
-    Fetch JSON with caching and error handling.
+    Fetch external API JSON with caching.
 
-    A successful result is cached to avoid
-    unnecessary repeated external requests.
+    Successful responses are cached.
 
-    If an API fails, requests for the same
-    resource are briefly paused.
+    Failed requests are briefly cached
+    to avoid repeated API calls.
     """
 
     cached = cache.get(cache_key)
@@ -90,14 +100,15 @@ def get_api_json(
             cache.set(
                 failure_key,
                 True,
-                FAILURE_CACHE_SECONDS
+                FAILURE_CACHE_SECONDS,
             )
+
             return None
 
         cache.set(
             cache_key,
             data,
-            cache_seconds
+            cache_seconds,
         )
 
         return data
@@ -105,11 +116,17 @@ def get_api_json(
     except (
         requests.RequestException,
         ValueError,
-    ):
+    ) as exc:
+
+        logger.warning(
+            "Dashboard API request failed: %s",
+            exc,
+        )
+
         cache.set(
             failure_key,
             True,
-            FAILURE_CACHE_SECONDS
+            FAILURE_CACHE_SECONDS,
         )
 
         return None
@@ -121,12 +138,18 @@ def get_api_json(
 
 def city_cache_suffix(city):
     """
-    Consistent cache key for a location.
+    Generate a consistent cache key
+    using city coordinates.
     """
 
     try:
-        latitude = float(city["latitude"])
-        longitude = float(city["longitude"])
+        latitude = float(
+            city["latitude"]
+        )
+
+        longitude = float(
+            city["longitude"]
+        )
 
         return (
             f"{latitude:.5f}:"
@@ -142,11 +165,75 @@ def city_cache_suffix(city):
 
 
 # ==========================================
+# WEATHER ICON HELPER
+# ==========================================
+
+def get_dashboard_weather_icon(weather_code):
+    """
+    Convert weather codes to Bootstrap icons.
+    """
+
+    if weather_code == 0:
+        return "bi-sun"
+
+    elif weather_code in (1, 2):
+        return "bi-cloud-sun"
+
+    elif weather_code == 3:
+        return "bi-clouds"
+
+    elif weather_code in (45, 48):
+        return "bi-cloud-fog"
+
+    elif weather_code in (
+        51, 53, 55,
+        56, 57,
+        61, 63, 65,
+        66, 67,
+        80, 81, 82,
+    ):
+        return "bi-cloud-rain"
+
+    elif weather_code in (
+        71, 73, 75,
+        77, 85, 86,
+    ):
+        return "bi-cloud-snow"
+
+    elif weather_code in (
+        95, 96, 99,
+    ):
+        return "bi-cloud-lightning-rain"
+
+    return "bi-cloud-sun"
+
+
+# ==========================================
 # WEATHER API
-# OPEN-METEO
+# OPEN-METEO + VISUAL CROSSING FALLBACK
 # ==========================================
 
 def get_weather(city):
+    """
+    Retrieve dashboard weather using
+    the shared weather integration.
+
+    PRIMARY API:
+        Open-Meteo
+
+    BACKUP API:
+        Visual Crossing
+
+    The shared integration handles:
+        - HTTP 429 rate limits
+        - Fallback requests
+        - API response normalization
+        - Weather response caching
+
+    This function converts the response
+    into the format expected by the
+    existing SkyAware PH dashboard.
+    """
 
     if not city:
         return None
@@ -156,124 +243,92 @@ def get_weather(city):
     if location_key is None:
         return None
 
-    data = get_api_json(
-        url=(
-            "https://api.open-meteo.com/v1/forecast"
-        ),
-        params={
-            "latitude": city["latitude"],
-            "longitude": city["longitude"],
-            "current": (
-                "temperature_2m,"
-                "relative_humidity_2m,"
-                "apparent_temperature,"
-                "wind_speed_10m,"
-                "weather_code"
-            ),
-            "daily": (
-                "temperature_2m_max,"
-                "temperature_2m_min,"
-                "precipitation_probability_max"
-            ),
-            "forecast_days": 7,
-            "timezone": "Asia/Manila",
-        },
-        cache_key=(
-            "skyaware:dashboard:"
-            f"weather:v2:{location_key}"
-        ),
-        cache_seconds=WEATHER_CACHE_SECONDS,
-    )
+    try:
+        # Uses the same integration as
+        # the working Weather Forecast page.
+        data = fetch_shared_weather(
+            city["latitude"],
+            city["longitude"],
+        )
+
+    except (
+        requests.RequestException,
+        ValueError,
+        TypeError,
+        KeyError,
+        IndexError,
+    ) as exc:
+
+        logger.warning(
+            "Dashboard weather request failed: %s",
+            exc,
+        )
+
+        return None
 
     if not data:
+        logger.warning(
+            "No weather data available for %s",
+            location_key,
+        )
+
         return None
 
     current = data.get("current") or {}
-    daily = data.get("daily") or {}
 
     weather_code = current.get(
         "weather_code"
     )
 
-    # ======================================
-    # WEATHER DESCRIPTION
-    # ======================================
+    condition = data.get(
+        "description",
+        "Weather Conditions",
+    )
 
-    if weather_code == 0:
-        condition = "Clear Sky"
-        icon = "bi-sun"
-
-    elif weather_code in (1, 2):
-        condition = "Partly Cloudy"
-        icon = "bi-cloud-sun"
-
-    elif weather_code == 3:
-        condition = "Cloudy"
-        icon = "bi-clouds"
-
-    elif weather_code in (45, 48):
-        condition = "Foggy"
-        icon = "bi-cloud-fog"
-
-    elif weather_code in (
-        51, 53, 55,
-        61, 63, 65,
-        80, 81, 82
-    ):
-        condition = "Rainy"
-        icon = "bi-cloud-rain"
-
-    elif weather_code in (95, 96, 99):
-        condition = "Thunderstorm"
-        icon = "bi-cloud-lightning-rain"
-
-    else:
-        condition = "Weather Conditions"
-        icon = "bi-cloud-sun"
+    icon = get_dashboard_weather_icon(
+        weather_code
+    )
 
     # ======================================
-    # SEVEN DAY FORECAST
+    # SEVEN-DAY FORECAST
     # ======================================
 
     forecast = []
 
-    dates = daily.get("time") or []
+    days = data.get("forecast") or []
 
-    def get_daily_value(field, index):
+    for day in days[:7]:
 
-        values = daily.get(field) or []
-
-        if index < len(values):
-            return values[index]
-
-        return None
-
-    for index, day in enumerate(dates[:7]):
+        date_value = day.get("date")
 
         try:
             day_name = datetime.strptime(
-                day,
-                "%Y-%m-%d"
+                date_value,
+                "%Y-%m-%d",
             ).strftime("%a")
 
-        except (ValueError, TypeError):
+        except (
+            ValueError,
+            TypeError,
+        ):
             day_name = "Day"
 
         forecast.append({
             "day": day_name,
-            "high": get_daily_value(
-                "temperature_2m_max",
-                index
+            "high": day.get(
+                "max_temp"
             ),
-            "low": get_daily_value(
-                "temperature_2m_min",
-                index
+            "low": day.get(
+                "min_temp"
             ),
-            "rain": get_daily_value(
-                "precipitation_probability_max",
-                index
+            "rain": day.get(
+                "rain_probability"
             ),
         })
+
+    # ======================================
+    # DASHBOARD WEATHER RESPONSE
+    # ======================================
 
     return {
         "temperature": current.get(
@@ -291,6 +346,10 @@ def get_weather(city):
         "condition": condition,
         "icon": icon,
         "forecast": forecast,
+        "source": data.get(
+            "source",
+            "Weather Provider",
+        ),
     }
 
 
@@ -391,7 +450,7 @@ def get_recent_earthquakes():
     try:
         data = fetch_usgs_earthquakes(
             days=7,
-            min_magnitude=2.5
+            min_magnitude=2.5,
         )
 
     except (
@@ -413,15 +472,13 @@ def get_recent_earthquakes():
         data.get("earthquakes") or []
     )[:5]:
 
-        # Convert date and time for the
-        # smaller dashboard card.
         try:
             event_datetime = datetime.strptime(
                 (
                     f"{quake['date']} "
                     f"{quake['time']}"
                 ),
-                "%B %d, %Y %I:%M %p"
+                "%B %d, %Y %I:%M %p",
             )
 
             display_time = (
@@ -444,7 +501,7 @@ def get_recent_earthquakes():
             "id": quake.get("id"),
             "place": quake.get(
                 "place",
-                "Unknown location"
+                "Unknown location",
             ),
             "magnitude": quake.get(
                 "magnitude"
@@ -470,14 +527,14 @@ def fetch_dashboard_data(city):
     """
     Fetch independent API data concurrently.
 
-    Previously:
-        Weather -> Air Quality -> Earthquakes
+    Weather:
+        Open-Meteo / Visual Crossing
 
-    Now:
-        Weather + Air Quality + Earthquakes
+    Air Quality:
+        Open-Meteo Air Quality
 
-    This reduces waiting when several
-    requests need fresh data at once.
+    Earthquakes:
+        USGS Earthquake API
     """
 
     with ThreadPoolExecutor(
@@ -486,34 +543,43 @@ def fetch_dashboard_data(city):
 
         weather_future = executor.submit(
             get_weather,
-            city
+            city,
         )
 
         air_future = executor.submit(
             get_air_quality,
-            city
+            city,
         )
 
         earthquake_future = executor.submit(
-            get_recent_earthquakes
+            get_recent_earthquakes,
         )
 
         try:
             weather = weather_future.result()
 
         except Exception:
+            logger.exception(
+                "Dashboard weather task failed."
+            )
             weather = None
 
         try:
             air_quality = air_future.result()
 
         except Exception:
+            logger.exception(
+                "Dashboard air quality task failed."
+            )
             air_quality = None
 
         try:
             earthquakes = earthquake_future.result()
 
         except Exception:
+            logger.exception(
+                "Dashboard earthquake task failed."
+            )
             earthquakes = None
 
     return weather, air_quality, earthquakes
@@ -564,7 +630,7 @@ def dashboard_view(request):
     (
         weather,
         air_quality,
-        earthquakes
+        earthquakes,
     ) = fetch_dashboard_data(city)
 
     # ======================================
@@ -590,7 +656,7 @@ def dashboard_view(request):
     return render(
         request,
         "dashboard/index.html",
-        context
+        context,
     )
 
 
@@ -621,8 +687,8 @@ def admin_dashboard_view(request):
         "-date_joined"
     )[:5]
 
-    # Status describes code integration,
-    # not real-time API availability.
+    # Status describes API integration,
+    # not real-time provider availability.
     api_integrations = [
         {
             "name": "Open-Meteo",
@@ -649,6 +715,11 @@ def admin_dashboard_view(request):
             "purpose": "City Geocoding",
             "status": "Integrated",
         },
+        {
+            "name": "Visual Crossing",
+            "purpose": "Backup Weather Forecast",
+            "status": "Integrated",
+        },
     ]
 
     context = {
@@ -663,5 +734,5 @@ def admin_dashboard_view(request):
     return render(
         request,
         "dashboard/admin_dashboard.html",
-        context
+        context,
     )
