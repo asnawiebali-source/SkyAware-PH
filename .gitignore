@@ -1,28 +1,48 @@
 
-# Python
+# ==========================================
+# PYTHON
+# ==========================================
 __pycache__/
 *.pyc
+*.pyo
 
-# Virtual environment
+# ==========================================
+# VIRTUAL ENVIRONMENTS
+# ==========================================
 venv/
+venv_old/
 .venv/
 
-# Environment variables and secrets
+# ==========================================
+# ENVIRONMENT VARIABLES AND SECRETS
+# ==========================================
 .env
 .env.*
+!.env.example
 
-# Database
-db.sqlite3
+# ==========================================
+# DATABASE AND BACKUPS
+# ==========================================
+db.sqlite3*
+local_backup.json
 
-# Uploaded files
+# ==========================================
+# UPLOADED FILES
+# ==========================================
 media/
 
-# Generated static files
+# ==========================================
+# GENERATED STATIC FILES
+# ==========================================
 staticfiles/
 
-# VS Code
+# ==========================================
+# VS CODE
+# ==========================================
 .vscode/
 
-# System files
+# ==========================================
+# SYSTEM FILES
+# ==========================================
 .DS_Store
 Thumbs.db

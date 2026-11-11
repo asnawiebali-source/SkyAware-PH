@@ -2,6 +2,7 @@
 from pathlib import Path
 import os
 
+import dj_database_url
 from dotenv import load_dotenv
 
 
@@ -37,12 +38,38 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        ""
+    ).split(",")
+    if origin.strip()
+]
+
+# Security settings for Render
+if not DEBUG:
+
+    SECURE_PROXY_SSL_HEADER = (
+        "HTTP_X_FORWARDED_PROTO",
+        "https"
+    )
+
+    SECURE_SSL_REDIRECT = True
+
+    SESSION_COOKIE_SECURE = True
+
+    CSRF_COOKIE_SECURE = True
+
 
 # ==========================================
-# GROQ AI CONFIGURATION
+# GROQ AI
 # ==========================================
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY = os.getenv(
+    "GROQ_API_KEY",
+    ""
+)
 
 
 # ==========================================
@@ -57,7 +84,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # SkyAware PH Applications
     "accounts",
     "dashboard",
     "weather",
@@ -70,6 +96,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    # WhiteNoise: serves CSS, JS and images on Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -77,23 +107,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    # ======================================
-    # SKYAWARE PH ROLE-BASED ACCESS
-    # ======================================
-
-    # Admin -> Custom Admin Dashboard
-    # User  -> Regular Weather Dashboard
-    #
-    # Prevents administrators from opening
-    # regular-user pages, and regular users
-    # from accessing administrative pages.
-
+    # Preserve separate Admin and User interfaces
     "config.role_middleware.SeparateAdminInterfaceMiddleware",
 ]
 
 
 # ==========================================
-# ROOT URL CONFIGURATION
+# URL CONFIGURATION
 # ==========================================
 
 ROOT_URLCONF = "config.urls"
@@ -108,7 +128,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
 
         "DIRS": [
-            BASE_DIR / "templates"
+            BASE_DIR / "templates",
         ],
 
         "APP_DIRS": True,
@@ -126,7 +146,7 @@ TEMPLATES = [
 
 
 # ==========================================
-# WSGI APPLICATION
+# WSGI
 # ==========================================
 
 WSGI_APPLICATION = "config.wsgi.application"
@@ -136,12 +156,33 @@ WSGI_APPLICATION = "config.wsgi.application"
 # DATABASE
 # ==========================================
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    ""
+).strip()
+
+if DATABASE_URL:
+
+    # Neon PostgreSQL on Render
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=0,
+        )
     }
-}
+
+    # Supports Neon's pooled connections
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+
+else:
+
+    # SQLite for local development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # ==========================================
@@ -193,7 +234,7 @@ USE_TZ = True
 # STATIC FILES
 # ==========================================
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -205,17 +246,37 @@ STATICFILES_DIRS = (
 
 
 # ==========================================
+# WHITENOISE STORAGE FOR RENDER
+# ==========================================
+
+if not DEBUG:
+
+    STORAGES = {
+
+        "default": {
+            "BACKEND": (
+                "django.core.files.storage."
+                "FileSystemStorage"
+            ),
+        },
+
+        "staticfiles": {
+            "BACKEND": (
+                "whitenoise.storage."
+                "CompressedManifestStaticFilesStorage"
+            ),
+        },
+    }
+
+
+# ==========================================
 # AUTHENTICATION
 # ==========================================
 
 LOGIN_URL = "login"
 
-# Regular users go to the Weather Dashboard.
-# The role middleware redirects Admin accounts
-# to the separate Admin Dashboard.
 LOGIN_REDIRECT_URL = "dashboard"
 
-# After logout, return to the public homepage.
 LOGOUT_REDIRECT_URL = "home"
 
 
@@ -233,7 +294,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CACHES = {
     "default": {
         "BACKEND": (
-            "django.core.cache.backends.locmem.LocMemCache"
+            "django.core.cache.backends.locmem."
+            "LocMemCache"
         ),
         "LOCATION": "skyaware-ph-cache",
     }
