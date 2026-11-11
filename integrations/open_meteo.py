@@ -1,11 +1,31 @@
 
+import os
+import logging
 import requests
 
 from django.core.cache import cache
 
 
-GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
-FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
+logger = logging.getLogger(__name__)
+
+GEOCODING_URL = (
+    "https://geocoding-api.open-meteo.com/v1/search"
+)
+
+FORECAST_URL = (
+    "https://api.open-meteo.com/v1/forecast"
+)
+
+VISUAL_CROSSING_URL = (
+    "https://weather.visualcrossing.com/"
+    "VisualCrossingWebServices/rest/services/timeline"
+)
+
+# Cache successful weather data for 15 minutes.
+WEATHER_CACHE_SECONDS = 900
+
+# Avoid repeating Open-Meteo requests during rate limits.
+RATE_LIMIT_COOLDOWN = 3600
 
 
 WEATHER_CODES = {
@@ -40,17 +60,40 @@ WEATHER_CODES = {
 }
 
 
+VISUAL_ICONS = {
+    "clear-day": (0, "Clear sky", "☀️"),
+    "clear-night": (0, "Clear sky", "🌙"),
+    "partly-cloudy-day": (2, "Partly cloudy", "⛅"),
+    "partly-cloudy-night": (2, "Partly cloudy", "☁️"),
+    "cloudy": (3, "Cloudy", "☁️"),
+    "rain": (61, "Rainy", "🌧️"),
+    "showers-day": (80, "Rain showers", "🌦️"),
+    "showers-night": (80, "Rain showers", "🌧️"),
+    "thunder-rain": (95, "Thunderstorm", "⛈️"),
+    "thunder-showers-day": (95, "Thunderstorm", "⛈️"),
+    "thunder-showers-night": (95, "Thunderstorm", "⛈️"),
+    "fog": (45, "Fog", "🌫️"),
+    "snow": (71, "Snow", "❄️"),
+    "snow-showers-day": (85, "Snow showers", "❄️"),
+    "snow-showers-night": (85, "Snow showers", "❄️"),
+    "wind": (2, "Windy", "💨"),
+}
+
+
 def get_weather_description(code):
     return WEATHER_CODES.get(
-        code, ("Unknown conditions", "🌡️")
+        code,
+        ("Unknown conditions", "🌡️"),
     )
 
 
 def search_city(city_name):
     """
-    Search for a city in the Philippines.
+    Existing Open-Meteo geocoding helper.
+    Retained for compatibility.
     """
     cache_key = f"weather_city_{city_name.lower().strip()}"
+
     cached = cache.get(cache_key)
 
     if cached is not None:
@@ -66,7 +109,7 @@ def search_city(city_name):
     response = requests.get(
         GEOCODING_URL,
         params=params,
-        timeout=10
+        timeout=10,
     )
     response.raise_for_status()
 
@@ -75,30 +118,26 @@ def search_city(city_name):
     if not results:
         return None
 
-    # Prefer an exact city-name match when possible.
     city = next(
         (
-            result for result in results
+            result
+            for result in results
             if result["name"].casefold()
             == city_name.strip().casefold()
         ),
-        results[0]
+        results[0],
     )
 
     cache.set(cache_key, city, 3600)
+
     return city
 
 
-def get_weather(latitude, longitude):
+def get_open_meteo_weather(latitude, longitude):
     """
-    Retrieve current weather and 7-day forecast.
+    Primary weather provider.
+    Returns the existing SkyAware PH format.
     """
-    cache_key = f"weather_{latitude}_{longitude}"
-    cached = cache.get(cache_key)
-
-    if cached is not None:
-        return cached
-
     params = {
         "latitude": latitude,
         "longitude": longitude,
@@ -123,14 +162,36 @@ def get_weather(latitude, longitude):
     response = requests.get(
         FORECAST_URL,
         params=params,
-        timeout=15
+        timeout=15,
     )
+
+    # Respect the provider's rate limit.
+    if response.status_code == 429:
+        cache.set(
+            "skyaware:open_meteo:rate_limited",
+            True,
+            RATE_LIMIT_COOLDOWN,
+        )
+
+        logger.warning(
+            "Open-Meteo returned HTTP 429. "
+            "Switching to backup weather provider."
+        )
+
+        return None
+
     response.raise_for_status()
 
     data = response.json()
 
-    current = data.get("current", {})
-    daily = data.get("daily", {})
+    current = data.get("current") or {}
+    daily = data.get("daily") or {}
+
+    if (
+        current.get("temperature_2m") is None
+        or not daily.get("time")
+    ):
+        return None
 
     description, icon = get_weather_description(
         current.get("weather_code")
@@ -138,32 +199,213 @@ def get_weather(latitude, longitude):
 
     forecast = []
 
-    dates = daily.get("time", [])
+    for index, date in enumerate(daily["time"][:7]):
 
-    for i, date in enumerate(dates):
-        code = daily["weather_code"][i]
-        day_description, day_icon = get_weather_description(code)
+        code = daily["weather_code"][index]
+
+        day_description, day_icon = (
+            get_weather_description(code)
+        )
 
         forecast.append({
             "date": date,
             "description": day_description,
             "icon": day_icon,
-            "max_temp": daily["temperature_2m_max"][i],
-            "min_temp": daily["temperature_2m_min"][i],
+            "max_temp": (
+                daily["temperature_2m_max"][index]
+            ),
+            "min_temp": (
+                daily["temperature_2m_min"][index]
+            ),
             "rain_probability": (
-                daily["precipitation_probability_max"][i]
+                daily["precipitation_probability_max"][index]
             ),
         })
 
-    result = {
+    return {
         "current": current,
         "description": description,
         "icon": icon,
         "forecast": forecast,
         "timezone": data.get("timezone"),
+        "source": "Open-Meteo",
     }
 
-    # Cache results for 10 minutes.
-    cache.set(cache_key, result, 600)
+
+def get_visual_crossing_weather(latitude, longitude):
+    """
+    Backup provider for current weather
+    and seven-day forecasts.
+    """
+    api_key = os.getenv(
+        "VISUAL_CROSSING_API_KEY",
+        "",
+    ).strip()
+
+    if not api_key:
+        logger.warning(
+            "Visual Crossing API key is missing."
+        )
+        return None
+
+    location = f"{latitude},{longitude}"
+
+    url = f"{VISUAL_CROSSING_URL}/{location}"
+
+    params = {
+        "key": api_key,
+        "unitGroup": "metric",
+        "include": "current,days",
+        "contentType": "json",
+        "lang": "en",
+    }
+
+    try:
+        response = requests.get(
+            url,
+            params=params,
+            timeout=15,
+        )
+
+        # Avoid logging the response URL because
+        # its query string contains the API key.
+        if response.status_code != 200:
+            logger.warning(
+                "Visual Crossing returned HTTP %s",
+                response.status_code,
+            )
+            return None
+
+        data = response.json()
+
+    except (requests.RequestException, ValueError) as exc:
+        logger.warning(
+            "Visual Crossing request failed: %s",
+            type(exc).__name__,
+        )
+        return None
+
+    current_data = data.get("currentConditions") or {}
+    days = data.get("days") or []
+
+    if current_data.get("temp") is None or not days:
+        logger.warning(
+            "Visual Crossing returned incomplete weather data."
+        )
+        return None
+
+    condition_code, description, icon = VISUAL_ICONS.get(
+        current_data.get("icon"),
+        (None, "Weather conditions", "🌤️"),
+    )
+
+    current_time = current_data.get("datetime", "")
+
+    if current_time and days:
+        current_time = (
+            f"{days[0].get('datetime', '')}T"
+            f"{current_time}"
+        )
+
+    current = {
+        "temperature_2m": current_data.get("temp"),
+        "relative_humidity_2m": current_data.get("humidity"),
+        "apparent_temperature": current_data.get("feelslike"),
+        "precipitation": current_data.get("precip"),
+        "weather_code": condition_code,
+        "wind_speed_10m": current_data.get("windspeed"),
+        "time": current_time,
+    }
+
+    forecast = []
+
+    for day in days[:7]:
+
+        _, day_description, day_icon = VISUAL_ICONS.get(
+            day.get("icon"),
+            (None, "Weather conditions", "🌤️"),
+        )
+
+        forecast.append({
+            "date": day.get("datetime"),
+            "description": day.get(
+                "conditions",
+                day_description,
+            ),
+            "icon": day_icon,
+            "max_temp": day.get("tempmax"),
+            "min_temp": day.get("tempmin"),
+            "rain_probability": day.get("precipprob"),
+        })
+
+    return {
+        "current": current,
+        "description": current_data.get(
+            "conditions",
+            description,
+        ),
+        "icon": icon,
+        "forecast": forecast,
+        "timezone": data.get(
+            "timezone",
+            "Asia/Manila",
+        ),
+        "source": "Visual Crossing",
+    }
+
+
+def get_weather(latitude, longitude):
+    """
+    Shared weather entry point.
+
+    1. Try cached weather.
+    2. Use Open-Meteo when available.
+    3. Fall back to Visual Crossing.
+    """
+    try:
+        lat = float(latitude)
+        lon = float(longitude)
+    except (ValueError, TypeError):
+        return None
+
+    # Use rounded coordinates for shared caching.
+    cache_key = f"skyaware:weather:v3:{lat:.5f}:{lon:.5f}"
+
+    cached = cache.get(cache_key)
+
+    if cached is not None:
+        return cached
+
+    result = None
+
+    rate_limited = cache.get(
+        "skyaware:open_meteo:rate_limited"
+    )
+
+    if not rate_limited:
+        try:
+            result = get_open_meteo_weather(
+                lat,
+                lon,
+            )
+
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning(
+                "Open-Meteo unavailable: %s",
+                type(exc).__name__,
+            )
+
+    if result is None:
+        result = get_visual_crossing_weather(
+            lat,
+            lon,
+        )
+
+    if result is not None:
+        cache.set(
+            cache_key,
+            result,
+            WEATHER_CACHE_SECONDS,
+        )
 
     return result
