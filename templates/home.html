@@ -11,30 +11,35 @@
         --muted: #64748b;
     }
 
+    /* ==================================
+       HERO SECTION
+    ================================== */
+
     .home-page .hero-section {
+        position: relative;
+        overflow: hidden;
         background: linear-gradient(
-            120deg,
+            115deg,
             #102f54 0%,
-            #15508b 55%,
+            #164c84 55%,
             #1976d2 100%
         );
         color: white;
         border-radius: 24px;
-        padding: 65px 50px;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 35px;
+        padding: 60px 45px;
+        margin-bottom: 28px;
     }
 
-    .home-page .hero-section::before {
+    .home-page .hero-section::after {
         content: "";
         position: absolute;
-        width: 350px;
-        height: 350px;
-        right: -100px;
+        width: 300px;
+        height: 300px;
+        right: -90px;
         top: -120px;
-        border-radius: 50%;
         background: rgba(255,255,255,.05);
+        border-radius: 50%;
+        pointer-events: none;
     }
 
     .home-page .hero-content {
@@ -46,39 +51,41 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        border-radius: 30px;
-        padding: 9px 16px;
-        background: rgba(255,255,255,.15);
-        border: 1px solid rgba(255,255,255,.2);
-        font-size: 13px;
-        font-weight: 600;
+        padding: 8px 15px;
         margin-bottom: 24px;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.20);
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
     }
 
     .home-page .hero-title {
-        font-size: clamp(32px, 4vw, 52px);
+        font-size: clamp(34px, 4vw, 52px);
+        line-height: 1.17;
         font-weight: 800;
-        line-height: 1.18;
-        margin-bottom: 22px;
         letter-spacing: -1px;
+        margin-bottom: 20px;
     }
 
     .home-page .hero-description {
         color: #dceaff;
-        font-size: 16px;
-        line-height: 1.8;
-        max-width: 620px;
-        margin-bottom: 28px;
+        font-size: 15px;
+        line-height: 1.85;
+        max-width: 590px;
+        margin-bottom: 25px;
     }
 
     .home-page .hero-actions {
         display: flex;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
 
     .home-page .hero-actions .btn {
-        padding: 13px 22px;
+        padding: 12px 21px;
+        border-radius: 9px;
         font-weight: 700;
     }
 
@@ -89,100 +96,123 @@
     }
 
     .home-page .hero-weather-icon {
-        font-size: 145px;
-        color: #ffdc83;
-        filter: drop-shadow(0 15px 35px rgba(0,0,0,.15));
+        font-size: 135px;
+        color: #ffda80;
     }
 
     .home-page .hero-visual-label {
-        color: #dceaff;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
+        color: #e2efff;
+        margin-top: 15px;
     }
+
+    /* ==================================
+       WEATHER SEARCH
+    ================================== */
 
     .home-page .search-panel {
-        background: #fff;
-        border: 1px solid #e5ebf3;
-        border-radius: 18px;
-        padding: 26px;
-        margin-bottom: 45px;
-        box-shadow: 0 6px 25px rgba(16,47,84,.04);
+        background: white;
+        border: 1px solid #e3eaf3;
+        border-radius: 17px;
+        padding: 25px;
+        margin-bottom: 38px;
+        box-shadow: 0 5px 20px rgba(16,47,84,.04);
     }
 
-    .home-page .search-panel h3 {
-        font-size: 20px;
+    .home-page .search-panel h2 {
         color: var(--navy);
+        font-size: 20px;
         font-weight: 800;
+        margin-bottom: 8px;
     }
 
     .home-page .search-panel p {
         color: var(--muted);
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .home-page .search-form {
         display: flex;
-        gap: 12px;
-        margin-top: 20px;
+        gap: 10px;
+        margin-top: 19px;
     }
 
     .home-page .search-form input {
         flex: 1;
         min-width: 0;
-        min-height: 49px;
+        min-height: 48px;
+        padding: 11px 15px;
         border: 1px solid #d7e1ed;
-        border-radius: 10px;
-        padding: 12px 15px;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .home-page .search-form input:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(23,105,194,.10);
     }
 
     .home-page .search-form button {
-        padding: 10px 24px;
+        padding: 10px 22px;
         font-weight: 700;
     }
 
+    /* ==================================
+       SECTION HEADINGS
+    ================================== */
+
     .home-page .section-heading {
-        margin-bottom: 25px;
+        margin-bottom: 24px;
     }
 
     .home-page .section-heading h2 {
-        color: var(--navy);
-        font-size: 27px;
+        font-size: 26px;
         font-weight: 800;
+        color: var(--navy);
+        margin-bottom: 8px;
     }
 
     .home-page .section-heading p {
         color: var(--muted);
         font-size: 14px;
+        line-height: 1.7;
+        margin: 0;
     }
 
+    /* ==================================
+       FEATURE CARDS
+    ================================== */
+
     .home-page .home-feature-card {
-        background: white;
-        border: 1px solid #e5ebf3;
-        border-radius: 18px;
-        padding: 27px;
-        height: 100%;
         display: flex;
         flex-direction: column;
+        height: 100%;
+        padding: 27px;
+        background: white;
+        border: 1px solid #e3eaf3;
+        border-radius: 17px;
         box-shadow: 0 5px 20px rgba(16,47,84,.035);
         transition: transform .2s, box-shadow .2s;
     }
 
     .home-page .home-feature-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 15px 35px rgba(16,47,84,.09);
+        box-shadow: 0 13px 28px rgba(16,47,84,.08);
     }
 
     .home-page .feature-icon {
-        width: 56px;
-        height: 56px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 15px;
+        width: 54px;
+        height: 54px;
+        margin-bottom: 19px;
+        border-radius: 14px;
         background: #e9f3ff;
         color: #1769c2;
-        font-size: 27px;
-        margin-bottom: 19px;
+        font-size: 25px;
     }
 
     .home-page .feature-icon.green {
@@ -206,69 +236,110 @@
     }
 
     .home-page .home-feature-card h3 {
-        font-size: 19px;
-        font-weight: 800;
         color: #17385d;
-        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 11px;
     }
 
     .home-page .home-feature-card p {
         color: var(--muted);
         font-size: 14px;
         line-height: 1.75;
-        margin-bottom: 22px;
+        margin-bottom: 20px;
     }
 
     .home-page .feature-link {
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        margin-top: auto;
         color: #1769c2;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
         text-decoration: none;
-        margin-top: auto;
     }
 
     .home-page .feature-link:hover {
+        color: #0d4f9a;
         text-decoration: underline;
     }
 
+    /* ==================================
+       SHORT ABOUT SECTION
+    ================================== */
+
     .home-page .about-section {
         background: white;
-        border: 1px solid #e5ebf3;
+        border: 1px solid #e3eaf3;
         border-radius: 20px;
         padding: 40px;
-        margin: 40px 0 30px;
+        margin: 35px 0 28px;
+        box-shadow: 0 5px 20px rgba(16,47,84,.03);
     }
 
-    .home-page .about-section h2 {
+    .home-page .about-heading {
         color: var(--navy);
         font-size: 27px;
         font-weight: 800;
         margin-bottom: 17px;
     }
 
-    .home-page .about-section p {
+    .home-page .about-description {
         color: var(--muted);
         font-size: 14px;
         line-height: 1.9;
+        max-width: 790px;
+        margin-bottom: 23px;
+    }
+
+    .home-page .about-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 19px;
+        background: var(--blue);
+        border: 1px solid var(--blue);
+        border-radius: 9px;
+        color: white;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: background .2s, transform .2s;
+    }
+
+    .home-page .about-button:hover {
+        background: #10549e;
+        border-color: #10549e;
+        color: white;
+        transform: translateY(-2px);
     }
 
     .home-page .about-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #1769c2;
-        font-size: 100px;
+        font-size: 105px;
     }
+
+    /* ==================================
+       SAFETY REMINDER
+    ================================== */
 
     .home-page .safety-notice {
         background: #e9f3ff;
         border: 1px solid #d1e5fc;
-        border-radius: 14px;
-        padding: 20px;
+        border-radius: 13px;
+        padding: 18px 21px;
         color: #305a86;
         font-size: 13px;
         line-height: 1.8;
     }
+
+    /* ==================================
+       RESPONSIVE DESIGN
+    ================================== */
 
     @media (max-width: 991px) {
         .home-page .hero-section {
@@ -279,6 +350,11 @@
     @media (max-width: 575px) {
         .home-page .hero-section {
             padding: 35px 23px;
+            border-radius: 17px;
+        }
+
+        .home-page .hero-title {
+            font-size: 33px;
         }
 
         .home-page .search-form {
@@ -294,7 +370,16 @@
         }
 
         .home-page .about-section {
-            padding: 25px;
+            padding: 25px 22px;
+        }
+
+        .home-page .about-heading {
+            font-size: 23px;
+        }
+
+        .home-page .about-button {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -305,7 +390,10 @@
 
 <div class="home-page">
 
+    <!-- ================================== -->
     <!-- HERO SECTION -->
+    <!-- ================================== -->
+
     <section class="hero-section">
 
         <div class="row align-items-center g-4">
@@ -315,24 +403,33 @@
                 <div class="hero-content">
 
                     <span class="hero-badge">
+
                         <i class="bi bi-shield-check"></i>
-                        Weather & Disaster Information Portal
+
+                        Weather &amp; Disaster Information Portal
+
                     </span>
 
                     <h1 class="hero-title">
+
                         Stay Informed.
                         <br>
+
                         Stay Prepared.
                         <br>
+
                         Stay Safe.
+
                     </h1>
 
                     <p class="hero-description">
+
                         SkyAware PH brings together weather forecasts,
                         air quality monitoring, earthquake updates,
                         natural event information, and AI-powered
                         disaster preparedness guidance in one
                         convenient platform for the Philippines.
+
                     </p>
 
                     <div class="hero-actions">
@@ -372,6 +469,7 @@
 
             </div>
 
+
             <div class="col-lg-4 d-none d-lg-block">
 
                 <div class="hero-visual">
@@ -379,7 +477,7 @@
                     <i class="bi bi-cloud-sun-fill hero-weather-icon"></i>
 
                     <p class="hero-visual-label">
-                        Your Weather & Safety Companion
+                        Your Weather &amp; Safety Companion
                     </p>
 
                 </div>
@@ -391,13 +489,16 @@
     </section>
 
 
-    <!-- CITY SEARCH -->
+    <!-- ================================== -->
+    <!-- SEARCH WEATHER -->
+    <!-- ================================== -->
+
     <section class="search-panel">
 
-        <h3>
+        <h2>
             <i class="bi bi-search text-primary me-2"></i>
             Search Weather by City
-        </h3>
+        </h2>
 
         <p class="mb-2">
             Find weather information for a Philippine city or town.
@@ -419,8 +520,10 @@
             >
 
             <button type="submit" class="btn btn-primary">
+
                 <i class="bi bi-search me-2"></i>
                 Search Weather
+
             </button>
 
         </form>
@@ -432,8 +535,11 @@
     </section>
 
 
-    <!-- FEATURES -->
-    <section>
+    <!-- ================================== -->
+    <!-- FEATURES SECTION -->
+    <!-- ================================== -->
+
+    <section id="features">
 
         <div class="section-heading">
 
@@ -479,7 +585,7 @@
             </div>
 
 
-            <!-- AIR QUALITY -->
+            <!-- AIR QUALITY MONITORING -->
             <div class="col-md-6 col-xl-4">
 
                 <div class="home-feature-card">
@@ -509,7 +615,7 @@
             </div>
 
 
-            <!-- EARTHQUAKES -->
+            <!-- EARTHQUAKE UPDATES -->
             <div class="col-md-6 col-xl-4">
 
                 <div class="home-feature-card">
@@ -539,7 +645,7 @@
             </div>
 
 
-            <!-- AI ASSISTANT -->
+            <!-- AI SAFETY ASSISTANT -->
             <div class="col-md-6 col-xl-4">
 
                 <div class="home-feature-card">
@@ -581,9 +687,11 @@
                     <h3>Saved Locations</h3>
 
                     <p>
-                        Save frequently searched cities and
-                        manage favorite locations using
-                        add, view, edit, and delete features.
+                        Save frequently searched cities
+                        and access weather forecasts
+                        or air quality information quickly.
+                        Manage locations using add, edit,
+                        and delete functions.
                     </p>
 
                     {% if user.is_authenticated %}
@@ -613,7 +721,7 @@
             </div>
 
 
-            <!-- NASA NATURAL EVENTS -->
+            <!-- NATURAL EVENTS -->
             <div class="col-md-6 col-xl-4">
 
                 <div class="home-feature-card">
@@ -648,43 +756,51 @@
     </section>
 
 
-    <!-- ABOUT -->
+    <!-- ================================== -->
+    <!-- SHORT ABOUT PREVIEW -->
+    <!-- ================================== -->
+
     <section class="about-section">
 
         <div class="row align-items-center g-4">
 
             <div class="col-lg-8">
 
-                <h2>About SkyAware PH</h2>
+                <h2 class="about-heading">
+                    About SkyAware PH
+                </h2>
 
-                <p>
+                <p class="about-description">
+
                     SkyAware PH is a weather and disaster
                     information portal designed to help
-                    residents in the Philippines access
-                    useful environmental information and
-                    disaster preparedness resources.
+                    Filipinos stay informed and prepared.
+                    It provides weather forecasts, air quality
+                    monitoring, earthquake updates, natural
+                    event information, and AI-powered safety
+                    guidance in one convenient platform.
+
                 </p>
 
-                <p>
-                    The platform combines information from
-                    external services to provide weather
-                    forecasts, air quality data, earthquake
-                    reports, natural event records, and
-                    AI-assisted safety guidance.
-                </p>
+                <a
+                    href="{% url 'about' %}"
+                    class="about-button"
+                >
 
-                <p class="mb-0">
-                    Its goal is to make important information
-                    easier to access and understand,
-                    helping users stay informed and
-                    better prepared for potential hazards.
-                </p>
+                    Learn More About Us
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
 
             </div>
 
-            <div class="col-lg-4 text-center d-none d-lg-block">
 
-                <i class="bi bi-shield-check about-icon"></i>
+            <div class="col-lg-4 d-none d-lg-block">
+
+                <div class="about-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
 
             </div>
 
@@ -693,16 +809,22 @@
     </section>
 
 
-    <!-- SAFETY NOTICE -->
+    <!-- ================================== -->
+    <!-- IMPORTANT SAFETY REMINDER -->
+    <!-- ================================== -->
+
     <div class="safety-notice">
 
         <strong>
+
             <i class="bi bi-info-circle me-2"></i>
+
             Important Safety Reminder:
+
         </strong>
 
-        SkyAware PH provides information from external sources
-        and general disaster preparedness guidance.
+        SkyAware PH provides information from external
+        sources and general disaster preparedness guidance.
         It does not replace official emergency alerts.
         Always follow local authorities, PAGASA, and PHIVOLCS.
 

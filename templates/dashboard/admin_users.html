@@ -1,0 +1,334 @@
+
+{% extends 'admin_base.html' %}
+
+{% block title %}Manage Users | SkyAware PH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .users-heading {
+        color: #17385d;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .users-subtitle {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .users-stat {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px;
+        background: #f3f8ff;
+        border: 1px solid #e4edf9;
+        border-radius: 12px;
+    }
+
+    .users-stat-icon {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: #e2efff;
+        color: #1769c2;
+        font-size: 25px;
+        flex-shrink: 0;
+    }
+
+    .users-stat-value {
+        color: #102f54;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .users-search {
+        max-width: 550px;
+    }
+
+    .users-table th {
+        color: #7d8da1;
+        font-size: 11px;
+        text-transform: uppercase;
+        padding: 14px;
+        white-space: nowrap;
+    }
+
+    .users-table td {
+        padding: 14px;
+        font-size: 13px;
+        vertical-align: middle;
+        border-color: #edf1f5;
+    }
+
+    .account-name {
+        color: #17385d;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .account-email {
+        color: #8290a3;
+        font-size: 11px;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 575px) {
+        .users-heading {
+            font-size: 24px;
+        }
+
+        .users-stat {
+            padding: 17px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+
+    <div>
+        <h1 class="users-heading">
+            <i class="bi bi-people text-primary me-2"></i>
+            Manage Users
+        </h1>
+
+        <p class="users-subtitle mb-0">
+            View registered users and manage their account details.
+        </p>
+    </div>
+
+    <a
+        href="{% url 'admin_dashboard' %}"
+        class="btn btn-outline-primary"
+    >
+        <i class="bi bi-arrow-left me-1"></i>
+        Dashboard
+    </a>
+
+</div>
+
+
+<!-- REGISTERED USER COUNT -->
+<div class="admin-card mb-4">
+
+    <div class="users-stat">
+
+        <div class="users-stat-icon">
+            <i class="bi bi-people-fill"></i>
+        </div>
+
+        <div>
+            <div class="users-stat-value">
+                {{ total_users }}
+            </div>
+
+            <div class="users-subtitle">
+                Registered Regular Users
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- USER MANAGEMENT TABLE -->
+<section class="admin-card">
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+
+        <div>
+            <h2 class="admin-section-title">
+                User Accounts
+            </h2>
+
+            <p class="admin-section-subtitle mb-0">
+                Search for a user to edit account details
+                or reset a password.
+            </p>
+        </div>
+
+        <span class="badge bg-primary">
+            {{ page_obj.paginator.count }} Results
+        </span>
+
+    </div>
+
+
+    <!-- SEARCH FORM -->
+    <form method="get" class="users-search mb-4">
+
+        <div class="input-group">
+
+            <input
+                type="search"
+                name="q"
+                class="form-control"
+                placeholder="Search name, username or email..."
+                value="{{ query }}"
+                maxlength="100"
+                aria-label="Search users"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                <i class="bi bi-search me-1"></i>
+                Search
+            </button>
+
+        </div>
+
+        {% if query %}
+
+        <a
+            href="{% url 'admin_users' %}"
+            class="small d-inline-block mt-2"
+        >
+            Clear Search
+        </a>
+
+        {% endif %}
+
+    </form>
+
+
+    <!-- USER ACCOUNTS TABLE -->
+    <div class="table-responsive">
+
+        <table class="table users-table">
+
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Date Joined</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for account in accounts %}
+
+                <tr>
+
+                    <!-- USERNAME AND EMAIL -->
+                    <td>
+                        <div class="account-name">
+                            {{ account.username }}
+                        </div>
+
+                        <div class="account-email">
+                            {{ account.email|default:"No email provided" }}
+                        </div>
+                    </td>
+
+                    <!-- ROLE -->
+                    <td>
+                        <span class="badge bg-secondary">
+                            User
+                        </span>
+                    </td>
+
+                    <!-- DATE JOINED -->
+                    <td class="text-muted">
+                        {{ account.date_joined|date:"M d, Y" }}
+                    </td>
+
+                    <!-- MANAGE -->
+                    <td class="text-end">
+
+                        <a
+                            href="{% url 'admin_user_detail' account.pk %}"
+                            class="btn btn-outline-primary btn-sm"
+                        >
+                            <i class="bi bi-pencil-square me-1"></i>
+                            Manage
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td
+                        colspan="4"
+                        class="text-center text-muted py-5"
+                    >
+                        <i class="bi bi-person-x fs-2 d-block mb-2"></i>
+                        No registered users found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+    {% if page_obj.paginator.num_pages > 1 %}
+
+    <nav aria-label="User pagination" class="mt-4">
+
+        <ul class="pagination justify-content-center flex-wrap">
+
+            {% if page_obj.has_previous %}
+
+            <li class="page-item">
+                <a
+                    class="page-link"
+                    href="?q={{ query|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
+                >
+                    Previous
+                </a>
+            </li>
+
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">
+                    {{ page_obj.number }}
+                    of
+                    {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+
+            <li class="page-item">
+                <a
+                    class="page-link"
+                    href="?q={{ query|urlencode }}&amp;page={{ page_obj.next_page_number }}"
+                >
+                    Next
+                </a>
+            </li>
+
+            {% endif %}
+
+        </ul>
+
+    </nav>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

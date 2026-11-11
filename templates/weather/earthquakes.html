@@ -5,8 +5,11 @@
 {% block title %}Earthquake Updates | SkyAware PH{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/maplibre-gl@6.16.0/dist/maplibre-gl.css">
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/maplibre-gl@6.16.0/dist/maplibre-gl.css"
+>
 
 <style>
     .eq-page {
@@ -17,7 +20,7 @@
 
     .eq-page .page-title {
         color: var(--navy);
-        font-size: 28px;
+        font-size: 27px;
         font-weight: 800;
     }
 
@@ -30,12 +33,60 @@
     .eq-page .stat-card,
     .eq-page .map-card,
     .eq-page .quake-card,
-    .eq-page .source-card {
+    .eq-page .source-card,
+    .eq-page .filter-card {
         background: white;
         border: 1px solid #e2eaf3;
         border-radius: 16px;
         box-shadow: 0 4px 18px rgba(16,47,84,.04);
     }
+
+    /* SEARCH FILTERS */
+
+    .eq-page .filter-card {
+        padding: 23px;
+        margin-bottom: 25px;
+    }
+
+    .eq-page .filter-heading {
+        color: var(--navy);
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .eq-page .filter-label {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .eq-page .filter-select {
+        min-height: 45px;
+        border: 1px solid #d7e1ed;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .eq-page .filter-select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(23,105,194,.10);
+    }
+
+    .eq-page .filter-actions {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+    .eq-page .filter-actions .btn {
+        min-height: 45px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    /* SUMMARY */
 
     .eq-page .stat-card {
         padding: 23px;
@@ -43,8 +94,8 @@
     }
 
     .eq-page .stat-label {
-        font-size: 12px;
         color: var(--muted);
+        font-size: 12px;
     }
 
     .eq-page .stat-number {
@@ -59,18 +110,20 @@
         font-size: 12px;
     }
 
+    /* MAP */
+
     .eq-page .map-card {
         overflow: hidden;
         margin-bottom: 30px;
     }
 
     .eq-page .map-header {
-        padding: 23px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 12px;
+        padding: 23px;
     }
 
     .eq-page .map-header h2 {
@@ -85,8 +138,8 @@
         color: var(--blue);
         font-size: 12px;
         font-weight: 700;
-        border-radius: 8px;
         padding: 9px 13px;
+        border-radius: 8px;
     }
 
     .eq-page #earthquakeMap {
@@ -96,10 +149,10 @@
     }
 
     .eq-page #mapError {
-        padding: 15px 20px;
-        color: #8b4f0d;
         background: #fff4df;
+        color: #8b4f0d;
         border-top: 1px solid #f6deb0;
+        padding: 14px 20px;
         font-size: 13px;
     }
 
@@ -129,11 +182,67 @@
         margin-right: 5px;
     }
 
+    /* EARTHQUAKE MARKERS */
+
+    .eq-pin {
+        width: 39px;
+        height: 39px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 3px 12px rgba(0,0,0,.3);
+    }
+
+    .eq-pin:hover {
+        transform: scale(1.1);
+    }
+
+    .eq-popup {
+        min-width: 200px;
+        max-width: 275px;
+        font-family: Arial, sans-serif;
+    }
+
+    .eq-popup h3 {
+        color: #102f54;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .eq-popup p {
+        font-size: 12px;
+        color: #475569;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .eq-popup .popup-link {
+        display: block;
+        margin-top: 10px;
+        background: #1769c2;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        padding: 9px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* REPORTS */
+
     .eq-page .quake-card {
-        height: 100%;
-        padding: 24px;
         display: flex;
         flex-direction: column;
+        height: 100%;
+        padding: 24px;
+    }
+
+    .eq-page .quake-card:hover {
+        box-shadow: 0 12px 25px rgba(16,47,84,.08);
     }
 
     .eq-page .quake-magnitude {
@@ -198,69 +307,27 @@
         line-height: 1.8;
     }
 
-    /* MAP MARKERS */
-    .eq-pin {
-        width: 39px;
-        height: 39px;
-        border-radius: 50%;
-        border: 3px solid white;
-        color: white;
-        font-size: 12px;
-        font-weight: 800;
-        cursor: pointer;
-        box-shadow: 0 3px 12px rgba(0,0,0,.3);
-    }
-
-    .eq-pin:hover {
-        transform: scale(1.1);
-    }
-
-    .eq-popup {
-        min-width: 200px;
-        max-width: 275px;
-        font-family: Arial, sans-serif;
-    }
-
-    .eq-popup h3 {
-        color: #102f54;
-        font-size: 17px;
-        font-weight: 800;
-    }
-
-    .eq-popup p {
-        font-size: 12px;
-        line-height: 1.7;
-        color: #475569;
-    }
-
-    .eq-popup .popup-link {
-        display: block;
-        background: #1769c2;
-        color: white;
-        text-align: center;
-        text-decoration: none;
-        padding: 9px;
-        border-radius: 7px;
-        margin-top: 10px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
     @media (max-width: 767px) {
         .eq-page #earthquakeMap {
             height: 330px;
         }
 
         .eq-page .page-title {
-            font-size: 24px;
+            font-size: 23px;
         }
 
+        .eq-page .filter-card,
         .eq-page .map-header,
         .eq-page .quake-card {
             padding: 19px;
         }
+
+        .eq-page .filter-actions .btn {
+            flex: 1;
+        }
     }
 </style>
+
 {% endblock %}
 
 
@@ -277,31 +344,160 @@
         </h1>
 
         <p class="subtitle">
-            Monitor recent earthquake activity in and
-            around the Philippines using USGS data.
+            Monitor recent earthquake activity
+            in and around the Philippines using USGS data.
         </p>
 
     </div>
 
-    <!-- SAFETY NOTICE -->
-    <div class="alert alert-info mb-4">
 
-        <i class="bi bi-info-circle me-2"></i>
+    <!-- SEARCH FILTERS -->
+    <section class="filter-card">
 
-        <strong>Important Notice:</strong>
-        Earthquake records are not predictions or
-        official emergency warnings.
+        <div class="mb-4">
 
-        For official Philippine bulletins, visit
+            <h2 class="filter-heading">
 
-        <a href="https://www.phivolcs.dost.gov.ph/"
-           target="_blank"
-           rel="noopener noreferrer">PHIVOLCS</a>.
+                <i class="bi bi-funnel text-primary me-2"></i>
 
-    </div>
+                Filter Earthquake Reports
+
+            </h2>
+
+            <p class="subtitle mb-0">
+                Choose a reporting period and
+                minimum earthquake magnitude.
+            </p>
+
+        </div>
+
+
+        <form
+            method="get"
+            action="{% url 'earthquake_updates' %}"
+        >
+
+            <div class="row g-3 align-items-end">
+
+                <!-- REPORTING PERIOD -->
+                <div class="col-md-4">
+
+                    <label
+                        for="earthquakeDays"
+                        class="form-label filter-label"
+                    >
+                        Reporting Period
+                    </label>
+
+                    <select
+                        id="earthquakeDays"
+                        name="days"
+                        class="form-select filter-select"
+                    >
+
+                        <option value="1"
+                            {% if selected_days == 1 %}selected{% endif %}
+                        >
+                            Last 24 Hours
+                        </option>
+
+                        <option value="7"
+                            {% if selected_days == 7 %}selected{% endif %}
+                        >
+                            Last 7 Days
+                        </option>
+
+                        <option value="14"
+                            {% if selected_days == 14 %}selected{% endif %}
+                        >
+                            Last 14 Days
+                        </option>
+
+                        <option value="30"
+                            {% if selected_days == 30 %}selected{% endif %}
+                        >
+                            Last 30 Days
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- MAGNITUDE -->
+                <div class="col-md-4">
+
+                    <label
+                        for="earthquakeMagnitude"
+                        class="form-label filter-label"
+                    >
+                        Minimum Magnitude
+                    </label>
+
+                    <select
+                        id="earthquakeMagnitude"
+                        name="min_magnitude"
+                        class="form-select filter-select"
+                    >
+
+                        <option value="2.5"
+                            {% if selected_magnitude == 2.5 %}selected{% endif %}
+                        >
+                            Magnitude 2.5+
+                        </option>
+
+                        <option value="4.0"
+                            {% if selected_magnitude == 4.0 %}selected{% endif %}
+                        >
+                            Magnitude 4.0+
+                        </option>
+
+                        <option value="6.0"
+                            {% if selected_magnitude == 6.0 %}selected{% endif %}
+                        >
+                            Magnitude 6.0+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="col-md-4">
+
+                    <div class="filter-actions">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            <i class="bi bi-search me-1"></i>
+                            Apply Filters
+                        </button>
+
+                        <a
+                            href="{% url 'earthquake_updates' %}"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
 
     {% if error %}
     <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
         {{ error }}
     </div>
     {% endif %}
@@ -309,11 +505,12 @@
 
     {% if earthquake_data %}
 
-    <!-- SUMMARY CARDS -->
+    <!-- THREE SUMMARY CARDS -->
     <div class="row g-3 mb-4">
 
         <div class="col-md-4">
             <div class="stat-card">
+
                 <div class="stat-label">
                     <i class="bi bi-activity me-1"></i>
                     Earthquakes Displayed
@@ -326,11 +523,14 @@
                 <div class="stat-note">
                     Up to 50 matching events
                 </div>
+
             </div>
         </div>
 
+
         <div class="col-md-4">
             <div class="stat-card">
+
                 <div class="stat-label">
                     <i class="bi bi-speedometer2 me-1"></i>
                     Minimum Magnitude
@@ -341,63 +541,84 @@
                 </div>
 
                 <div class="stat-note">
-                    Search filter
+                    Selected magnitude threshold
                 </div>
+
             </div>
         </div>
 
+
         <div class="col-md-4">
             <div class="stat-card">
+
                 <div class="stat-label">
                     <i class="bi bi-calendar-week me-1"></i>
                     Search Period
                 </div>
 
                 <div class="stat-number">
-                    {{ earthquake_data.days }} Days
+
+                    {% if earthquake_data.days == 1 %}
+                        24 Hours
+                    {% else %}
+                        {{ earthquake_data.days }} Days
+                    {% endif %}
+
                 </div>
 
                 <div class="stat-note">
-                    Reporting period
+                    Selected reporting period
                 </div>
+
             </div>
         </div>
 
     </div>
 
 
-    <!-- LAST UPDATED -->
+    <!-- LAST RETRIEVED -->
     <p class="text-muted small mb-4">
+
         <i class="bi bi-clock-history me-1"></i>
+
         <strong>Last Retrieved:</strong>
+
         {{ earthquake_data.updated_at }}
         (Philippine Time)
+
     </p>
 
 
-    <!-- INTERACTIVE MAP -->
+    <!-- INTERACTIVE EARTHQUAKE MAP -->
     <section class="map-card" id="mapSection">
 
         <div class="map-header">
 
             <div>
+
                 <h2>
                     <i class="bi bi-geo-alt-fill text-danger me-2"></i>
                     Earthquake Location Map
                 </h2>
 
                 <p class="subtitle mb-0">
-                    Explore reported earthquake epicenters
-                    across the Philippines and nearby waters.
+                    Epicenters matching your selected
+                    reporting period and magnitude.
                 </p>
+
             </div>
 
             <span class="map-count">
+
                 <i class="bi bi-geo-alt me-1"></i>
-                <span id="markerCount">0</span> Plotted
+
+                <span id="markerCount">0</span>
+                Plotted
+
             </span>
 
         </div>
+
 
         <div
             id="earthquakeMap"
@@ -405,52 +626,70 @@
             aria-label="Interactive earthquake location map"
         ></div>
 
-        <!-- VISIBLE ERROR IF MAP FAILS -->
+
         <div id="mapError" role="alert" hidden>
+
             <i class="bi bi-exclamation-triangle me-2"></i>
+
             <span id="mapErrorText">
                 Map could not load.
             </span>
+
         </div>
+
 
         <div class="map-footer">
 
             <div class="legend">
+
                 <span>
-                    <span class="legend-dot"
-                          style="background:#1769c2;"></span>
+                    <span
+                        class="legend-dot"
+                        style="background:#1769c2;"
+                    ></span>
                     Below M 4.0
                 </span>
 
                 <span>
-                    <span class="legend-dot"
-                          style="background:#f0a43b;"></span>
+                    <span
+                        class="legend-dot"
+                        style="background:#f0a43b;"
+                    ></span>
                     M 4.0–5.9
                 </span>
 
                 <span>
-                    <span class="legend-dot"
-                          style="background:#dc3545;"></span>
+                    <span
+                        class="legend-dot"
+                        style="background:#dc3545;"
+                    ></span>
                     M 6.0+
                 </span>
+
             </div>
 
             <p class="subtitle mt-3 mb-1">
-                Select a marker to view its magnitude,
-                location, depth, date and time.
-                Use the zoom controls to explore.
+                Click a marker to view its magnitude,
+                location, date, time, and depth.
+                You can also zoom or drag the map.
             </p>
 
             <small class="text-muted">
-                Map: <a href="https://openfreemap.org/"
-                        target="_blank"
-                        rel="noopener noreferrer">OpenFreeMap</a>
+
+                Map:
+                <a
+                    href="https://openfreemap.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >OpenFreeMap</a>
+
                 · Data ©
-                <a href="https://www.openstreetmap.org/copyright"
-                   target="_blank"
-                   rel="noopener noreferrer">
-                    OpenStreetMap contributors
-                </a>
+                <a
+                    href="https://www.openstreetmap.org/copyright"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >OpenStreetMap contributors</a>
+
             </small>
 
         </div>
@@ -458,7 +697,7 @@
     </section>
 
 
-    <!-- HIDDEN DATA FOR MAP JAVASCRIPT -->
+    <!-- HIDDEN USGS RECORDS FOR MAP -->
     <div id="earthquakeMapData" hidden>
 
         {% for quake in earthquake_data.earthquakes %}
@@ -475,6 +714,7 @@
                 data-depth="{% if quake.depth != None %}{{ quake.depth|unlocalize }}{% endif %}"
                 data-date="{{ quake.date }}"
                 data-time="{{ quake.time }}"
+                data-url="{{ quake.url|default:'' }}"
             ></div>
 
             {% endif %}
@@ -488,9 +728,13 @@
     <section id="quakeReports">
 
         <h2 class="page-title fs-4 mb-4">
+
             <i class="bi bi-list-ul text-primary me-2"></i>
+
             Recent Earthquake Reports
+
         </h2>
+
 
         {% if earthquake_data.earthquakes %}
 
@@ -502,8 +746,8 @@
 
                 <article class="quake-card">
 
-                    <div class="d-flex align-items-center
-                                justify-content-between gap-2 mb-3">
+                    <!-- MAGNITUDE AND BADGE -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
 
                         <h3 class="quake-magnitude mb-0">
                             M {{ quake.magnitude|floatformat:1 }}
@@ -534,40 +778,56 @@
 
                     <!-- LOCATION -->
                     <div class="quake-location">
-                        <i class="bi bi-geo-alt-fill
-                                  text-danger me-1"></i>
+
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+
                         {{ quake.place }}
+
                     </div>
+
 
                     <hr>
 
 
                     <!-- DATE -->
                     <div class="quake-info">
+
                         <i class="bi bi-calendar-event"></i>
+
                         <strong>Date:</strong>
                         {{ quake.date }}
+
                     </div>
 
 
                     <!-- TIME -->
                     <div class="quake-info">
+
                         <i class="bi bi-clock"></i>
+
                         <strong>Time:</strong>
                         {{ quake.time }} PHT
+
                     </div>
 
 
                     <!-- DEPTH -->
                     <div class="quake-info">
+
                         <i class="bi bi-rulers"></i>
+
                         <strong>Depth:</strong>
 
                         {% if quake.depth != None %}
+
                             {{ quake.depth|floatformat:1 }} km
+
                         {% else %}
+
                             Not Available
+
                         {% endif %}
+
                     </div>
 
 
@@ -578,15 +838,29 @@
 
                             <div class="col-6">
                                 <small>Latitude</small>
+
                                 <strong>
-                                    {{ quake.latitude|floatformat:4 }}
+
+                                    {% if quake.latitude != None %}
+                                        {{ quake.latitude|floatformat:4 }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+
                                 </strong>
                             </div>
 
                             <div class="col-6">
                                 <small>Longitude</small>
+
                                 <strong>
-                                    {{ quake.longitude|floatformat:4 }}
+
+                                    {% if quake.longitude != None %}
+                                        {{ quake.longitude|floatformat:4 }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+
                                 </strong>
                             </div>
 
@@ -597,8 +871,11 @@
 
                     <!-- STATUS -->
                     <p class="small text-muted mb-3">
+
                         <strong>Record Status:</strong>
+
                         {{ quake.status|default:"Not available"|title }}
+
                     </p>
 
 
@@ -612,9 +889,12 @@
                             class="btn btn-outline-primary show-on-map"
                             data-id="{{ forloop.counter0 }}"
                         >
+
                             <i class="bi bi-map me-2"></i>
                             Show on Map
+
                         </button>
+
 
                         <a
                             href="https://www.google.com/maps/search/?api=1&amp;query={{ quake.latitude|unlocalize }},{{ quake.longitude|unlocalize }}"
@@ -622,11 +902,15 @@
                             target="_blank"
                             rel="noopener noreferrer"
                         >
+
                             <i class="bi bi-geo-alt me-2"></i>
+
                             View Location on Google Maps
+
                         </a>
 
                         {% endif %}
+
 
                         {% if quake.url %}
 
@@ -636,8 +920,11 @@
                             target="_blank"
                             rel="noopener noreferrer"
                         >
+
                             <i class="bi bi-info-circle me-2"></i>
+
                             View USGS Details
+
                         </a>
 
                         {% endif %}
@@ -655,7 +942,14 @@
         {% else %}
 
         <div class="alert alert-secondary">
-            No matching earthquake records were found.
+
+            <i class="bi bi-info-circle me-2"></i>
+
+            No earthquakes match the selected
+            reporting period and magnitude.
+
+            Try a longer period or lower magnitude.
+
         </div>
 
         {% endif %}
@@ -667,21 +961,35 @@
     <div class="source-card">
 
         <strong class="text-dark">
+
             <i class="bi bi-database text-primary me-2"></i>
+
             Data Source:
+
         </strong>
 
-        <a href="https://earthquake.usgs.gov/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a
+            href="https://earthquake.usgs.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
             USGS Earthquake Hazards Program
         </a>
 
+
         <p class="mt-2 mb-0">
-            Reports may be revised by USGS.
-            The earthquake markers use coordinates
-            supplied by the USGS Earthquake API.
-            The background map is provided by OpenFreeMap.
+
+            Earthquake records may be revised by USGS.
+
+            Results are limited to 50 recent matching
+            events for the Philippines and nearby waters.
+
+            The interactive map uses USGS epicenter
+            coordinates and OpenFreeMap background data.
+
+            These records do not replace
+            PHIVOLCS emergency bulletins.
+
         </p>
 
     </div>
@@ -694,8 +1002,8 @@
 
 
 {% block extra_js %}
-<script type="module">
 
+<script type="module">
 (async function () {
     "use strict";
 
@@ -723,9 +1031,10 @@
         return;
     }
 
-    // =====================================
-    // ERROR DISPLAY
-    // =====================================
+
+    // ======================================
+    // DISPLAY MAP ERRORS
+    // ======================================
 
     function displayError(message) {
 
@@ -735,18 +1044,18 @@
             errorText.textContent = message;
             errorBox.hidden = false;
         }
-
     }
 
-    // =====================================
+
+    // ======================================
     // LOAD MAPLIBRE
-    // =====================================
+    // USE THE WORKING VERSION
+    // ======================================
 
     let maplibregl;
 
     try {
 
-        // First CDN
         maplibregl = await import(
             "https://cdn.jsdelivr.net/npm/maplibre-gl@6.16.0/dist/maplibre-gl.mjs"
         );
@@ -754,13 +1063,12 @@
     } catch (firstError) {
 
         console.warn(
-            "First MapLibre CDN failed:",
+            "First CDN failed:",
             firstError
         );
 
         try {
 
-            // Second CDN
             maplibregl = await import(
                 "https://unpkg.com/maplibre-gl@6.16.0/dist/maplibre-gl.mjs"
             );
@@ -768,14 +1076,12 @@
         } catch (secondError) {
 
             displayError(
-                "MapLibre could not be downloaded. " +
-                "Check your internet connection or browser extensions."
+                "Unable to load the mapping library. " +
+                "Please check your internet connection."
             );
 
             return;
-
         }
-
     }
 
     if (typeof maplibregl.Map !== "function") {
@@ -785,12 +1091,12 @@
         );
 
         return;
-
     }
 
-    // =====================================
-    // READ EARTHQUAKE RECORDS
-    // =====================================
+
+    // ======================================
+    // READ USGS DATA
+    // ======================================
 
     const events = [];
 
@@ -813,47 +1119,35 @@
         }
 
         events.push({
-
             id: item.dataset.id,
-
             lat: lat,
             lng: lng,
             mag: mag,
-
             place: item.dataset.place || "Unknown location",
-
             depth: item.dataset.depth
                 ? Number(item.dataset.depth)
                 : null,
-
             date: item.dataset.date || "N/A",
-            time: item.dataset.time || "N/A"
-
+            time: item.dataset.time || "N/A",
+            url: item.dataset.url || "",
         });
-
     });
 
-    // =====================================
-    // MAP INITIALIZATION
-    // =====================================
+
+    // ======================================
+    // INITIALIZE MAP
+    // ======================================
 
     let map;
 
     try {
 
         map = new maplibregl.Map({
-
             container: mapElement,
-
-            style:
-                "https://tiles.openfreemap.org/styles/liberty",
-
+            style: "https://tiles.openfreemap.org/styles/liberty",
             center: [121.774, 12.8797],
-
             zoom: 5,
-
             attributionControl: true
-
         });
 
         map.addControl(
@@ -866,46 +1160,42 @@
         console.error(error);
 
         displayError(
-            "Map could not initialize. " +
-            "Enable hardware acceleration in Chrome " +
-            "and check that WebGL2 is available."
+            "Map initialization failed. " +
+            "Check browser WebGL support."
         );
 
         return;
-
     }
 
-    // =====================================
-    // MAP BACKGROUND ERRORS
-    // =====================================
 
     map.on("error", function (event) {
 
-        console.warn("Map provider error:", event.error);
+        console.warn(
+            "Map provider error:",
+            event.error
+        );
 
         if (!map.isStyleLoaded()) {
 
             displayError(
                 "The map background could not load. " +
-                "USGS reports and Google Maps links " +
-                "are still available below."
+                "USGS reports are still available below."
             );
-
         }
-
     });
+
 
     map.on("load", function () {
 
         if (errorBox) {
             errorBox.hidden = true;
         }
-
     });
 
-    // =====================================
-    // MARKER COLORS
-    // =====================================
+
+    // ======================================
+    // MAGNITUDE COLOR
+    // ======================================
 
     function getColor(magnitude) {
 
@@ -918,12 +1208,12 @@
         }
 
         return "#1769c2";
-
     }
 
-    // =====================================
-    // BUILD SAFE POPUP
-    // =====================================
+
+    // ======================================
+    // CREATE SAFE POPUP
+    // ======================================
 
     function makePopup(eventData) {
 
@@ -932,15 +1222,18 @@
 
         const title = document.createElement("h3");
 
-        title.textContent =
-            "Magnitude " + eventData.mag.toFixed(1);
+        title.textContent = (
+            "Magnitude " + eventData.mag.toFixed(1)
+        );
 
         box.appendChild(title);
+
 
         const place = document.createElement("p");
         place.textContent = eventData.place;
 
         box.appendChild(place);
+
 
         const details = document.createElement("p");
 
@@ -951,39 +1244,65 @@
             ? eventData.depth.toFixed(1) + " km"
             : "Not Available";
 
-        details.textContent =
+        details.textContent = (
             "Date: " + eventData.date + "\n" +
             "Time: " + eventData.time + " PHT\n" +
-            "Depth: " + depthText;
+            "Depth: " + depthText
+        );
 
         details.style.whiteSpace = "pre-line";
 
         box.appendChild(details);
 
+
+        // Google Maps
         const mapsLink = document.createElement("a");
 
         mapsLink.className = "popup-link";
 
-        mapsLink.href =
+        mapsLink.href = (
             "https://www.google.com/maps/search/?api=1&query=" +
             encodeURIComponent(
                 eventData.lat + "," + eventData.lng
-            );
+            )
+        );
 
         mapsLink.target = "_blank";
         mapsLink.rel = "noopener noreferrer";
-
         mapsLink.textContent = "View on Google Maps";
 
         box.appendChild(mapsLink);
 
-        return box;
 
+        // USGS details
+        if (
+            eventData.url &&
+            /^https:\/\/earthquake\.usgs\.gov\//.test(
+                eventData.url
+            )
+        ) {
+
+            const usgsLink = document.createElement("a");
+
+            usgsLink.href = eventData.url;
+            usgsLink.target = "_blank";
+            usgsLink.rel = "noopener noreferrer";
+
+            usgsLink.textContent = "View USGS Details";
+            usgsLink.style.display = "block";
+            usgsLink.style.textAlign = "center";
+            usgsLink.style.marginTop = "10px";
+
+            box.appendChild(usgsLink);
+        }
+
+        return box;
     }
 
-    // =====================================
-    // PLOT EARTHQUAKE MARKERS
-    // =====================================
+
+    // ======================================
+    // ADD EARTHQUAKE MARKERS
+    // ======================================
 
     const markers = new Map();
 
@@ -994,7 +1313,6 @@
         const pin = document.createElement("button");
 
         pin.type = "button";
-
         pin.className = "eq-pin";
 
         pin.style.backgroundColor = getColor(
@@ -1009,26 +1327,26 @@
             " earthquake near " + eventData.place
         );
 
+
         const popup = new maplibregl.Popup({
-
             offset: 24,
-
             maxWidth: "290px"
-
         }).setDOMContent(
             makePopup(eventData)
         );
 
+
         const marker = new maplibregl.Marker({
-
             element: pin,
-
             anchor: "center"
-
         })
-        .setLngLat([eventData.lng, eventData.lat])
+        .setLngLat([
+            eventData.lng,
+            eventData.lat
+        ])
         .setPopup(popup)
         .addTo(map);
+
 
         markers.set(eventData.id, marker);
 
@@ -1036,93 +1354,89 @@
             eventData.lng,
             eventData.lat
         ]);
-
     });
 
+
     if (countElement) {
-
         countElement.textContent = markers.size;
-
     }
 
-    // =====================================
-    // ZOOM TO EARTHQUAKES
-    // =====================================
+
+    // ======================================
+    // ZOOM TO MATCHING EARTHQUAKES
+    // ======================================
 
     if (markers.size > 1) {
 
         map.fitBounds(bounds, {
-
             padding: 50,
-
             maxZoom: 8,
-
             duration: 0
-
         });
 
     } else if (markers.size === 1) {
 
         map.jumpTo({
-
             center: bounds.getCenter(),
-
             zoom: 7
-
         });
-
     }
 
-    // =====================================
-    // SHOW ON MAP BUTTONS
-    // =====================================
+
+    // ======================================
+    // SHOW ON MAP BUTTON
+    // ======================================
 
     document.querySelectorAll(
         ".show-on-map"
     ).forEach(function (button) {
 
-        button.addEventListener("click", function () {
+        button.addEventListener(
+            "click",
+            function () {
 
-            const marker = markers.get(
-                button.dataset.id
-            );
+                const marker = markers.get(
+                    button.dataset.id
+                );
 
-            if (!marker) {
-                return;
+                if (!marker) {
+                    return;
+                }
+
+                document.getElementById(
+                    "mapSection"
+                ).scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                map.flyTo({
+                    center: marker.getLngLat(),
+                    zoom: Math.max(
+                        map.getZoom(),
+                        7
+                    )
+                });
+
+
+                const popup = marker.getPopup();
+
+                if (popup && !popup.isOpen()) {
+                    marker.togglePopup();
+                }
             }
-
-            document.getElementById(
-                "mapSection"
-            ).scrollIntoView({
-
-                behavior: "smooth",
-
-                block: "center"
-
-            });
-
-            map.flyTo({
-
-                center: marker.getLngLat(),
-
-                zoom: Math.max(map.getZoom(), 7)
-
-            });
-
-            const popup = marker.getPopup();
-
-            if (popup && !popup.isOpen()) {
-                marker.togglePopup();
-            }
-
-        });
-
+        );
     });
 
-    window.addEventListener("resize", function () {
-        map.resize();
-    });
+
+    window.addEventListener(
+        "resize",
+        function () {
+            map.resize();
+        }
+    );
 
 })();
 </script>
+
 {% endblock %}

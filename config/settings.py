@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 load_dotenv(BASE_DIR / ".env")
 
 
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # SkyAware PH Applications
     "accounts",
     "dashboard",
     "weather",
@@ -74,8 +76,25 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
+    # ======================================
+    # SKYAWARE PH ROLE-BASED ACCESS
+    # ======================================
+
+    # Admin -> Custom Admin Dashboard
+    # User  -> Regular Weather Dashboard
+    #
+    # Prevents administrators from opening
+    # regular-user pages, and regular users
+    # from accessing administrative pages.
+
+    "config.role_middleware.SeparateAdminInterfaceMiddleware",
 ]
 
+
+# ==========================================
+# ROOT URL CONFIGURATION
+# ==========================================
 
 ROOT_URLCONF = "config.urls"
 
@@ -87,8 +106,13 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+
+        "DIRS": [
+            BASE_DIR / "templates"
+        ],
+
         "APP_DIRS": True,
+
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -100,6 +124,10 @@ TEMPLATES = [
     },
 ]
 
+
+# ==========================================
+# WSGI APPLICATION
+# ==========================================
 
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -153,8 +181,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # ==========================================
 
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "Asia/Manila"
+
 USE_I18N = True
+
 USE_TZ = True
 
 
@@ -163,6 +194,7 @@ USE_TZ = True
 # ==========================================
 
 STATIC_URL = "static/"
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = (
@@ -177,9 +209,19 @@ STATICFILES_DIRS = (
 # ==========================================
 
 LOGIN_URL = "login"
+
+# Regular users go to the Weather Dashboard.
+# The role middleware redirects Admin accounts
+# to the separate Admin Dashboard.
 LOGIN_REDIRECT_URL = "dashboard"
+
+# After logout, return to the public homepage.
 LOGOUT_REDIRECT_URL = "home"
 
+
+# ==========================================
+# DEFAULT PRIMARY KEY
+# ==========================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

@@ -1,47 +1,294 @@
 
 {% extends 'base.html' %}
 
+{% block title %}Login | SkyAware PH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-section {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 0 48px;
+    }
+
+    .login-card {
+        background: #fff;
+        width: 100%;
+        max-width: 500px;
+        padding: 38px;
+        border: 1px solid #e5ebf3;
+        border-radius: 22px;
+        box-shadow: 0 12px 38px rgba(16,47,84,.07);
+    }
+
+    .login-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: #1769c2;
+        font-size: 28px;
+    }
+
+    .login-title {
+        font-size: 29px;
+        font-weight: 800;
+        color: #102f54;
+    }
+
+    .login-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .login-card .form-label {
+        font-size: 14px;
+        color: #334155;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .login-card .form-control {
+        min-height: 48px;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 14px;
+        border-color: #d7e1ed;
+    }
+
+    .login-card .form-control:focus {
+        border-color: #1769c2;
+        box-shadow: 0 0 0 4px rgba(23,105,194,.11);
+    }
+
+    .login-card .password-wrap {
+        position: relative;
+    }
+
+    .login-card .password-wrap input {
+        padding-right: 49px;
+    }
+
+    .login-card .password-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        color: #64748b;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .login-card .password-toggle:hover {
+        background: #edf5ff;
+        color: #1769c2;
+    }
+
+    .login-card .login-button {
+        min-height: 48px;
+        font-weight: 700;
+        border-radius: 10px;
+    }
+
+    .login-footer {
+        color: #64748b;
+        font-size: 14px;
+        text-align: center;
+        margin-top: 22px;
+    }
+
+    .login-footer a {
+        color: #1769c2;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @media (max-width: 575px) {
+        .login-card {
+            padding: 28px 21px;
+        }
+
+        .login-title {
+            font-size: 25px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h3 class="fw-bold text-center mb-4">
-                    Login
-                </h3>
 
-                <form method="POST">
-                    {% csrf_token %}
+<section class="login-section">
 
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            Invalid username or password.
-                        </div>
-                    {% endif %}
+    <div class="login-card">
 
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username"
-                               class="form-control" required>
-                    </div>
+        <!-- HEADER -->
+        <div class="text-center mb-4">
 
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password"
-                               class="form-control" required>
-                    </div>
-
-                    <button class="btn btn-primary w-100">
-                        Login
-                    </button>
-                </form>
-
-                <p class="text-center mt-3">
-                    Don't have an account?
-                    <a href="{% url 'register' %}">Register</a>
-                </p>
+            <div class="login-icon">
+                <i class="bi bi-person-lock"></i>
             </div>
+
+            <h1 class="login-title">
+                Welcome Back
+            </h1>
+
+            <p class="login-subtitle mb-0">
+                Sign in to your SkyAware PH account
+                to access your dashboard and saved locations.
+            </p>
+
         </div>
+
+        <!-- LOGIN FORM -->
+        <form method="post" novalidate>
+
+            {% csrf_token %}
+
+            {% if form.errors %}
+
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                Invalid username or password.
+                Please try again.
+            </div>
+
+            {% endif %}
+
+            <div class="mb-3">
+
+                <label
+                    for="loginUsername"
+                    class="form-label"
+                >
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="loginUsername"
+                    class="form-control"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    value="{{ form.username.value|default_if_none:'' }}"
+                    maxlength="150"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+            <div class="mb-4">
+
+                <label
+                    for="loginPassword"
+                    class="form-label"
+                >
+                    Password
+                </label>
+
+                <div class="password-wrap">
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="loginPassword"
+                        class="form-control"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+            {% if next %}
+            <input
+                type="hidden"
+                name="next"
+                value="{{ next }}"
+            >
+            {% endif %}
+
+            <button
+                type="submit"
+                class="btn btn-primary login-button w-100"
+            >
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="login-footer">
+
+            Don't have an account?
+
+            <a href="{% url 'register' %}">
+                Create Account
+            </a>
+
+        </div>
+
+        
+
     </div>
-</div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const toggleButton = document.getElementById(
+        "passwordToggle"
+    );
+
+    const passwordInput = document.getElementById(
+        "loginPassword"
+    );
+
+    toggleButton.addEventListener("click", function () {
+
+        const show = passwordInput.type === "password";
+
+        passwordInput.type = show ? "text" : "password";
+
+        toggleButton.querySelector("i").className = show
+            ? "bi bi-eye-slash"
+            : "bi bi-eye";
+
+        toggleButton.setAttribute(
+            "aria-label",
+            show ? "Hide password" : "Show password"
+        );
+
+        toggleButton.setAttribute(
+            "aria-pressed",
+            show ? "true" : "false"
+        );
+
+    });
+</script>
 {% endblock %}

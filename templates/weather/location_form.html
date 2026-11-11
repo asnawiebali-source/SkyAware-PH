@@ -1,49 +1,630 @@
 
 {% extends 'base.html' %}
 
+{% block title %}{{ title }} | SkyAware PH{% endblock %}
+
+{% block extra_css %}
+<style>
+    .location-form-page {
+        max-width: 650px;
+        margin: 20px auto 50px;
+    }
+
+    .location-form-card {
+        background: #fff;
+        border: 1px solid #e5ebf3;
+        border-radius: 20px;
+        padding: 34px;
+        box-shadow: 0 12px 35px rgba(16,47,84,.06);
+    }
+
+    .location-form-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e9f3ff;
+        color: #1769c2;
+        border-radius: 15px;
+        font-size: 25px;
+        margin-bottom: 18px;
+    }
+
+    .location-form-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #102f54;
+        margin-bottom: 8px;
+    }
+
+    .location-form-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 26px;
+    }
+
+    .location-form-card .form-label {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .location-form-card .form-control {
+        min-height: 47px;
+        border-radius: 10px;
+        border: 1px solid #d7e1ed;
+        padding: 11px 14px;
+        font-size: 14px;
+    }
+
+    .location-form-card .form-control:focus {
+        border-color: #1769c2;
+        box-shadow: 0 0 0 4px rgba(23,105,194,.10);
+    }
+
+    .location-form-card .form-control[readonly] {
+        background: #f3f6fb;
+        color: #475569;
+    }
+
+    .field-help {
+        font-size: 12px;
+        color: #8492a6;
+        line-height: 1.65;
+        margin-top: 7px;
+    }
+
+    .field-error {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .popular-cities {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 12px 0 25px;
+    }
+
+    .popular-city {
+        background: #eef6ff;
+        color: #1769c2;
+        border: 1px solid #d4e8ff;
+        border-radius: 20px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .popular-city:hover,
+    .popular-city:focus {
+        background: #1769c2;
+        color: #fff;
+    }
+
+    .location-form-divider {
+        height: 1px;
+        background: #e8edf4;
+        margin: 24px 0;
+    }
+
+    .location-form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .location-form-actions .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .location-form-note {
+        background: #f3f8ff;
+        border: 1px solid #dcecff;
+        padding: 13px 15px;
+        border-radius: 10px;
+        font-size: 12px;
+        line-height: 1.7;
+        color: #46678a;
+        margin-top: 22px;
+    }
+
+    @media (max-width: 575px) {
+        .location-form-page {
+            margin-top: 0;
+        }
+
+        .location-form-card {
+            padding: 25px 20px;
+        }
+
+        .location-form-title {
+            font-size: 23px;
+        }
+
+        .location-form-actions .btn {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="location-form-page">
 
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
+    <div class="location-form-card">
 
-                <h3 class="fw-bold mb-4">{{ title }}</h3>
+        <!-- HEADER -->
+        <div class="location-form-icon">
+            <i class="bi bi-geo-alt-fill"></i>
+        </div>
 
-                <form method="POST">
-                    {% csrf_token %}
+        <h1 class="location-form-title">
+            {{ title }}
+        </h1>
 
-                    {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label">
-                            {{ field.label }}
-                        </label>
+        <p class="location-form-subtitle">
+            Choose a Philippine city or municipality to
+            quickly access its weather forecast and
+            air quality information.
+        </p>
 
-                        {{ field }}
 
-                        {% for error in field.errors %}
-                        <div class="text-danger small">
-                            {{ error }}
-                        </div>
-                        {% endfor %}
+        <!-- LOCATION FORM -->
+        <form method="post" id="locationForm">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+
+            <!-- CITY -->
+            <div class="mb-3">
+
+                <label
+                    for="{{ form.city.id_for_label }}"
+                    class="form-label"
+                >
+                    City / Municipality
+                    <span class="text-danger">*</span>
+                </label>
+
+                {{ form.city }}
+
+                <datalist id="philippineCityList">
+
+                    <!-- NORTHERN MINDANAO -->
+                    <option value="Iligan City" data-province="Lanao del Norte"></option>
+                    <option value="Cagayan de Oro" data-province="Misamis Oriental"></option>
+                    <option value="Marawi City" data-province="Lanao del Sur"></option>
+                    <option value="Ozamiz City" data-province="Misamis Occidental"></option>
+                    <option value="Oroquieta City" data-province="Misamis Occidental"></option>
+                    <option value="Tangub City" data-province="Misamis Occidental"></option>
+                    <option value="Gingoog City" data-province="Misamis Oriental"></option>
+                    <option value="Malaybalay City" data-province="Bukidnon"></option>
+                    <option value="Valencia City" data-province="Bukidnon"></option>
+                    <option value="El Salvador City" data-province="Misamis Oriental"></option>
+
+                    <!-- CARAGA -->
+                    <option value="Butuan City" data-province="Agusan del Norte"></option>
+                    <option value="Surigao City" data-province="Surigao del Norte"></option>
+                    <option value="Tandag City" data-province="Surigao del Sur"></option>
+                    <option value="Bislig City" data-province="Surigao del Sur"></option>
+                    <option value="Bayugan City" data-province="Agusan del Sur"></option>
+                    <option value="Cabadbaran City" data-province="Agusan del Norte"></option>
+
+                    <!-- DAVAO REGION -->
+                    <option value="Davao City" data-province="Davao del Sur"></option>
+                    <option value="Tagum City" data-province="Davao del Norte"></option>
+                    <option value="Panabo City" data-province="Davao del Norte"></option>
+                    <option value="Digos City" data-province="Davao del Sur"></option>
+                    <option value="Mati City" data-province="Davao Oriental"></option>
+                    <option value="Samal City" data-province="Davao del Norte"></option>
+
+                    <!-- SOCCSKSARGEN -->
+                    <option value="General Santos City" data-province="South Cotabato"></option>
+                    <option value="Koronadal City" data-province="South Cotabato"></option>
+                    <option value="Kidapawan City" data-province="Cotabato"></option>
+                    <option value="Tacurong City" data-province="Sultan Kudarat"></option>
+
+                    <!-- ZAMBOANGA PENINSULA -->
+                    <option value="Zamboanga City" data-province="Zamboanga del Sur"></option>
+                    <option value="Pagadian City" data-province="Zamboanga del Sur"></option>
+                    <option value="Dipolog City" data-province="Zamboanga del Norte"></option>
+                    <option value="Dapitan City" data-province="Zamboanga del Norte"></option>
+
+                    <!-- BARMM -->
+                    <option value="Cotabato City" data-province="Maguindanao del Norte"></option>
+                    <option value="Lamitan City" data-province="Basilan"></option>
+                    <option value="Isabela City" data-province="Basilan"></option>
+
+                    <!-- CENTRAL VISAYAS -->
+                    <option value="Cebu City" data-province="Cebu"></option>
+                    <option value="Mandaue City" data-province="Cebu"></option>
+                    <option value="Lapu-Lapu City" data-province="Cebu"></option>
+                    <option value="Talisay City" data-province="Cebu"></option>
+                    <option value="Carcar City" data-province="Cebu"></option>
+                    <option value="Toledo City" data-province="Cebu"></option>
+                    <option value="Danao City" data-province="Cebu"></option>
+                    <option value="Tagbilaran City" data-province="Bohol"></option>
+                    <option value="Dumaguete City" data-province="Negros Oriental"></option>
+
+                    <!-- WESTERN VISAYAS -->
+                    <option value="Bacolod City" data-province="Negros Occidental"></option>
+                    <option value="Silay City" data-province="Negros Occidental"></option>
+                    <option value="Iloilo City" data-province="Iloilo"></option>
+                    <option value="Passi City" data-province="Iloilo"></option>
+                    <option value="Roxas City" data-province="Capiz"></option>
+                    <option value="Kabankalan City" data-province="Negros Occidental"></option>
+
+                    <!-- EASTERN VISAYAS -->
+                    <option value="Tacloban City" data-province="Leyte"></option>
+                    <option value="Ormoc City" data-province="Leyte"></option>
+                    <option value="Calbayog City" data-province="Samar"></option>
+                    <option value="Catbalogan City" data-province="Samar"></option>
+                    <option value="Borongan City" data-province="Eastern Samar"></option>
+                    <option value="Maasin City" data-province="Southern Leyte"></option>
+
+                    <!-- METRO MANILA -->
+                    <option value="Manila" data-province="Metro Manila"></option>
+                    <option value="Quezon City" data-province="Metro Manila"></option>
+                    <option value="Makati City" data-province="Metro Manila"></option>
+                    <option value="Pasig City" data-province="Metro Manila"></option>
+                    <option value="Taguig City" data-province="Metro Manila"></option>
+                    <option value="Pasay City" data-province="Metro Manila"></option>
+                    <option value="Caloocan City" data-province="Metro Manila"></option>
+                    <option value="Mandaluyong City" data-province="Metro Manila"></option>
+                    <option value="Marikina City" data-province="Metro Manila"></option>
+                    <option value="Muntinlupa City" data-province="Metro Manila"></option>
+                    <option value="Parañaque City" data-province="Metro Manila"></option>
+                    <option value="Las Piñas City" data-province="Metro Manila"></option>
+                    <option value="Valenzuela City" data-province="Metro Manila"></option>
+                    <option value="San Juan City" data-province="Metro Manila"></option>
+
+                    <!-- NORTHERN LUZON -->
+                    <option value="Baguio City" data-province="Benguet"></option>
+                    <option value="Laoag City" data-province="Ilocos Norte"></option>
+                    <option value="Vigan City" data-province="Ilocos Sur"></option>
+                    <option value="Dagupan City" data-province="Pangasinan"></option>
+                    <option value="Tuguegarao City" data-province="Cagayan"></option>
+                    <option value="Santiago City" data-province="Isabela"></option>
+                    <option value="Ilagan City" data-province="Isabela"></option>
+
+                    <!-- CENTRAL LUZON -->
+                    <option value="Olongapo City" data-province="Zambales"></option>
+                    <option value="Angeles City" data-province="Pampanga"></option>
+                    <option value="Tarlac City" data-province="Tarlac"></option>
+                    <option value="Cabanatuan City" data-province="Nueva Ecija"></option>
+                    <option value="Malolos City" data-province="Bulacan"></option>
+
+                    <!-- CALABARZON -->
+                    <option value="Antipolo City" data-province="Rizal"></option>
+                    <option value="Calamba City" data-province="Laguna"></option>
+                    <option value="Santa Rosa City" data-province="Laguna"></option>
+                    <option value="San Pablo City" data-province="Laguna"></option>
+                    <option value="Batangas City" data-province="Batangas"></option>
+                    <option value="Lipa City" data-province="Batangas"></option>
+                    <option value="Lucena City" data-province="Quezon"></option>
+
+                    <!-- BICOL -->
+                    <option value="Legazpi City" data-province="Albay"></option>
+                    <option value="Naga City" data-province="Camarines Sur"></option>
+                    <option value="Iriga City" data-province="Camarines Sur"></option>
+                    <option value="Sorsogon City" data-province="Sorsogon"></option>
+
+                    <!-- MIMAROPA -->
+                    <option value="Puerto Princesa City" data-province="Palawan"></option>
+                    <option value="Calapan City" data-province="Oriental Mindoro"></option>
+
+                </datalist>
+
+                <div class="field-help">
+                    Start typing to see suggested cities,
+                    or select a popular city below.
+                </div>
+
+                {% for error in form.city.errors %}
+                    <div class="field-error">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        {{ error }}
                     </div>
-                    {% endfor %}
-
-                    <button type="submit" class="btn btn-primary">
-                        Save Location
-                    </button>
-
-                    <a href="{% url 'saved_locations' %}"
-                       class="btn btn-secondary">
-                        Cancel
-                    </a>
-                </form>
+                {% endfor %}
 
             </div>
+
+
+            <!-- POPULAR CITIES -->
+            <div>
+
+                <label class="form-label">
+                    Quick Select
+                </label>
+
+                <div class="popular-cities">
+
+                    <button
+                        type="button"
+                        class="popular-city"
+                        data-city="Iligan City"
+                    >
+                        Iligan City
+                    </button>
+
+                    <button
+                        type="button"
+                        class="popular-city"
+                        data-city="Cagayan de Oro"
+                    >
+                        Cagayan de Oro
+                    </button>
+
+                    <button
+                        type="button"
+                        class="popular-city"
+                        data-city="Davao City"
+                    >
+                        Davao City
+                    </button>
+
+                    <button
+                        type="button"
+                        class="popular-city"
+                        data-city="Cebu City"
+                    >
+                        Cebu City
+                    </button>
+
+                    <button
+                        type="button"
+                        class="popular-city"
+                        data-city="Manila"
+                    >
+                        Manila
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROVINCE -->
+            <div class="mb-4">
+
+                <label
+                    for="{{ form.province.id_for_label }}"
+                    class="form-label"
+                >
+                    Province / Area
+                </label>
+
+                {{ form.province }}
+
+                <div class="field-help">
+                    Filled automatically for suggested cities.
+                    For other municipalities, you may enter
+                    the province yourself.
+                </div>
+
+                {% for error in form.province.errors %}
+                    <div class="field-error">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+            <!-- COUNTRY -->
+            <div class="mb-3">
+
+                <label
+                    for="{{ form.country.id_for_label }}"
+                    class="form-label"
+                >
+                    Country
+                </label>
+
+                {{ form.country }}
+
+                {% for error in form.country.errors %}
+                    <div class="field-error">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+            <div class="location-form-divider"></div>
+
+
+            <!-- BUTTONS -->
+            <div class="location-form-actions">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    <i class="bi bi-check-circle me-2"></i>
+                    Save Location
+                </button>
+
+                <a
+                    href="{% url 'saved_locations' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+
+        <!-- INFO -->
+        <div class="location-form-note">
+
+            <i class="bi bi-info-circle me-2"></i>
+
+            Saved locations allow you to quickly open
+            weather forecasts and air quality information
+            without searching for the same city again.
+
         </div>
 
     </div>
+
 </div>
 
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function () {
+    "use strict";
+
+    const cityInput = document.getElementById(
+        "id_city"
+    );
+
+    const provinceInput = document.getElementById(
+        "id_province"
+    );
+
+    const countryInput = document.getElementById(
+        "id_country"
+    );
+
+    const cityList = document.getElementById(
+        "philippineCityList"
+    );
+
+    if (
+        !cityInput ||
+        !provinceInput ||
+        !countryInput ||
+        !cityList
+    ) {
+        return;
+    }
+
+    // Get predefined city/province combinations.
+    const cities = Array.from(
+        cityList.querySelectorAll("option")
+    ).map(function (option) {
+
+        return {
+            city: option.value,
+            province: option.dataset.province || ""
+        };
+
+    });
+
+    let lastAutomaticProvince = null;
+
+    // Search for an exact city in the local list.
+    function findCity(name) {
+
+        const searched = name.trim().toLowerCase();
+
+        return cities.find(function (item) {
+
+            return item.city.toLowerCase() === searched;
+
+        });
+
+    }
+
+    // Auto-populate province and country.
+    function updateLocation() {
+
+        const selected = findCity(
+            cityInput.value
+        );
+
+        if (selected) {
+
+            cityInput.value = selected.city;
+
+            provinceInput.value = selected.province;
+
+            countryInput.value = "Philippines";
+
+            lastAutomaticProvince = selected.province;
+
+        } else {
+
+            if (
+                lastAutomaticProvince !== null &&
+                provinceInput.value === lastAutomaticProvince
+            ) {
+                provinceInput.value = "";
+            }
+
+            lastAutomaticProvince = null;
+
+            countryInput.value = "Philippines";
+
+        }
+
+    }
+
+    // Selecting a datalist suggestion.
+    cityInput.addEventListener(
+        "input",
+        updateLocation
+    );
+
+    cityInput.addEventListener(
+        "change",
+        updateLocation
+    );
+
+    // Quick Select buttons.
+    document.querySelectorAll(
+        ".popular-city"
+    ).forEach(function (button) {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                cityInput.value = button.dataset.city;
+
+                updateLocation();
+
+                cityInput.focus();
+
+            }
+        );
+
+    });
+
+    // Country is always Philippines.
+    if (!countryInput.value.trim()) {
+        countryInput.value = "Philippines";
+    }
+
+})();
+</script>
 {% endblock %}

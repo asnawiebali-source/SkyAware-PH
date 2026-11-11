@@ -1,0 +1,550 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}SkyAware PH Admin{% endblock %}</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root {
+            --navy: #10243f;
+            --blue: #1769c2;
+            --background: #f3f6fb;
+            --heading: #17385d;
+            --muted: #64748b;
+            --sidebar-width: 255px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: #29394d;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        /* =====================================
+           ADMIN SIDEBAR
+        ===================================== */
+
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--navy);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            z-index: 1100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 27px 19px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .sidebar-brand:hover {
+            color: #ffffff;
+        }
+
+        .sidebar-logo {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--blue);
+            border-radius: 12px;
+            font-size: 22px;
+        }
+
+        .brand-title {
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            color: #9fb7d3;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 12px;
+        }
+
+        .sidebar-heading {
+            padding: 15px 13px 9px;
+            color: #819cbd;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #cbd7e7;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .2s, color .2s;
+        }
+
+        .sidebar-link i {
+            width: 21px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,.1);
+            color: #ffffff;
+        }
+
+        .sidebar-link.active {
+            background: var(--blue);
+            color: #ffffff;
+        }
+
+        /* =====================================
+           ADMIN PROFILE AND LOGOUT
+        ===================================== */
+
+        .sidebar-account {
+            padding: 18px 14px;
+            border-top: 1px solid rgba(255,255,255,.1);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 7px 5px 17px;
+        }
+
+        .sidebar-avatar {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #234d7c;
+            border-radius: 11px;
+            font-size: 22px;
+        }
+
+        .sidebar-username {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .sidebar-role {
+            color: #a1b8d2;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .sidebar-logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #f0b9b9;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(239,68,68,.15);
+            color: #ffffff;
+        }
+
+        /* =====================================
+           MAIN CONTENT
+        ===================================== */
+
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-main {
+            flex: 1;
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 34px;
+        }
+
+        .admin-footer {
+            background: #ffffff;
+            border-top: 1px solid #e4ebf3;
+            color: #8290a3;
+            text-align: center;
+            padding: 18px;
+            font-size: 12px;
+        }
+
+        /* =====================================
+           SHARED ADMIN COMPONENTS
+        ===================================== */
+
+        .admin-card {
+            background: #ffffff;
+            border: 1px solid #e4ebf3;
+            border-radius: 16px;
+            padding: 23px;
+            box-shadow: 0 5px 20px rgba(16,47,84,.04);
+        }
+
+        .admin-section-title {
+            color: var(--heading);
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .admin-section-subtitle {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            border-radius: 9px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .btn-primary:hover {
+            background: #10549e;
+            border-color: #10549e;
+        }
+
+        /* =====================================
+           RESPONSIVE SIDEBAR
+        ===================================== */
+
+        .admin-mobile-header,
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 991px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform .25s ease;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-content {
+                margin-left: 0;
+            }
+
+            .admin-main {
+                padding: 24px 18px;
+            }
+
+            .admin-mobile-header {
+                display: flex;
+                align-items: center;
+                gap: 13px;
+                padding: 14px 18px;
+                background: var(--navy);
+                color: white;
+            }
+
+            .admin-mobile-toggle {
+                width: 42px;
+                height: 42px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: rgba(255,255,255,.12);
+                border: 0;
+                border-radius: 9px;
+                color: white;
+                font-size: 22px;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+                position: fixed;
+                inset: 0;
+                z-index: 1090;
+                background: rgba(10,25,45,.55);
+            }
+        }
+
+        @media (max-width: 575px) {
+            .admin-main {
+                padding: 18px 12px;
+            }
+
+            .admin-card {
+                padding: 18px;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- MOBILE HEADER -->
+    <header class="admin-mobile-header">
+        <button
+            type="button"
+            id="sidebarToggle"
+            class="admin-mobile-toggle"
+            aria-controls="adminSidebar"
+            aria-expanded="false"
+            aria-label="Open admin menu"
+        >
+            <i class="bi bi-list"></i>
+        </button>
+
+        <strong>
+            <i class="bi bi-shield-check me-2"></i>
+            SkyAware PH Admin
+        </strong>
+    </header>
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        aria-hidden="true"
+    ></div>
+
+    <!-- =====================================
+         SIDEBAR
+    ===================================== -->
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <!-- BRAND -->
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="sidebar-brand"
+        >
+            <div class="sidebar-logo">
+                <i class="bi bi-shield-check"></i>
+            </div>
+
+            <div>
+                <div class="brand-title">
+                    SkyAware PH
+                </div>
+
+                <div class="brand-subtitle">
+                    Administration Portal
+                </div>
+            </div>
+        </a>
+
+        <!-- ADMIN NAVIGATION -->
+        <nav class="sidebar-nav" aria-label="Admin menu">
+
+            <div class="sidebar-heading">
+                Main Menu
+            </div>
+
+            <!-- DASHBOARD OVERVIEW -->
+            <a
+                href="{% url 'admin_dashboard' %}"
+                class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
+            >
+                <i class="bi bi-grid-1x2"></i>
+                Dashboard Overview
+            </a>
+
+            <!-- MANAGE USERS -->
+            <a
+                href="{% url 'admin_users' %}"
+                class="sidebar-link {% if request.resolver_match.url_name == 'admin_users' or request.resolver_match.url_name == 'admin_user_detail' %}active{% endif %}"
+            >
+                <i class="bi bi-people"></i>
+                Manage Users
+            </a>
+
+            <!-- API INTEGRATIONS -->
+            <a
+                href="{% url 'admin_dashboard' %}#api-integrations"
+                class="sidebar-link"
+            >
+                <i class="bi bi-hdd-network"></i>
+                API Integrations
+            </a>
+
+        </nav>
+
+        <!-- ADMIN PROFILE -->
+        <div class="sidebar-account">
+
+            <div class="sidebar-user">
+
+                <div class="sidebar-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+
+                <div>
+                    <div class="sidebar-username">
+                        {{ user.username }}
+                    </div>
+
+                    <div class="sidebar-role">
+                        Administrator
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- POST LOGOUT -->
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="sidebar-logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- =====================================
+         MAIN ADMIN AREA
+    ===================================== -->
+
+    <div class="admin-content">
+
+        <main class="admin-main">
+
+            {% if messages %}
+                {% for message in messages %}
+                <div
+                    class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ message }}
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+
+        </main>
+
+        <footer class="admin-footer">
+            © 2026 SkyAware PH — Administration Portal
+        </footer>
+
+    </div>
+
+    <!-- BOOTSTRAP JAVASCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- MOBILE MENU -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById("adminSidebar");
+            const toggle = document.getElementById("sidebarToggle");
+            const overlay = document.getElementById("sidebarOverlay");
+
+            function setSidebar(open) {
+                sidebar.classList.toggle("open", open);
+                overlay.classList.toggle("active", open);
+
+                toggle.setAttribute(
+                    "aria-expanded",
+                    String(open)
+                );
+            }
+
+            toggle.addEventListener("click", function () {
+                setSidebar(!sidebar.classList.contains("open"));
+            });
+
+            overlay.addEventListener("click", function () {
+                setSidebar(false);
+            });
+
+            sidebar.querySelectorAll(".sidebar-link").forEach(
+                function (link) {
+                    link.addEventListener("click", function () {
+                        setSidebar(false);
+                    });
+                }
+            );
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    setSidebar(false);
+                }
+            });
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

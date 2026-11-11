@@ -1,10 +1,11 @@
 
 from django.urls import path
+
 from . import views
+from .earthquake_views import earthquake_updates
 
 
 urlpatterns = [
-
     # Weather Forecast
     path(
         "forecast/",
@@ -12,10 +13,10 @@ urlpatterns = [
         name="weather_forecast"
     ),
 
-    # Earthquake Updates
+    # Earthquake Updates with filters
     path(
         "earthquakes/",
-        views.earthquake_updates,
+        earthquake_updates,
         name="earthquake_updates"
     ),
 
@@ -26,7 +27,7 @@ urlpatterns = [
         name="air_quality"
     ),
 
-    # Gemini AI Safety Assistant
+    # AI Safety Assistant
     path(
         "ai-assistant/",
         views.ai_assistant,
