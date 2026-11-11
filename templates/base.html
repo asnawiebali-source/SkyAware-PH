@@ -1,8 +1,11 @@
 
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -14,19 +17,24 @@
         {% block title %}SkyAware PH{% endblock %}
     </title>
 
-    <!-- Bootstrap CSS -->
+    <!-- BOOTSTRAP CSS -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    <!-- Bootstrap Icons -->
+    <!-- BOOTSTRAP ICONS -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet"
     >
 
     <style>
+
+        /* ======================================
+           MAIN WEBSITE THEME
+        ====================================== */
+
         :root {
             --sky-blue: #1769c2;
             --sky-navy: #102f54;
@@ -35,14 +43,19 @@
         }
 
         body {
+            margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            margin: 0;
             background: var(--sky-background);
             color: var(--sky-text);
             font-family: "Segoe UI", Arial, sans-serif;
         }
+
+
+        /* ======================================
+           NAVIGATION BAR
+        ====================================== */
 
         .navbar {
             background: var(--sky-navy);
@@ -61,17 +74,11 @@
             padding: 10px 13px !important;
             border-radius: 9px;
             font-size: 14px;
-            transition: background .2s;
         }
 
         .navbar .nav-link:hover,
         .navbar .nav-link:focus {
-            background: rgba(255,255,255,.10);
-            color: #fff !important;
-        }
-
-        .navbar .nav-link.active {
-            background: rgba(255,255,255,.12);
+            background: rgba(255,255,255,.1);
             color: #fff !important;
         }
 
@@ -96,6 +103,11 @@
             background: #e9f3ff;
             color: var(--sky-blue);
         }
+
+
+        /* ======================================
+           MAIN CONTENT
+        ====================================== */
 
         main {
             flex: 1;
@@ -124,6 +136,11 @@
             box-shadow: 0 12px 28px rgba(24,53,86,.1);
         }
 
+
+        /* ======================================
+           BUTTONS
+        ====================================== */
+
         .btn {
             border-radius: 9px;
             font-weight: 600;
@@ -139,30 +156,156 @@
             border-color: #10549e;
         }
 
+
+        /* ======================================
+           PHILIPPINE CITY AUTOCOMPLETE
+        ====================================== */
+
+        .ph-city-dropdown {
+            position: fixed;
+            z-index: 2000;
+            background: #ffffff;
+            border: 1px solid #dbe7f5;
+            border-radius: 12px;
+            padding: 7px;
+            max-height: 340px;
+            overflow-y: auto;
+            box-shadow:
+                0 12px 30px rgba(16,47,84,.15);
+            box-sizing: border-box;
+        }
+
+        .ph-city-dropdown[hidden] {
+            display: none !important;
+        }
+
+        .ph-city-dropdown-heading {
+            color: #708199;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 10px 11px 8px;
+        }
+
+        .ph-city-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 12px;
+            color: #233a56;
+            text-align: left;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .ph-city-option:hover,
+        .ph-city-option:focus,
+        .ph-city-option.active {
+            background: #e9f3ff;
+            color: #1769c2;
+            outline: none;
+        }
+
+        .ph-city-option-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            background: #f0f6ff;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .ph-city-option-name {
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .ph-city-dropdown-note {
+            margin-top: 6px;
+            padding: 10px 12px;
+            border-top: 1px solid #e9eef5;
+            color: #7b8797;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+
+        /* ======================================
+           FOOTER
+        ====================================== */
+
         footer {
-            background: #fff;
+            background: #ffffff;
             border-top: 1px solid #e5eaf0;
             font-size: 13px;
         }
 
+        footer a {
+            color: #1769c2;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ======================================
+           RESPONSIVE
+        ====================================== */
+
         @media (max-width: 991px) {
+
             .navbar-collapse {
                 padding: 15px 0;
             }
+
         }
+
+        @media (max-width: 575px) {
+
+            .navbar-brand {
+                font-size: 18px;
+            }
+
+            .ph-city-dropdown {
+                max-height: 270px;
+            }
+
+            .ph-city-option {
+                padding: 12px 10px;
+            }
+
+        }
+
     </style>
 
     {% block extra_css %}{% endblock %}
+
 </head>
+
 
 <body>
 
-    <!-- NAVIGATION -->
+    <!-- ======================================
+         NAVIGATION BAR
+    ====================================== -->
+
     <nav class="navbar navbar-expand-lg navbar-dark">
 
         <div class="container-fluid px-3 px-lg-5">
 
-            <!-- BRAND -->
+            <!-- LOGO -->
             <a
                 class="navbar-brand"
                 href="{% url 'home' %}"
@@ -170,6 +313,7 @@
                 <i class="bi bi-cloud-sun-fill me-2"></i>
                 SkyAware PH
             </a>
+
 
             <!-- MOBILE MENU -->
             <button
@@ -181,8 +325,11 @@
                 aria-expanded="false"
                 aria-label="Toggle navigation"
             >
+
                 <span class="navbar-toggler-icon"></span>
+
             </button>
+
 
             <div
                 class="collapse navbar-collapse"
@@ -191,42 +338,53 @@
 
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
 
+
                     <!-- HOME -->
                     <li class="nav-item">
+
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                            class="nav-link"
                             href="{% url 'home' %}"
                         >
                             <i class="bi bi-house me-1"></i>
                             Home
                         </a>
+
                     </li>
+
 
                     <!-- ABOUT US -->
                     <li class="nav-item">
+
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
-                            href="{% url 'about' %}"
+                            class="nav-link"
+                            href="{% url 'home' %}#about"
                         >
                             <i class="bi bi-info-circle me-1"></i>
                             About Us
                         </a>
+
                     </li>
+
 
                     {% if user.is_authenticated %}
 
+
                     <!-- DASHBOARD -->
                     <li class="nav-item">
+
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                            class="nav-link"
                             href="{% url 'dashboard' %}"
                         >
                             <i class="bi bi-grid me-1"></i>
                             Dashboard
                         </a>
+
                     </li>
 
-                    <!-- EXPLORE MENU -->
+
+                    <!-- EXPLORE -->
                     <li class="nav-item dropdown">
 
                         <a
@@ -242,7 +400,10 @@
 
                         <ul class="dropdown-menu">
 
+
+                            <!-- WEATHER -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'weather_forecast' %}"
@@ -250,9 +411,13 @@
                                     <i class="bi bi-cloud-sun me-2"></i>
                                     Weather Forecast
                                 </a>
+
                             </li>
 
+
+                            <!-- EARTHQUAKES -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'earthquake_updates' %}"
@@ -260,9 +425,13 @@
                                     <i class="bi bi-activity me-2"></i>
                                     Earthquake Updates
                                 </a>
+
                             </li>
 
+
+                            <!-- AIR QUALITY -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'air_quality' %}"
@@ -270,9 +439,13 @@
                                     <i class="bi bi-wind me-2"></i>
                                     Air Quality
                                 </a>
+
                             </li>
 
+
+                            <!-- NASA NATURAL EVENTS -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'natural_events' %}"
@@ -280,9 +453,13 @@
                                     <i class="bi bi-globe-americas me-2"></i>
                                     Natural Events
                                 </a>
+
                             </li>
 
+
+                            <!-- GROQ AI -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'ai_assistant' %}"
@@ -290,9 +467,13 @@
                                     <i class="bi bi-robot me-2"></i>
                                     AI Safety Assistant
                                 </a>
+
                             </li>
 
+
+                            <!-- SAVED LOCATIONS -->
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'saved_locations' %}"
@@ -300,15 +481,19 @@
                                     <i class="bi bi-geo-alt me-2"></i>
                                     Saved Locations
                                 </a>
+
                             </li>
 
                         </ul>
 
                     </li>
 
+
                     <!-- ADMIN -->
                     {% if user.is_staff %}
+
                     <li class="nav-item">
+
                         <a
                             class="nav-link"
                             href="{% url 'admin_dashboard' %}"
@@ -316,10 +501,13 @@
                             <i class="bi bi-speedometer2 me-1"></i>
                             Admin
                         </a>
+
                     </li>
+
                     {% endif %}
 
-                    <!-- USER MENU -->
+
+                    <!-- USER ACCOUNT -->
                     <li class="nav-item dropdown">
 
                         <a
@@ -336,23 +524,18 @@
                         <ul class="dropdown-menu dropdown-menu-lg-end">
 
                             <li>
+
                                 <span class="dropdown-item-text text-muted small">
                                     Signed in as {{ user.username }}
                                 </span>
+
                             </li>
 
-                            <li>
-                                <a
-                                    class="dropdown-item"
-                                    href="{% url 'profile' %}"
-                                >
-                                    <i class="bi bi-person-gear me-2"></i>
-                                    Profile Settings
-                                </a>
-                            </li>
 
                             {% if user.is_staff %}
+
                             <li>
+
                                 <a
                                     class="dropdown-item"
                                     href="{% url 'admin:index' %}"
@@ -360,19 +543,27 @@
                                     <i class="bi bi-gear me-2"></i>
                                     Django Admin
                                 </a>
+
                             </li>
+
                             {% endif %}
+
 
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
 
+
+                            <!-- LOGOUT -->
                             <li class="px-3 py-1">
+
                                 <form
                                     method="post"
                                     action="{% url 'logout' %}"
                                 >
+
                                     {% csrf_token %}
+
                                     <button
                                         type="submit"
                                         class="btn btn-outline-danger btn-sm w-100"
@@ -380,17 +571,22 @@
                                         <i class="bi bi-box-arrow-right me-2"></i>
                                         Logout
                                     </button>
+
                                 </form>
+
                             </li>
 
                         </ul>
 
                     </li>
 
+
                     {% else %}
+
 
                     <!-- LOGIN -->
                     <li class="nav-item">
+
                         <a
                             class="nav-link"
                             href="{% url 'login' %}"
@@ -398,35 +594,49 @@
                             <i class="bi bi-box-arrow-in-right me-1"></i>
                             Login
                         </a>
+
                     </li>
+
 
                     <!-- REGISTER -->
                     <li class="nav-item">
+
                         <a
                             class="btn btn-light btn-sm px-3"
                             href="{% url 'register' %}"
                         >
                             Register
                         </a>
+
                     </li>
+
 
                     {% endif %}
 
                 </ul>
 
             </div>
+
         </div>
+
     </nav>
 
-    <!-- DJANGO MESSAGES -->
+
+    <!-- ======================================
+         DJANGO MESSAGES
+    ====================================== -->
+
     <div class="container-fluid px-3 px-lg-5 mt-3">
 
         {% if messages %}
+
             {% for message in messages %}
+
             <div
                 class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
                 role="alert"
             >
+
                 {{ message }}
 
                 <button
@@ -435,34 +645,56 @@
                     data-bs-dismiss="alert"
                     aria-label="Close"
                 ></button>
+
             </div>
+
             {% endfor %}
+
         {% endif %}
 
     </div>
 
-    <!-- MAIN CONTENT -->
+
+    <!-- ======================================
+         MAIN PAGE CONTENT
+    ====================================== -->
+
     <main class="container-fluid px-3 px-lg-5 py-4 py-lg-5">
+
         {% block content %}{% endblock %}
+
     </main>
 
-    <!-- FOOTER -->
+
+    <!-- ======================================
+         FOOTER
+    ====================================== -->
+
     <footer class="text-center text-muted py-4">
 
         <div class="container">
 
             <p class="mb-1">
-                © 2026 SkyAware PH. All Rights Reserved.
+
+                © 2026 SkyAware PH.
+                All Rights Reserved.
+
             </p>
 
             <small>
+
                 Weather &amp; Disaster Information Portal |
                 Stay Informed. Stay Prepared.
+
             </small>
 
+
             <div class="mt-2">
+
                 <small>
+
                     Location search data ©
+
                     <a
                         href="https://www.openstreetmap.org/copyright"
                         target="_blank"
@@ -470,18 +702,85 @@
                     >
                         OpenStreetMap contributors
                     </a>
+
                     (via Nominatim).
+
                 </small>
+
+            </div>
+
+
+            <div class="mt-1">
+
+                <small>
+
+                    City suggestions based on the
+
+                    <a
+                        href="https://psa.gov.ph/classification/psgc/cities"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Philippine Standard Geographic Code
+                    </a>.
+
+                </small>
+
             </div>
 
         </div>
 
     </footer>
 
-    <!-- BOOTSTRAP JAVASCRIPT -->
+
+    <!-- ======================================
+         JAVASCRIPT
+    ====================================== -->
+
+    <!-- BOOTSTRAP -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+
+    <!-- PHILIPPINE CITY AUTOCOMPLETE -->
+    <script src="{% static 'weather/city_autocomplete.js' %}"></script>
+
+
+    <!-- ABOUT SECTION ANCHOR -->
+    <script>
+        function scrollToAboutSection() {
+
+            if (window.location.hash !== "#about") {
+                return;
+            }
+
+            const about = document.querySelector(
+                "#about, .about-section"
+            );
+
+            if (about) {
+
+                about.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+        }
+
+        window.addEventListener(
+            "hashchange",
+            scrollToAboutSection
+        );
+
+        window.addEventListener(
+            "load",
+            scrollToAboutSection
+        );
+    </script>
+
+
     {% block extra_js %}{% endblock %}
+
 </body>
 
 </html>
